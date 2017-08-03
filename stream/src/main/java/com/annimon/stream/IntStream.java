@@ -1,20 +1,52 @@
 package com.annimon.stream;
 
-import com.annimon.stream.function.*;
+import java.io.Closeable;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
+
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.IntBinaryOperator;
+import com.annimon.stream.function.IntConsumer;
+import com.annimon.stream.function.IntFunction;
+import com.annimon.stream.function.IntPredicate;
+import com.annimon.stream.function.IntSupplier;
+import com.annimon.stream.function.IntToDoubleFunction;
+import com.annimon.stream.function.IntToLongFunction;
+import com.annimon.stream.function.IntUnaryOperator;
+import com.annimon.stream.function.ObjIntConsumer;
+import com.annimon.stream.function.Supplier;
+import com.annimon.stream.function.ToIntFunction;
 import com.annimon.stream.internal.Compose;
 import com.annimon.stream.internal.Operators;
 import com.annimon.stream.internal.Params;
 import com.annimon.stream.iterator.PrimitiveIterator;
-import com.annimon.stream.operator.*;
-import java.io.Closeable;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
+import com.annimon.stream.operator.IntArray;
+import com.annimon.stream.operator.IntCodePoints;
+import com.annimon.stream.operator.IntConcat;
+import com.annimon.stream.operator.IntDropWhile;
+import com.annimon.stream.operator.IntFilter;
+import com.annimon.stream.operator.IntFlatMap;
+import com.annimon.stream.operator.IntGenerate;
+import com.annimon.stream.operator.IntIterate;
+import com.annimon.stream.operator.IntLimit;
+import com.annimon.stream.operator.IntMap;
+import com.annimon.stream.operator.IntMapToDouble;
+import com.annimon.stream.operator.IntMapToLong;
+import com.annimon.stream.operator.IntMapToObj;
+import com.annimon.stream.operator.IntPeek;
+import com.annimon.stream.operator.IntRangeClosed;
+import com.annimon.stream.operator.IntSample;
+import com.annimon.stream.operator.IntScan;
+import com.annimon.stream.operator.IntScanIdentity;
+import com.annimon.stream.operator.IntSkip;
+import com.annimon.stream.operator.IntSorted;
+import com.annimon.stream.operator.IntTakeUntil;
+import com.annimon.stream.operator.IntTakeWhile;
 
 /**
  * A sequence of primitive int-valued elements supporting sequential operations. This is the {@code int}
  * primitive specialization of {@link Stream}.
  */
-@SuppressWarnings("WeakerAccess")
 public final class IntStream implements Closeable {
 
     /**
@@ -193,8 +225,7 @@ public final class IntStream implements Closeable {
      * @throws NullPointerException if {@code op} is null
      * @since 1.1.5
      */
-    public static IntStream iterate(final int seed,
-            final IntPredicate predicate, final IntUnaryOperator op) {
+    public static IntStream iterate(final int seed, final IntPredicate predicate, final IntUnaryOperator op) {
         Objects.requireNonNull(predicate);
         return iterate(seed, op).takeWhile(predicate);
     }
@@ -219,6 +250,7 @@ public final class IntStream implements Closeable {
     public static IntStream concat(final IntStream a, final IntStream b) {
         Objects.requireNonNull(a);
         Objects.requireNonNull(b);
+        @SuppressWarnings("resource")
         IntStream result = new IntStream(new IntConcat(a.iterator, b.iterator));
         return result.onClose(Compose.closeables(a, b));
     }
@@ -325,7 +357,7 @@ public final class IntStream implements Closeable {
      *         each boxed to an {@code Integer}
      */
     public Stream<Integer> boxed() {
-        return new Stream<Integer>(params, iterator);
+        return new Stream<>(params, iterator);
     }
 
     /**
@@ -395,7 +427,7 @@ public final class IntStream implements Closeable {
      * @return the new {@code Stream}
      */
     public <R> Stream<R> mapToObj(final IntFunction<? extends R> mapper) {
-        return new Stream<R>(params, new IntMapToObj<R>(iterator, mapper));
+        return new Stream<>(params, new IntMapToObj<>(iterator, mapper));
     }
 
     /**
@@ -525,8 +557,10 @@ public final class IntStream implements Closeable {
      * @see Stream#sample(int)
      */
     public IntStream sample(final int stepWidth) {
-        if (stepWidth <= 0) throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1) return this;
+        if (stepWidth <= 0)
+            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
+        if (stepWidth == 1)
+            return this;
         return new IntStream(params, new IntSample(iterator, stepWidth));
     }
 
@@ -728,7 +762,7 @@ public final class IntStream implements Closeable {
      * @param action a non-interfering action to perform on the elements
      */
     public void forEach(IntConsumer action) {
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             action.accept(iterator.nextInt());
         }
     }
@@ -763,7 +797,7 @@ public final class IntStream implements Closeable {
      */
     public int reduce(int identity, IntBinaryOperator op) {
         int result = identity;
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             int value = iterator.nextInt();
             result = op.applyAsInt(result, value);
         }
@@ -787,10 +821,10 @@ public final class IntStream implements Closeable {
     public OptionalInt reduce(IntBinaryOperator op) {
         boolean foundAny = false;
         int result = 0;
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             int value = iterator.nextInt();
 
-            if(!foundAny) {
+            if (!foundAny) {
                 foundAny = true;
                 result = value;
             } else {
@@ -838,7 +872,7 @@ public final class IntStream implements Closeable {
      */
     public int sum() {
         int sum = 0;
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             sum += iterator.nextInt();
         }
 
@@ -890,7 +924,7 @@ public final class IntStream implements Closeable {
      */
     public long count() {
         long count = 0;
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             iterator.nextInt();
             count++;
         }
@@ -922,8 +956,8 @@ public final class IntStream implements Closeable {
      *         predicate, otherwise {@code false}
      */
     public boolean anyMatch(IntPredicate predicate) {
-        while(iterator.hasNext()) {
-            if(predicate.test(iterator.nextInt()))
+        while (iterator.hasNext()) {
+            if (predicate.test(iterator.nextInt()))
                 return true;
         }
 
@@ -955,8 +989,8 @@ public final class IntStream implements Closeable {
      *         provided predicate or the stream is empty, otherwise {@code false}
      */
     public boolean allMatch(IntPredicate predicate) {
-        while(iterator.hasNext()) {
-            if(!predicate.test(iterator.nextInt()))
+        while (iterator.hasNext()) {
+            if (!predicate.test(iterator.nextInt()))
                 return false;
         }
 
@@ -1141,7 +1175,6 @@ public final class IntStream implements Closeable {
             params.closeHandler = null;
         }
     }
-
 
     private static final ToIntFunction<Integer> UNBOX_FUNCTION = new ToIntFunction<Integer>() {
         @Override

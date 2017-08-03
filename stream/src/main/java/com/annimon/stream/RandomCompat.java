@@ -1,14 +1,14 @@
 package com.annimon.stream;
 
+import java.util.Random;
+
 import com.annimon.stream.function.DoubleSupplier;
 import com.annimon.stream.function.IntSupplier;
 import com.annimon.stream.function.LongSupplier;
-import java.util.Random;
 
 /**
  * Backported stream apis from {@link java.util.Random} class.
  */
-@SuppressWarnings("WeakerAccess")
 public final class RandomCompat {
 
     private final Random random;
@@ -60,7 +60,8 @@ public final class RandomCompat {
      *         less than zero
      */
     public IntStream ints(long streamSize) {
-        if (streamSize < 0L) throw new IllegalArgumentException();
+        if (streamSize < 0L)
+            throw new IllegalArgumentException();
         if (streamSize == 0L) {
             return IntStream.empty();
         }
@@ -81,7 +82,8 @@ public final class RandomCompat {
      *         less than zero
      */
     public LongStream longs(long streamSize) {
-        if (streamSize < 0L) throw new IllegalArgumentException();
+        if (streamSize < 0L)
+            throw new IllegalArgumentException();
         if (streamSize == 0L) {
             return LongStream.empty();
         }
@@ -102,13 +104,13 @@ public final class RandomCompat {
      *         less than zero
      */
     public DoubleStream doubles(long streamSize) {
-        if (streamSize < 0L) throw new IllegalArgumentException();
+        if (streamSize < 0L)
+            throw new IllegalArgumentException();
         if (streamSize == 0L) {
             return DoubleStream.empty();
         }
         return doubles().limit(streamSize);
     }
-
 
     /**
      * Returns an effectively unlimited stream of pseudorandom {@code int}
@@ -179,7 +181,8 @@ public final class RandomCompat {
      *         greater than or equal to {@code randomNumberBound}
      */
     public IntStream ints(long streamSize, final int randomNumberOrigin, final int randomNumberBound) {
-        if (streamSize < 0L) throw new IllegalArgumentException();
+        if (streamSize < 0L)
+            throw new IllegalArgumentException();
         if (streamSize == 0L) {
             return IntStream.empty();
         }
@@ -200,9 +203,9 @@ public final class RandomCompat {
      *         less than zero, or {@code randomNumberOrigin} is
      *         greater than or equal to {@code randomNumberBound}
      */
-    public LongStream longs(long streamSize,
-            final long randomNumberOrigin, final long randomNumberBound) {
-        if (streamSize < 0L) throw new IllegalArgumentException();
+    public LongStream longs(long streamSize, final long randomNumberOrigin, final long randomNumberBound) {
+        if (streamSize < 0L)
+            throw new IllegalArgumentException();
         if (streamSize == 0L) {
             return LongStream.empty();
         }
@@ -223,9 +226,9 @@ public final class RandomCompat {
      *         less than zero, or {@code randomNumberOrigin} is
      *         greater than or equal to {@code randomNumberBound}
      */
-    public DoubleStream doubles(long streamSize,
-            final double randomNumberOrigin, final double randomNumberBound) {
-        if (streamSize < 0L) throw new IllegalArgumentException();
+    public DoubleStream doubles(long streamSize, final double randomNumberOrigin, final double randomNumberBound) {
+        if (streamSize < 0L)
+            throw new IllegalArgumentException();
         if (streamSize == 0L) {
             return DoubleStream.empty();
         }

@@ -1,5 +1,7 @@
 package com.annimon.stream;
 
+import java.util.NoSuchElementException;
+
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.IntConsumer;
 import com.annimon.stream.function.IntFunction;
@@ -9,14 +11,12 @@ import com.annimon.stream.function.IntToDoubleFunction;
 import com.annimon.stream.function.IntToLongFunction;
 import com.annimon.stream.function.IntUnaryOperator;
 import com.annimon.stream.function.Supplier;
-import java.util.NoSuchElementException;
 
 /**
  * A container object which may or may not contain a {@code int} value.
  * If a value is present, {@code isPresent()} will return {@code true} and
  * {@code getAsInt()} will return the value.
  */
-@SuppressWarnings("WeakerAccess")
 public final class OptionalInt {
     /**
      * Common instance for {@code empty()}.
@@ -77,7 +77,7 @@ public final class OptionalInt {
      * @see OptionalInt#isPresent()
      */
     public int getAsInt() {
-        if(!isPresent) {
+        if (!isPresent) {
             throw new NoSuchElementException("No value present");
         }
         return value;
@@ -172,7 +172,8 @@ public final class OptionalInt {
      * @since 1.1.4
      */
     public OptionalInt filter(IntPredicate predicate) {
-        if (!isPresent()) return this;
+        if (!isPresent())
+            return this;
         return predicate.test(value) ? this : OptionalInt.empty();
     }
 
@@ -199,7 +200,8 @@ public final class OptionalInt {
      * @since 1.1.3
      */
     public OptionalInt map(IntUnaryOperator mapper) {
-        if (!isPresent()) return empty();
+        if (!isPresent())
+            return empty();
         return OptionalInt.of(mapper.applyAsInt(value));
     }
 
@@ -215,7 +217,8 @@ public final class OptionalInt {
      * @since 1.1.3
      */
     public <U> Optional<U> mapToObj(IntFunction<U> mapper) {
-        if (!isPresent()) return Optional.empty();
+        if (!isPresent())
+            return Optional.empty();
         return Optional.ofNullable(mapper.apply(value));
     }
 
@@ -230,7 +233,8 @@ public final class OptionalInt {
      * @since 1.1.4
      */
     public OptionalLong mapToLong(IntToLongFunction mapper) {
-        if (!isPresent()) return OptionalLong.empty();
+        if (!isPresent())
+            return OptionalLong.empty();
         return OptionalLong.of(mapper.applyAsLong(value));
     }
 
@@ -245,7 +249,8 @@ public final class OptionalInt {
      * @since 1.1.4
      */
     public OptionalDouble mapToDouble(IntToDoubleFunction mapper) {
-        if (!isPresent()) return OptionalDouble.empty();
+        if (!isPresent())
+            return OptionalDouble.empty();
         return OptionalDouble.of(mapper.applyAsDouble(value));
     }
 
@@ -255,7 +260,8 @@ public final class OptionalInt {
      * @return the optional value as an {@code IntStream}
      */
     public IntStream stream() {
-        if (!isPresent()) return IntStream.empty();
+        if (!isPresent())
+            return IntStream.empty();
         return IntStream.of(value);
     }
 
@@ -270,7 +276,8 @@ public final class OptionalInt {
      *         {@code supplier} or value produced by it is {@code null}
      */
     public OptionalInt or(Supplier<OptionalInt> supplier) {
-        if (isPresent()) return this;
+        if (isPresent())
+            return this;
         Objects.requireNonNull(supplier);
         return Objects.requireNonNull(supplier.get());
     }
@@ -330,18 +337,16 @@ public final class OptionalInt {
      */
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) {
+        if (this == obj) {
             return true;
         }
 
-        if(!(obj instanceof OptionalInt)) {
+        if (!(obj instanceof OptionalInt)) {
             return false;
         }
 
         OptionalInt other = (OptionalInt) obj;
-        return (isPresent && other.isPresent)
-                ? value == other.value
-                : isPresent == other.isPresent;
+        return (isPresent && other.isPresent) ? value == other.value : isPresent == other.isPresent;
     }
 
     /**
@@ -363,8 +368,6 @@ public final class OptionalInt {
      */
     @Override
     public String toString() {
-        return isPresent
-                ? String.format("OptionalInt[%s]", value)
-                : "OptionalInt.empty";
+        return isPresent ? String.format("OptionalInt[%s]", value) : "OptionalInt.empty";
     }
 }

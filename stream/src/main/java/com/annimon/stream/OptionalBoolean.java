@@ -1,12 +1,13 @@
 package com.annimon.stream;
 
+import java.util.NoSuchElementException;
+
 import com.annimon.stream.function.BooleanConsumer;
 import com.annimon.stream.function.BooleanFunction;
 import com.annimon.stream.function.BooleanPredicate;
 import com.annimon.stream.function.BooleanSupplier;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
-import java.util.NoSuchElementException;
 
 /**
  * A container object which may or may not contain a {@code boolean} value.
@@ -14,7 +15,6 @@ import java.util.NoSuchElementException;
  * @since 1.1.8
  * @see Optional
  */
-@SuppressWarnings("WeakerAccess")
 public final class OptionalBoolean {
 
     private static final OptionalBoolean EMPTY = new OptionalBoolean();
@@ -39,7 +39,6 @@ public final class OptionalBoolean {
     public static OptionalBoolean of(boolean value) {
         return value ? TRUE : FALSE;
     }
-
 
     private final boolean isPresent;
     private final boolean value;
@@ -154,7 +153,8 @@ public final class OptionalBoolean {
      *         otherwise an empty {@code OptionalBoolean}
      */
     public OptionalBoolean filter(BooleanPredicate predicate) {
-        if (!isPresent()) return this;
+        if (!isPresent())
+            return this;
         return predicate.test(value) ? this : OptionalBoolean.empty();
     }
 
@@ -216,7 +216,8 @@ public final class OptionalBoolean {
      *         {@code supplier} or value produced by it is {@code null}
      */
     public OptionalBoolean or(Supplier<OptionalBoolean> supplier) {
-        if (isPresent()) return this;
+        if (isPresent())
+            return this;
         Objects.requireNonNull(supplier);
         return Objects.requireNonNull(supplier.get());
     }
@@ -260,15 +261,14 @@ public final class OptionalBoolean {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj)
+            return true;
         if (!(obj instanceof OptionalBoolean)) {
             return false;
         }
 
         OptionalBoolean other = (OptionalBoolean) obj;
-        return (isPresent && other.isPresent)
-                ? value == other.value
-                : isPresent == other.isPresent;
+        return (isPresent && other.isPresent) ? value == other.value : isPresent == other.isPresent;
     }
 
     @Override
@@ -278,8 +278,6 @@ public final class OptionalBoolean {
 
     @Override
     public String toString() {
-        return isPresent
-                ? (value ? "OptionalBoolean[true]" : "OptionalBoolean[false]")
-                : "OptionalBoolean.empty";
+        return isPresent ? (value ? "OptionalBoolean[true]" : "OptionalBoolean[false]") : "OptionalBoolean.empty";
     }
 }

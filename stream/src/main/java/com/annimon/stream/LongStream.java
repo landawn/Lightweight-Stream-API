@@ -1,14 +1,46 @@
 package com.annimon.stream;
 
-import com.annimon.stream.function.*;
+import java.io.Closeable;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
+
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.LongBinaryOperator;
+import com.annimon.stream.function.LongConsumer;
+import com.annimon.stream.function.LongFunction;
+import com.annimon.stream.function.LongPredicate;
+import com.annimon.stream.function.LongSupplier;
+import com.annimon.stream.function.LongToDoubleFunction;
+import com.annimon.stream.function.LongToIntFunction;
+import com.annimon.stream.function.LongUnaryOperator;
+import com.annimon.stream.function.ObjLongConsumer;
+import com.annimon.stream.function.Supplier;
+import com.annimon.stream.function.ToLongFunction;
 import com.annimon.stream.internal.Compose;
 import com.annimon.stream.internal.Operators;
 import com.annimon.stream.internal.Params;
 import com.annimon.stream.iterator.PrimitiveIterator;
-import com.annimon.stream.operator.*;
-import java.io.Closeable;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
+import com.annimon.stream.operator.LongArray;
+import com.annimon.stream.operator.LongConcat;
+import com.annimon.stream.operator.LongDropWhile;
+import com.annimon.stream.operator.LongFilter;
+import com.annimon.stream.operator.LongFlatMap;
+import com.annimon.stream.operator.LongGenerate;
+import com.annimon.stream.operator.LongIterate;
+import com.annimon.stream.operator.LongLimit;
+import com.annimon.stream.operator.LongMap;
+import com.annimon.stream.operator.LongMapToDouble;
+import com.annimon.stream.operator.LongMapToInt;
+import com.annimon.stream.operator.LongMapToObj;
+import com.annimon.stream.operator.LongPeek;
+import com.annimon.stream.operator.LongRangeClosed;
+import com.annimon.stream.operator.LongSample;
+import com.annimon.stream.operator.LongScan;
+import com.annimon.stream.operator.LongScanIdentity;
+import com.annimon.stream.operator.LongSkip;
+import com.annimon.stream.operator.LongSorted;
+import com.annimon.stream.operator.LongTakeUntil;
+import com.annimon.stream.operator.LongTakeWhile;
 
 /**
  * A sequence of {@code long}-valued elements supporting aggregate operations.
@@ -16,7 +48,6 @@ import java.util.NoSuchElementException;
  * @since 1.1.4
  * @see Stream
  */
-@SuppressWarnings("WeakerAccess")
 public final class LongStream implements Closeable {
 
     /**
@@ -113,7 +144,8 @@ public final class LongStream implements Closeable {
             return empty();
         } else if (startInclusive == endInclusive) {
             return of(startInclusive);
-        } else return new LongStream(new LongRangeClosed(startInclusive, endInclusive));
+        } else
+            return new LongStream(new LongRangeClosed(startInclusive, endInclusive));
     }
 
     /**
@@ -174,8 +206,7 @@ public final class LongStream implements Closeable {
      * @throws NullPointerException if {@code op} is null
      * @since 1.1.5
      */
-    public static LongStream iterate(final long seed,
-            final LongPredicate predicate, final LongUnaryOperator op) {
+    public static LongStream iterate(final long seed, final LongPredicate predicate, final LongUnaryOperator op) {
         Objects.requireNonNull(predicate);
         return iterate(seed, op).takeWhile(predicate);
     }
@@ -198,10 +229,10 @@ public final class LongStream implements Closeable {
     public static LongStream concat(final LongStream a, final LongStream b) {
         Objects.requireNonNull(a);
         Objects.requireNonNull(b);
+        @SuppressWarnings("resource")
         LongStream result = new LongStream(new LongConcat(a.iterator, b.iterator));
         return result.onClose(Compose.closeables(a, b));
     }
-
 
     private final PrimitiveIterator.OfLong iterator;
     private final Params params;
@@ -314,7 +345,7 @@ public final class LongStream implements Closeable {
      *         each boxed to an {@code Long}
      */
     public Stream<Long> boxed() {
-        return new Stream<Long>(params, iterator);
+        return new Stream<>(params, iterator);
     }
 
     /**
@@ -380,7 +411,7 @@ public final class LongStream implements Closeable {
      * @return the new {@code Stream}
      */
     public <R> Stream<R> mapToObj(final LongFunction<? extends R> mapper) {
-        return new Stream<R>(params, new LongMapToObj<R>(iterator, mapper));
+        return new Stream<>(params, new LongMapToObj<>(iterator, mapper));
     }
 
     /**
@@ -503,8 +534,10 @@ public final class LongStream implements Closeable {
      * @see Stream#sample(int)
      */
     public LongStream sample(final int stepWidth) {
-        if (stepWidth <= 0) throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1) return this;
+        if (stepWidth <= 0)
+            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
+        if (stepWidth == 1)
+            return this;
         return new LongStream(params, new LongSample(iterator, stepWidth));
     }
 
@@ -654,8 +687,10 @@ public final class LongStream implements Closeable {
      * @throws IllegalArgumentException if {@code maxSize} is negative
      */
     public LongStream limit(final long maxSize) {
-        if (maxSize < 0) throw new IllegalArgumentException("maxSize cannot be negative");
-        if (maxSize == 0) return LongStream.empty();
+        if (maxSize < 0)
+            throw new IllegalArgumentException("maxSize cannot be negative");
+        if (maxSize == 0)
+            return LongStream.empty();
         return new LongStream(params, new LongLimit(iterator, maxSize));
     }
 
@@ -682,8 +717,10 @@ public final class LongStream implements Closeable {
      * @throws IllegalArgumentException if {@code n} is negative
      */
     public LongStream skip(final long n) {
-        if (n < 0) throw new IllegalArgumentException("n cannot be negative");
-        if (n == 0) return this;
+        if (n < 0)
+            throw new IllegalArgumentException("n cannot be negative");
+        if (n == 0)
+            return this;
         return new LongStream(params, new LongSkip(iterator, n));
     }
 
@@ -1093,7 +1130,6 @@ public final class LongStream implements Closeable {
             params.closeHandler = null;
         }
     }
-
 
     private static final ToLongFunction<Long> UNBOX_FUNCTION = new ToLongFunction<Long>() {
         @Override

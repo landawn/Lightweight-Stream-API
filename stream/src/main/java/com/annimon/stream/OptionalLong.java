@@ -1,5 +1,7 @@
 package com.annimon.stream;
 
+import java.util.NoSuchElementException;
+
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.LongConsumer;
 import com.annimon.stream.function.LongFunction;
@@ -8,7 +10,6 @@ import com.annimon.stream.function.LongSupplier;
 import com.annimon.stream.function.LongToIntFunction;
 import com.annimon.stream.function.LongUnaryOperator;
 import com.annimon.stream.function.Supplier;
-import java.util.NoSuchElementException;
 
 /**
  * A container object which may or may not contain a {@code long} value.
@@ -16,7 +17,6 @@ import java.util.NoSuchElementException;
  * @since 1.1.4
  * @see Optional
  */
-@SuppressWarnings("WeakerAccess")
 public final class OptionalLong {
 
     private static final OptionalLong EMPTY = new OptionalLong();
@@ -39,7 +39,6 @@ public final class OptionalLong {
     public static OptionalLong of(long value) {
         return new OptionalLong(value);
     }
-
 
     private final boolean isPresent;
     private final long value;
@@ -154,7 +153,8 @@ public final class OptionalLong {
      *         otherwise an empty {@code OptionalLong}
      */
     public OptionalLong filter(LongPredicate predicate) {
-        if (!isPresent()) return this;
+        if (!isPresent())
+            return this;
         return predicate.test(value) ? this : OptionalLong.empty();
     }
 
@@ -246,7 +246,8 @@ public final class OptionalLong {
      *         {@code supplier} or value produced by it is {@code null}
      */
     public OptionalLong or(Supplier<OptionalLong> supplier) {
-        if (isPresent()) return this;
+        if (isPresent())
+            return this;
         Objects.requireNonNull(supplier);
         return Objects.requireNonNull(supplier.get());
     }
@@ -290,15 +291,14 @@ public final class OptionalLong {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj)
+            return true;
         if (!(obj instanceof OptionalLong)) {
             return false;
         }
 
         OptionalLong other = (OptionalLong) obj;
-        return (isPresent && other.isPresent)
-                ? value == other.value
-                : isPresent == other.isPresent;
+        return (isPresent && other.isPresent) ? value == other.value : isPresent == other.isPresent;
     }
 
     @Override
@@ -308,8 +308,6 @@ public final class OptionalLong {
 
     @Override
     public String toString() {
-        return isPresent
-                ? String.format("OptionalLong[%s]", value)
-                : "OptionalLong.empty";
+        return isPresent ? String.format("OptionalLong[%s]", value) : "OptionalLong.empty";
     }
 }

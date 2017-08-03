@@ -1,11 +1,12 @@
 package com.annimon.stream.internal;
 
+import java.util.Arrays;
+import java.util.Iterator;
+
 import com.annimon.stream.function.DoubleConsumer;
 import com.annimon.stream.function.IntConsumer;
 import com.annimon.stream.function.LongConsumer;
 import com.annimon.stream.iterator.PrimitiveIterator;
-import java.util.Arrays;
-import java.util.Iterator;
 
 final class SpinedBuffer {
 
@@ -72,10 +73,9 @@ final class SpinedBuffer {
          */
         OfPrimitive(int initialCapacity) {
             if (initialCapacity < 0)
-                throw new IllegalArgumentException("Illegal Capacity: "+ initialCapacity);
+                throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
 
-            this.initialChunkPower = Math.max(MIN_CHUNK_POWER,
-                    Integer.SIZE - Integer.numberOfLeadingZeros(initialCapacity - 1));
+            this.initialChunkPower = Math.max(MIN_CHUNK_POWER, Integer.SIZE - Integer.numberOfLeadingZeros(initialCapacity - 1));
             curChunk = newArray(1 << initialChunkPower);
         }
 
@@ -104,25 +104,19 @@ final class SpinedBuffer {
          * How many elements are currently in the buffer?
          */
         public long count() {
-            return (spineIndex == 0)
-                    ? elementIndex
-                    : priorElementCount[spineIndex] + elementIndex;
+            return (spineIndex == 0) ? elementIndex : priorElementCount[spineIndex] + elementIndex;
         }
 
         /**
          * How big should the nth chunk be?
          */
         int chunkSize(int n) {
-            int power = (n == 0 || n == 1)
-                    ? initialChunkPower
-                    : Math.min(initialChunkPower + n - 1, MAX_CHUNK_POWER);
+            int power = (n == 0 || n == 1) ? initialChunkPower : Math.min(initialChunkPower + n - 1, MAX_CHUNK_POWER);
             return 1 << power;
         }
 
         long capacity() {
-            return (spineIndex == 0)
-                    ? arrayLength(curChunk)
-                    : priorElementCount[spineIndex] + arrayLength(spine[spineIndex]);
+            return (spineIndex == 0) ? arrayLength(curChunk) : priorElementCount[spineIndex] + arrayLength(spine[spineIndex]);
         }
 
         private void inflateSpine() {
@@ -137,7 +131,7 @@ final class SpinedBuffer {
             long capacity = capacity();
             if (targetSize > capacity) {
                 inflateSpine();
-                for (int i=spineIndex+1; targetSize > capacity; i++) {
+                for (int i = spineIndex + 1; targetSize > capacity; i++) {
                     if (i >= spine.length) {
                         int newSpineSize = spine.length * 2;
                         spine = Arrays.copyOf(spine, newSpineSize);
@@ -145,7 +139,7 @@ final class SpinedBuffer {
                     }
                     int nextChunkSize = chunkSize(i);
                     spine[i] = newArray(nextChunkSize);
-                    priorElementCount[i] = priorElementCount[i-1] + arrayLength(spine[i - 1]);
+                    priorElementCount[i] = priorElementCount[i - 1] + arrayLength(spine[i - 1]);
                     capacity += nextChunkSize;
                 }
             }
@@ -166,14 +160,13 @@ final class SpinedBuffer {
             if (index >= count())
                 throw new IndexOutOfBoundsException(Long.toString(index));
 
-            for (int j=0; j <= spineIndex; j++)
+            for (int j = 0; j <= spineIndex; j++)
                 if (index < priorElementCount[j] + arrayLength(spine[j]))
                     return j;
 
             throw new IndexOutOfBoundsException(Long.toString(index));
         }
 
-        @SuppressWarnings("SuspiciousSystemArraycopy")
         void copyInto(T_ARR array, int offset) {
             long finalOffset = offset + count();
             if (finalOffset > arrayLength(array) || finalOffset < offset) {
@@ -184,7 +177,7 @@ final class SpinedBuffer {
                 System.arraycopy(curChunk, 0, array, offset, elementIndex);
             else {
                 // full chunks
-                for (int i=0; i < spineIndex; i++) {
+                for (int i = 0; i < spineIndex; i++) {
                     System.arraycopy(spine[i], 0, array, offset, arrayLength(spine[i]));
                     offset += arrayLength(spine[i]);
                 }
@@ -206,7 +199,7 @@ final class SpinedBuffer {
         void preAccept() {
             if (elementIndex == arrayLength(curChunk)) {
                 inflateSpine();
-                if (spineIndex+1 >= spine.length || spine[spineIndex+1] == null)
+                if (spineIndex + 1 >= spine.length || spine[spineIndex + 1] == null)
                     increaseCapacity();
                 elementIndex = 0;
                 ++spineIndex;
@@ -228,9 +221,9 @@ final class SpinedBuffer {
         }
     }
 
-    static class OfInt extends SpinedBuffer.OfPrimitive<Integer, int[], IntConsumer>
-            implements IntConsumer {
-        OfInt() { }
+    static class OfInt extends SpinedBuffer.OfPrimitive<Integer, int[], IntConsumer> implements IntConsumer {
+        OfInt() {
+        }
 
         OfInt(int initialCapacity) {
             super(initialCapacity);
@@ -286,9 +279,9 @@ final class SpinedBuffer {
         }
     }
 
-    static class OfLong extends SpinedBuffer.OfPrimitive<Long, long[], LongConsumer>
-            implements LongConsumer {
-        OfLong() { }
+    static class OfLong extends SpinedBuffer.OfPrimitive<Long, long[], LongConsumer> implements LongConsumer {
+        OfLong() {
+        }
 
         OfLong(int initialCapacity) {
             super(initialCapacity);
@@ -342,9 +335,9 @@ final class SpinedBuffer {
         }
     }
 
-    static class OfDouble extends SpinedBuffer.OfPrimitive<Double, double[], DoubleConsumer>
-            implements DoubleConsumer {
-        OfDouble() { }
+    static class OfDouble extends SpinedBuffer.OfPrimitive<Double, double[], DoubleConsumer> implements DoubleConsumer {
+        OfDouble() {
+        }
 
         OfDouble(int initialCapacity) {
             super(initialCapacity);

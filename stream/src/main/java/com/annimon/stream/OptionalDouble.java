@@ -1,5 +1,7 @@
 package com.annimon.stream;
 
+import java.util.NoSuchElementException;
+
 import com.annimon.stream.function.DoubleConsumer;
 import com.annimon.stream.function.DoubleFunction;
 import com.annimon.stream.function.DoublePredicate;
@@ -9,7 +11,6 @@ import com.annimon.stream.function.DoubleToLongFunction;
 import com.annimon.stream.function.DoubleUnaryOperator;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
-import java.util.NoSuchElementException;
 
 /**
  * A container object which may or may not contain a {@code double} value.
@@ -17,7 +18,6 @@ import java.util.NoSuchElementException;
  * @since 1.1.4
  * @see Optional
  */
-@SuppressWarnings("WeakerAccess")
 public final class OptionalDouble {
 
     private static final OptionalDouble EMPTY = new OptionalDouble();
@@ -40,7 +40,6 @@ public final class OptionalDouble {
     public static OptionalDouble of(double value) {
         return new OptionalDouble(value);
     }
-
 
     private final boolean isPresent;
     private final double value;
@@ -155,7 +154,8 @@ public final class OptionalDouble {
      *         otherwise an empty {@code OptionalDouble}
      */
     public OptionalDouble filter(DoublePredicate predicate) {
-        if (!isPresent()) return this;
+        if (!isPresent())
+            return this;
         return predicate.test(value) ? this : OptionalDouble.empty();
     }
 
@@ -264,7 +264,8 @@ public final class OptionalDouble {
      *         {@code supplier} or value produced by it is {@code null}
      */
     public OptionalDouble or(Supplier<OptionalDouble> supplier) {
-        if (isPresent()) return this;
+        if (isPresent())
+            return this;
         Objects.requireNonNull(supplier);
         return Objects.requireNonNull(supplier.get());
     }
@@ -308,15 +309,14 @@ public final class OptionalDouble {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj)
+            return true;
         if (!(obj instanceof OptionalDouble)) {
             return false;
         }
 
         OptionalDouble other = (OptionalDouble) obj;
-        return (isPresent && other.isPresent)
-                ? Double.compare(value, other.value) == 0
-                : isPresent == other.isPresent;
+        return (isPresent && other.isPresent) ? Double.compare(value, other.value) == 0 : isPresent == other.isPresent;
     }
 
     @Override
@@ -326,8 +326,6 @@ public final class OptionalDouble {
 
     @Override
     public String toString() {
-        return isPresent
-                ? String.format("OptionalDouble[%s]", value)
-                : "OptionalDouble.empty";
+        return isPresent ? String.format("OptionalDouble[%s]", value) : "OptionalDouble.empty";
     }
 }

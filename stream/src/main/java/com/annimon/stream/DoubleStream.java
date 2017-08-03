@@ -1,14 +1,45 @@
 package com.annimon.stream;
 
-import com.annimon.stream.function.*;
+import java.io.Closeable;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
+
+import com.annimon.stream.function.DoubleBinaryOperator;
+import com.annimon.stream.function.DoubleConsumer;
+import com.annimon.stream.function.DoubleFunction;
+import com.annimon.stream.function.DoublePredicate;
+import com.annimon.stream.function.DoubleSupplier;
+import com.annimon.stream.function.DoubleToIntFunction;
+import com.annimon.stream.function.DoubleToLongFunction;
+import com.annimon.stream.function.DoubleUnaryOperator;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.ObjDoubleConsumer;
+import com.annimon.stream.function.Supplier;
+import com.annimon.stream.function.ToDoubleFunction;
 import com.annimon.stream.internal.Compose;
 import com.annimon.stream.internal.Operators;
 import com.annimon.stream.internal.Params;
 import com.annimon.stream.iterator.PrimitiveIterator;
-import com.annimon.stream.operator.*;
-import java.io.Closeable;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
+import com.annimon.stream.operator.DoubleArray;
+import com.annimon.stream.operator.DoubleConcat;
+import com.annimon.stream.operator.DoubleDropWhile;
+import com.annimon.stream.operator.DoubleFilter;
+import com.annimon.stream.operator.DoubleFlatMap;
+import com.annimon.stream.operator.DoubleGenerate;
+import com.annimon.stream.operator.DoubleIterate;
+import com.annimon.stream.operator.DoubleLimit;
+import com.annimon.stream.operator.DoubleMap;
+import com.annimon.stream.operator.DoubleMapToInt;
+import com.annimon.stream.operator.DoubleMapToLong;
+import com.annimon.stream.operator.DoubleMapToObj;
+import com.annimon.stream.operator.DoublePeek;
+import com.annimon.stream.operator.DoubleSample;
+import com.annimon.stream.operator.DoubleScan;
+import com.annimon.stream.operator.DoubleScanIdentity;
+import com.annimon.stream.operator.DoubleSkip;
+import com.annimon.stream.operator.DoubleSorted;
+import com.annimon.stream.operator.DoubleTakeUntil;
+import com.annimon.stream.operator.DoubleTakeWhile;
 
 /**
  * A sequence of {@code double}-valued elements supporting aggregate operations.
@@ -16,7 +47,6 @@ import java.util.NoSuchElementException;
  * @since 1.1.4
  * @see Stream
  */
-@SuppressWarnings("WeakerAccess")
 public final class DoubleStream implements Closeable {
 
     /**
@@ -139,8 +169,7 @@ public final class DoubleStream implements Closeable {
      * @throws NullPointerException if {@code op} is null
      * @since 1.1.5
      */
-    public static DoubleStream iterate(final double seed,
-            final DoublePredicate predicate, final DoubleUnaryOperator op) {
+    public static DoubleStream iterate(final double seed, final DoublePredicate predicate, final DoubleUnaryOperator op) {
         Objects.requireNonNull(predicate);
         return iterate(seed, op).takeWhile(predicate);
     }
@@ -163,10 +192,10 @@ public final class DoubleStream implements Closeable {
     public static DoubleStream concat(final DoubleStream a, final DoubleStream b) {
         Objects.requireNonNull(a);
         Objects.requireNonNull(b);
+        @SuppressWarnings("resource")
         DoubleStream result = new DoubleStream(new DoubleConcat(a.iterator, b.iterator));
         return result.onClose(Compose.closeables(a, b));
     }
-
 
     private final PrimitiveIterator.OfDouble iterator;
     private final Params params;
@@ -280,7 +309,7 @@ public final class DoubleStream implements Closeable {
      *         each boxed to an {@code Double}
      */
     public Stream<Double> boxed() {
-        return new Stream<Double>(params, iterator);
+        return new Stream<>(params, iterator);
     }
 
     /**
@@ -346,7 +375,7 @@ public final class DoubleStream implements Closeable {
      * @return the new {@code Stream}
      */
     public <R> Stream<R> mapToObj(final DoubleFunction<? extends R> mapper) {
-        return new Stream<R>(params, new DoubleMapToObj<R>(iterator, mapper));
+        return new Stream<>(params, new DoubleMapToObj<>(iterator, mapper));
     }
 
     /**
@@ -469,8 +498,10 @@ public final class DoubleStream implements Closeable {
      * @see Stream#sample(int)
      */
     public DoubleStream sample(final int stepWidth) {
-        if (stepWidth <= 0) throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1) return this;
+        if (stepWidth <= 0)
+            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
+        if (stepWidth == 1)
+            return this;
         return new DoubleStream(params, new DoubleSample(iterator, stepWidth));
     }
 
@@ -620,8 +651,10 @@ public final class DoubleStream implements Closeable {
      * @throws IllegalArgumentException if {@code maxSize} is negative
      */
     public DoubleStream limit(final long maxSize) {
-        if (maxSize < 0) throw new IllegalArgumentException("maxSize cannot be negative");
-        if (maxSize == 0) return DoubleStream.empty();
+        if (maxSize < 0)
+            throw new IllegalArgumentException("maxSize cannot be negative");
+        if (maxSize == 0)
+            return DoubleStream.empty();
         return new DoubleStream(params, new DoubleLimit(iterator, maxSize));
     }
 
@@ -648,8 +681,10 @@ public final class DoubleStream implements Closeable {
      * @throws IllegalArgumentException if {@code n} is negative
      */
     public DoubleStream skip(final long n) {
-        if (n < 0) throw new IllegalArgumentException("n cannot be negative");
-        if (n == 0) return this;
+        if (n < 0)
+            throw new IllegalArgumentException("n cannot be negative");
+        if (n == 0)
+            return this;
         return new DoubleStream(params, new DoubleSkip(iterator, n));
     }
 
@@ -838,8 +873,9 @@ public final class DoubleStream implements Closeable {
             sum += iterator.nextDouble();
             count++;
         }
-        if (count == 0) return OptionalDouble.empty();
-        return OptionalDouble.of(sum / (double) count);
+        if (count == 0)
+            return OptionalDouble.empty();
+        return OptionalDouble.of(sum / count);
     }
 
     /**
@@ -1077,7 +1113,6 @@ public final class DoubleStream implements Closeable {
             params.closeHandler = null;
         }
     }
-
 
     private static final ToDoubleFunction<Double> UNBOX_FUNCTION = new ToDoubleFunction<Double>() {
         @Override

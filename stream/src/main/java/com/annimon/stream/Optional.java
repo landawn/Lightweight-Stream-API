@@ -17,7 +17,8 @@ import com.annimon.stream.function.ToLongFunction;
  */
 public class Optional<T> {
 
-    private static final Optional<?> EMPTY = new Optional();
+    @SuppressWarnings("rawtypes")
+    private static final Optional EMPTY = new Optional<>();
 
     /**
      * Returns an {@code Optional} with the specified present non-null value.
@@ -52,7 +53,7 @@ public class Optional<T> {
      */
     @SuppressWarnings("unchecked")
     public static <T> Optional<T> empty() {
-        return (Optional<T>) EMPTY;
+        return EMPTY;
     }
 
     private final T value;

@@ -1,32 +1,33 @@
 package com.annimon.stream.internal;
 
-import com.annimon.stream.function.IntFunction;
-import com.annimon.stream.iterator.PrimitiveIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.annimon.stream.function.IntFunction;
+import com.annimon.stream.iterator.PrimitiveIterator;
+
 public final class Operators {
 
-    private Operators() {}
+    private Operators() {
+    }
 
     public static <T> List<T> toList(Iterator<? extends T> iterator) {
-        final List<T> result = new ArrayList<T>();
+        final List<T> result = new ArrayList<>();
         while (iterator.hasNext()) {
             result.add(iterator.next());
         }
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T, R> R[] toArray(Iterator<? extends T> iterator, IntFunction<R[]> generator) {
-        final List<T> container = Operators.<T>toList(iterator);
+        final List<T> container = Operators.<T> toList(iterator);
         final int size = container.size();
 
         Compat.checkMaxArraySize(size);
 
         //noinspection unchecked
-        T[] source = container.toArray(Compat.<T>newArray(size));
+        T[] source = container.toArray(Compat.<T> newArray(size));
         R[] boxed = generator.apply(size);
 
         //noinspection SuspiciousSystemArraycopy

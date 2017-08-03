@@ -129,6 +129,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      * @throws NullPointerException if {@code elements} is null
      */
+    @SafeVarargs
     public static <T> Stream<T> of(final T... elements) {
         Objects.requireNonNull(elements);
         if (elements.length == 0) {
@@ -146,7 +147,6 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      * @since 1.1.5
      */
-    @SuppressWarnings("unchecked")
     public static <T> Stream<T> ofNullable(T element) {
         return (element == null) ? Stream.<T> empty() : Stream.of(element);
     }
@@ -294,6 +294,7 @@ public class Stream<T> implements Closeable {
     public static <T> Stream<T> concat(Stream<? extends T> stream1, Stream<? extends T> stream2) {
         Objects.requireNonNull(stream1);
         Objects.requireNonNull(stream2);
+        @SuppressWarnings("resource")
         Stream<T> result = new Stream<>(new ObjConcat<>(stream1.iterator, stream2.iterator));
         return result.onClose(Compose.closeables(stream1, stream2));
     }
@@ -949,7 +950,7 @@ public class Stream<T> implements Closeable {
     public Stream<T> sorted() {
         return sorted(new Comparator<T>() {
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "unchecked", "rawtypes" })
             @Override
             public int compare(T o1, T o2) {
                 Comparable c1 = (Comparable) o1;
