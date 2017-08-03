@@ -1,12 +1,5 @@
 package com.annimon.stream;
 
-import com.annimon.stream.function.*;
-import com.annimon.stream.internal.Compose;
-import com.annimon.stream.internal.Operators;
-import com.annimon.stream.internal.Params;
-import com.annimon.stream.iterator.IndexedIterator;
-import com.annimon.stream.iterator.LazyIterator;
-import com.annimon.stream.operator.*;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +8,61 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.annimon.stream.function.BiConsumer;
+import com.annimon.stream.function.BiFunction;
+import com.annimon.stream.function.BinaryOperator;
+import com.annimon.stream.function.Consumer;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.IndexedBiFunction;
+import com.annimon.stream.function.IndexedConsumer;
+import com.annimon.stream.function.IndexedFunction;
+import com.annimon.stream.function.IndexedPredicate;
+import com.annimon.stream.function.IntFunction;
+import com.annimon.stream.function.Predicate;
+import com.annimon.stream.function.Supplier;
+import com.annimon.stream.function.ToDoubleFunction;
+import com.annimon.stream.function.ToIntFunction;
+import com.annimon.stream.function.ToLongFunction;
+import com.annimon.stream.function.UnaryOperator;
+import com.annimon.stream.internal.Compose;
+import com.annimon.stream.internal.Operators;
+import com.annimon.stream.internal.Params;
+import com.annimon.stream.iterator.IndexedIterator;
+import com.annimon.stream.iterator.LazyIterator;
+import com.annimon.stream.operator.ObjArray;
+import com.annimon.stream.operator.ObjChunkBy;
+import com.annimon.stream.operator.ObjConcat;
+import com.annimon.stream.operator.ObjDistinct;
+import com.annimon.stream.operator.ObjDistinctBy;
+import com.annimon.stream.operator.ObjDropWhile;
+import com.annimon.stream.operator.ObjDropWhileIndexed;
+import com.annimon.stream.operator.ObjFilter;
+import com.annimon.stream.operator.ObjFilterIndexed;
+import com.annimon.stream.operator.ObjFlatMap;
+import com.annimon.stream.operator.ObjFlatMapToDouble;
+import com.annimon.stream.operator.ObjFlatMapToInt;
+import com.annimon.stream.operator.ObjFlatMapToLong;
+import com.annimon.stream.operator.ObjGenerate;
+import com.annimon.stream.operator.ObjIterate;
+import com.annimon.stream.operator.ObjLimit;
+import com.annimon.stream.operator.ObjMap;
+import com.annimon.stream.operator.ObjMapIndexed;
+import com.annimon.stream.operator.ObjMapToDouble;
+import com.annimon.stream.operator.ObjMapToInt;
+import com.annimon.stream.operator.ObjMapToLong;
+import com.annimon.stream.operator.ObjMerge;
+import com.annimon.stream.operator.ObjPeek;
+import com.annimon.stream.operator.ObjScan;
+import com.annimon.stream.operator.ObjScanIdentity;
+import com.annimon.stream.operator.ObjSkip;
+import com.annimon.stream.operator.ObjSlidingWindow;
+import com.annimon.stream.operator.ObjSorted;
+import com.annimon.stream.operator.ObjTakeUntil;
+import com.annimon.stream.operator.ObjTakeUntilIndexed;
+import com.annimon.stream.operator.ObjTakeWhile;
+import com.annimon.stream.operator.ObjTakeWhileIndexed;
+import com.annimon.stream.operator.ObjZip;
 
 /**
  * A sequence of elements supporting aggregate operations.
@@ -30,7 +78,7 @@ public class Stream<T> implements Closeable {
      * @return the new empty stream
      */
     public static <T> Stream<T> empty() {
-        return of(Collections.<T>emptyList());
+        return of(Collections.<T> emptyList());
     }
 
     /**
@@ -44,7 +92,7 @@ public class Stream<T> implements Closeable {
      */
     public static <K, V> Stream<Map.Entry<K, V>> of(Map<K, V> map) {
         Objects.requireNonNull(map);
-        return new Stream<Map.Entry<K, V>>(map.entrySet());
+        return new Stream<>(map.entrySet());
     }
 
     /**
@@ -57,7 +105,7 @@ public class Stream<T> implements Closeable {
      */
     public static <T> Stream<T> of(Iterator<? extends T> iterator) {
         Objects.requireNonNull(iterator);
-        return new Stream<T>(iterator);
+        return new Stream<>(iterator);
     }
 
     /**
@@ -70,7 +118,7 @@ public class Stream<T> implements Closeable {
      */
     public static <T> Stream<T> of(Iterable<? extends T> iterable) {
         Objects.requireNonNull(iterable);
-        return new Stream<T>(iterable);
+        return new Stream<>(iterable);
     }
 
     /**
@@ -84,9 +132,9 @@ public class Stream<T> implements Closeable {
     public static <T> Stream<T> of(final T... elements) {
         Objects.requireNonNull(elements);
         if (elements.length == 0) {
-            return Stream.<T>empty();
+            return Stream.<T> empty();
         }
-        return new Stream<T>(new ObjArray<T>(elements));
+        return new Stream<>(new ObjArray<>(elements));
     }
 
     /**
@@ -100,7 +148,7 @@ public class Stream<T> implements Closeable {
      */
     @SuppressWarnings("unchecked")
     public static <T> Stream<T> ofNullable(T element) {
-        return (element == null) ? Stream.<T>empty() : Stream.of(element);
+        return (element == null) ? Stream.<T> empty() : Stream.of(element);
     }
 
     /**
@@ -113,7 +161,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.5
      */
     public static <T> Stream<T> ofNullable(Iterable<? extends T> iterable) {
-        return (iterable == null) ? Stream.<T>empty() : Stream.<T>of(iterable);
+        return (iterable == null) ? Stream.<T> empty() : Stream.<T> of(iterable);
     }
 
     /**
@@ -176,7 +224,7 @@ public class Stream<T> implements Closeable {
      */
     public static <T> Stream<T> generate(final Supplier<T> supplier) {
         Objects.requireNonNull(supplier);
-        return new Stream<T>(new ObjGenerate<T>(supplier));
+        return new Stream<>(new ObjGenerate<>(supplier));
     }
 
     /**
@@ -199,7 +247,7 @@ public class Stream<T> implements Closeable {
      */
     public static <T> Stream<T> iterate(final T seed, final UnaryOperator<T> op) {
         Objects.requireNonNull(op);
-        return new Stream<T>(new ObjIterate<T>(seed, op));
+        return new Stream<>(new ObjIterate<>(seed, op));
     }
 
     /**
@@ -222,8 +270,7 @@ public class Stream<T> implements Closeable {
      * @throws NullPointerException if {@code op} is null
      * @since 1.1.5
      */
-    public static <T> Stream<T> iterate(final T seed,
-            final Predicate<? super T> predicate, final UnaryOperator<T> op) {
+    public static <T> Stream<T> iterate(final T seed, final Predicate<? super T> predicate, final UnaryOperator<T> op) {
         Objects.requireNonNull(predicate);
         return iterate(seed, op).takeWhile(predicate);
     }
@@ -247,7 +294,7 @@ public class Stream<T> implements Closeable {
     public static <T> Stream<T> concat(Stream<? extends T> stream1, Stream<? extends T> stream2) {
         Objects.requireNonNull(stream1);
         Objects.requireNonNull(stream2);
-        Stream<T> result = new Stream<T>(new ObjConcat<T>(stream1.iterator, stream2.iterator));
+        Stream<T> result = new Stream<>(new ObjConcat<>(stream1.iterator, stream2.iterator));
         return result.onClose(Compose.closeables(stream1, stream2));
     }
 
@@ -271,7 +318,7 @@ public class Stream<T> implements Closeable {
     public static <T> Stream<T> concat(Iterator<? extends T> iterator1, Iterator<? extends T> iterator2) {
         Objects.requireNonNull(iterator1);
         Objects.requireNonNull(iterator2);
-        return new Stream<T>(new ObjConcat<T>(iterator1, iterator2));
+        return new Stream<>(new ObjConcat<>(iterator1, iterator2));
     }
 
     /**
@@ -298,7 +345,7 @@ public class Stream<T> implements Closeable {
             final BiFunction<? super F, ? super S, ? extends R> combiner) {
         Objects.requireNonNull(stream1);
         Objects.requireNonNull(stream2);
-        return Stream.<F, S, R>zip(stream1.iterator, stream2.iterator, combiner);
+        return Stream.<F, S, R> zip(stream1.iterator, stream2.iterator, combiner);
     }
 
     /**
@@ -322,12 +369,11 @@ public class Stream<T> implements Closeable {
      * @throws NullPointerException if {@code iterator1} or {@code iterator2} is null
      * @since 1.1.2
      */
-    public static <F, S, R> Stream<R> zip(final Iterator<? extends F> iterator1,
-            final Iterator<? extends S> iterator2,
+    public static <F, S, R> Stream<R> zip(final Iterator<? extends F> iterator1, final Iterator<? extends S> iterator2,
             final BiFunction<? super F, ? super S, ? extends R> combiner) {
         Objects.requireNonNull(iterator1);
         Objects.requireNonNull(iterator2);
-        return new Stream<R>(new ObjZip<F, S, R>(iterator1, iterator2, combiner));
+        return new Stream<>(new ObjZip<>(iterator1, iterator2, combiner));
     }
 
     /**
@@ -357,12 +403,11 @@ public class Stream<T> implements Closeable {
      * @throws NullPointerException if {@code stream1} or {@code stream2} is null
      * @since 1.1.9
      */
-    public static <T> Stream<T> merge(
-            Stream<? extends T> stream1, Stream<? extends T> stream2,
+    public static <T> Stream<T> merge(Stream<? extends T> stream1, Stream<? extends T> stream2,
             BiFunction<? super T, ? super T, ObjMerge.MergeResult> selector) {
         Objects.requireNonNull(stream1);
         Objects.requireNonNull(stream2);
-        return Stream.<T>merge(stream1.iterator, stream2.iterator, selector);
+        return Stream.<T> merge(stream1.iterator, stream2.iterator, selector);
     }
 
     /**
@@ -392,16 +437,14 @@ public class Stream<T> implements Closeable {
      * @throws NullPointerException if {@code iterator1} or {@code iterator2} is null
      * @since 1.1.9
      */
-    public static <T> Stream<T> merge(
-            Iterator<? extends T> iterator1, Iterator<? extends T> iterator2,
+    public static <T> Stream<T> merge(Iterator<? extends T> iterator1, Iterator<? extends T> iterator2,
             BiFunction<? super T, ? super T, ObjMerge.MergeResult> selector) {
         Objects.requireNonNull(iterator1);
         Objects.requireNonNull(iterator2);
-        return new Stream<T>(new ObjMerge<T>(iterator1, iterator2, selector));
+        return new Stream<>(new ObjMerge<>(iterator1, iterator2, selector));
     }
 
-
-//<editor-fold defaultstate="collapsed" desc="Implementation">
+    //<editor-fold defaultstate="collapsed" desc="Implementation">
     private final Iterator<? extends T> iterator;
     private final Params params;
 
@@ -410,11 +453,11 @@ public class Stream<T> implements Closeable {
     }
 
     private Stream(Iterable<? extends T> iterable) {
-        this(null, new LazyIterator<T>(iterable));
+        this(null, new LazyIterator<>(iterable));
     }
 
     private Stream(Params params, Iterable<? extends T> iterable) {
-        this(params, new LazyIterator<T>(iterable));
+        this(params, new LazyIterator<>(iterable));
     }
 
     Stream(Params params, Iterator<? extends T> iterator) {
@@ -519,7 +562,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public Stream<T> filter(final Predicate<? super T> predicate) {
-        return new Stream<T>(params, new ObjFilter<T>(iterator, predicate));
+        return new Stream<>(params, new ObjFilter<>(iterator, predicate));
     }
 
     /**
@@ -569,9 +612,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> filterIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        return new Stream<T>(params, new ObjFilterIndexed<T>(
-                new IndexedIterator<T>(from, step, iterator),
-                predicate));
+        return new Stream<>(params, new ObjFilterIndexed<>(new IndexedIterator<>(from, step, iterator), predicate));
     }
 
     /**
@@ -615,7 +656,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> withoutNulls() {
-        return filter(Predicate.Util.<T>notNull());
+        return filter(Predicate.Util.<T> notNull());
     }
 
     /**
@@ -627,7 +668,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> nullsOnly() {
-        return filterNot(Predicate.Util.<T>notNull());
+        return filterNot(Predicate.Util.<T> notNull());
     }
 
     /**
@@ -647,7 +688,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public <R> Stream<R> map(final Function<? super T, ? extends R> mapper) {
-        return new Stream<R>(params, new ObjMap<T, R>(iterator, mapper));
+        return new Stream<>(params, new ObjMap<>(iterator, mapper));
     }
 
     /**
@@ -669,7 +710,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public <R> Stream<R> mapIndexed(IndexedFunction<? super T, ? extends R> mapper) {
-        return this.<R>mapIndexed(0, 1, mapper);
+        return this.<R> mapIndexed(0, 1, mapper);
     }
 
     /**
@@ -695,9 +736,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public <R> Stream<R> mapIndexed(int from, int step, IndexedFunction<? super T, ? extends R> mapper) {
-        return new Stream<R>(params, new ObjMapIndexed<T, R>(
-                new IndexedIterator<T>(from, step, iterator),
-                mapper));
+        return new Stream<>(params, new ObjMapIndexed<>(new IndexedIterator<>(from, step, iterator), mapper));
     }
 
     /**
@@ -710,7 +749,7 @@ public class Stream<T> implements Closeable {
      * @see #map(com.annimon.stream.function.Function)
      */
     public IntStream mapToInt(final ToIntFunction<? super T> mapper) {
-        return new IntStream(params, new ObjMapToInt<T>(iterator, mapper));
+        return new IntStream(params, new ObjMapToInt<>(iterator, mapper));
     }
 
     /**
@@ -724,7 +763,7 @@ public class Stream<T> implements Closeable {
      * @see #map(com.annimon.stream.function.Function)
      */
     public LongStream mapToLong(final ToLongFunction<? super T> mapper) {
-        return new LongStream(params, new ObjMapToLong<T>(iterator, mapper));
+        return new LongStream(params, new ObjMapToLong<>(iterator, mapper));
     }
 
     /**
@@ -738,7 +777,7 @@ public class Stream<T> implements Closeable {
      * @see #map(com.annimon.stream.function.Function)
      */
     public DoubleStream mapToDouble(final ToDoubleFunction<? super T> mapper) {
-        return new DoubleStream(params, new ObjMapToDouble<T>(iterator, mapper));
+        return new DoubleStream(params, new ObjMapToDouble<>(iterator, mapper));
     }
 
     /**
@@ -760,7 +799,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public <R> Stream<R> flatMap(final Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return new Stream<R>(params, new ObjFlatMap<T, R>(iterator, mapper));
+        return new Stream<>(params, new ObjFlatMap<>(iterator, mapper));
     }
 
     /**
@@ -775,7 +814,7 @@ public class Stream<T> implements Closeable {
      * @see #flatMap(com.annimon.stream.function.Function)
      */
     public IntStream flatMapToInt(final Function<? super T, ? extends IntStream> mapper) {
-        return new IntStream(params, new ObjFlatMapToInt<T>(iterator, mapper));
+        return new IntStream(params, new ObjFlatMapToInt<>(iterator, mapper));
     }
 
     /**
@@ -790,7 +829,7 @@ public class Stream<T> implements Closeable {
      * @see #flatMap(com.annimon.stream.function.Function)
      */
     public LongStream flatMapToLong(final Function<? super T, ? extends LongStream> mapper) {
-        return new LongStream(params, new ObjFlatMapToLong<T>(iterator, mapper));
+        return new LongStream(params, new ObjFlatMapToLong<>(iterator, mapper));
     }
 
     /**
@@ -805,7 +844,7 @@ public class Stream<T> implements Closeable {
      * @see #flatMap(com.annimon.stream.function.Function)
      */
     public DoubleStream flatMapToDouble(final Function<? super T, ? extends DoubleStream> mapper) {
-        return new DoubleStream(params, new ObjFlatMapToDouble<T>(iterator, mapper));
+        return new DoubleStream(params, new ObjFlatMapToDouble<>(iterator, mapper));
     }
 
     /**
@@ -849,7 +888,7 @@ public class Stream<T> implements Closeable {
 
             @Override
             public IntPair<T> apply(int index, T t) {
-                return new IntPair<T>(index, t);
+                return new IntPair<>(index, t);
             }
         });
     }
@@ -868,7 +907,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public Stream<T> distinct() {
-        return new Stream<T>(params, new ObjDistinct<T>(iterator));
+        return new Stream<>(params, new ObjDistinct<>(iterator));
     }
 
     /**
@@ -889,7 +928,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.8
      */
     public <K> Stream<T> distinctBy(Function<? super T, ? extends K> classifier) {
-        return new Stream<T>(params, new ObjDistinctBy<T, K>(iterator, classifier));
+        return new Stream<>(params, new ObjDistinctBy<>(iterator, classifier));
     }
 
     /**
@@ -936,7 +975,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public Stream<T> sorted(final Comparator<? super T> comparator) {
-        return new Stream<T>(params, new ObjSorted<T>(iterator, comparator));
+        return new Stream<>(params, new ObjSorted<>(iterator, comparator));
     }
 
     /**
@@ -977,8 +1016,8 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public <K> Stream<Map.Entry<K, List<T>>> groupBy(final Function<? super T, ? extends K> classifier) {
-        Map<K, List<T>> map = collect(Collectors.<T, K>groupingBy(classifier));
-        return new Stream<Map.Entry<K, List<T>>>(params, map.entrySet());
+        Map<K, List<T>> map = collect(Collectors.<T, K> groupingBy(classifier));
+        return new Stream<>(params, map.entrySet());
     }
 
     /**
@@ -1002,7 +1041,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public <K> Stream<List<T>> chunkBy(final Function<? super T, ? extends K> classifier) {
-        return new Stream<List<T>>(params, new ObjChunkBy<T, K>(iterator, classifier));
+        return new Stream<>(params, new ObjChunkBy<>(iterator, classifier));
     }
 
     /**
@@ -1022,8 +1061,10 @@ public class Stream<T> implements Closeable {
      * @throws IllegalArgumentException if {@code stepWidth} is zero or negative
      */
     public Stream<T> sample(final int stepWidth) {
-        if (stepWidth <= 0) throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1) return this;
+        if (stepWidth <= 0)
+            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
+        if (stepWidth == 1)
+            return this;
         return slidingWindow(1, stepWidth).map(new Function<List<T>, T>() {
             @Override
             public T apply(List<T> list) {
@@ -1085,9 +1126,11 @@ public class Stream<T> implements Closeable {
      * @throws IllegalArgumentException if {@code stepWidth} is zero or negative
      */
     public Stream<List<T>> slidingWindow(final int windowSize, final int stepWidth) {
-        if (windowSize <= 0) throw new IllegalArgumentException("windowSize cannot be zero or negative");
-        if (stepWidth <= 0) throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        return new Stream<List<T>>(params, new ObjSlidingWindow<T>(iterator, windowSize, stepWidth));
+        if (windowSize <= 0)
+            throw new IllegalArgumentException("windowSize cannot be zero or negative");
+        if (stepWidth <= 0)
+            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
+        return new Stream<>(params, new ObjSlidingWindow<>(iterator, windowSize, stepWidth));
     }
 
     /**
@@ -1099,7 +1142,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public Stream<T> peek(final Consumer<? super T> action) {
-        return new Stream<T>(params, new ObjPeek<T>(iterator, action));
+        return new Stream<>(params, new ObjPeek<>(iterator, action));
     }
 
     /**
@@ -1124,7 +1167,7 @@ public class Stream<T> implements Closeable {
      */
     public Stream<T> scan(final BiFunction<T, T, T> accumulator) {
         Objects.requireNonNull(accumulator);
-        return new Stream<T>(params, new ObjScan<T>(iterator, accumulator));
+        return new Stream<>(params, new ObjScan<>(iterator, accumulator));
     }
 
     /**
@@ -1152,7 +1195,7 @@ public class Stream<T> implements Closeable {
      */
     public <R> Stream<R> scan(final R identity, final BiFunction<? super R, ? super T, ? extends R> accumulator) {
         Objects.requireNonNull(accumulator);
-        return new Stream<R>(params, new ObjScanIdentity<T, R>(iterator, identity, accumulator));
+        return new Stream<>(params, new ObjScanIdentity<>(iterator, identity, accumulator));
     }
 
     /**
@@ -1171,7 +1214,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public Stream<T> takeWhile(final Predicate<? super T> predicate) {
-        return new Stream<T>(params, new ObjTakeWhile<T>(iterator, predicate));
+        return new Stream<>(params, new ObjTakeWhile<>(iterator, predicate));
     }
 
     /**
@@ -1219,9 +1262,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> takeWhileIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        return new Stream<T>(params, new ObjTakeWhileIndexed<T>(
-                new IndexedIterator<T>(from, step, iterator),
-                predicate));
+        return new Stream<>(params, new ObjTakeWhileIndexed<>(new IndexedIterator<>(from, step, iterator), predicate));
     }
 
     /**
@@ -1243,7 +1284,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> takeUntil(final Predicate<? super T> stopPredicate) {
-        return new Stream<T>(params, new ObjTakeUntil<T>(iterator, stopPredicate));
+        return new Stream<>(params, new ObjTakeUntil<>(iterator, stopPredicate));
     }
 
     /**
@@ -1295,9 +1336,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> takeUntilIndexed(int from, int step, IndexedPredicate<? super T> stopPredicate) {
-        return new Stream<T>(params, new ObjTakeUntilIndexed<T>(
-                new IndexedIterator<T>(from, step, iterator),
-                stopPredicate));
+        return new Stream<>(params, new ObjTakeUntilIndexed<>(new IndexedIterator<>(from, step, iterator), stopPredicate));
     }
 
     /**
@@ -1316,7 +1355,7 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public Stream<T> dropWhile(final Predicate<? super T> predicate) {
-        return new Stream<T>(params, new ObjDropWhile<T>(iterator, predicate));
+        return new Stream<>(params, new ObjDropWhile<>(iterator, predicate));
     }
 
     /**
@@ -1364,9 +1403,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> dropWhileIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        return new Stream<T>(params, new ObjDropWhileIndexed<T>(
-                new IndexedIterator<T>(from, step, iterator),
-                predicate));
+        return new Stream<>(params, new ObjDropWhileIndexed<>(new IndexedIterator<>(from, step, iterator), predicate));
     }
 
     /**
@@ -1396,7 +1433,7 @@ public class Stream<T> implements Closeable {
         if (maxSize == 0) {
             return Stream.empty();
         }
-        return new Stream<T>(params, new ObjLimit<T>(iterator, maxSize));
+        return new Stream<>(params, new ObjLimit<>(iterator, maxSize));
     }
 
     /**
@@ -1421,9 +1458,11 @@ public class Stream<T> implements Closeable {
      * @throws IllegalArgumentException if {@code n} is negative
      */
     public Stream<T> skip(final long n) {
-        if (n < 0) throw new IllegalArgumentException("n cannot be negative");
-        if (n == 0) return this;
-        return new Stream<T>(params, new ObjSkip<T>(iterator, n));
+        if (n < 0)
+            throw new IllegalArgumentException("n cannot be negative");
+        if (n == 0)
+            return this;
+        return new Stream<>(params, new ObjSkip<>(iterator, n));
     }
 
     /**
@@ -1546,8 +1585,7 @@ public class Stream<T> implements Closeable {
      * @return the result of the reduction
      * @since 1.1.6
      */
-    public <R> R reduceIndexed(int from, int step, R identity,
-            IndexedBiFunction<? super R, ? super T, ? extends R> accumulator) {
+    public <R> R reduceIndexed(int from, int step, R identity, IndexedBiFunction<? super R, ? super T, ? extends R> accumulator) {
         R result = identity;
         int index = from;
         while (iterator.hasNext()) {
@@ -1579,7 +1617,7 @@ public class Stream<T> implements Closeable {
                 result = accumulator.apply(result, value);
             }
         }
-        return foundAny ? Optional.of(result) : Optional.<T>empty();
+        return foundAny ? Optional.of(result) : Optional.<T> empty();
     }
 
     /**
@@ -1626,7 +1664,7 @@ public class Stream<T> implements Closeable {
      * @see Collectors#toList()
      */
     public List<T> toList() {
-        final List<T> result = new ArrayList<T>();
+        final List<T> result = new ArrayList<>();
         while (iterator.hasNext()) {
             result.add(iterator.next());
         }
@@ -1672,7 +1710,7 @@ public class Stream<T> implements Closeable {
         }
         if (collector.finisher() != null)
             return collector.finisher().apply(container);
-        return Collectors.<A, R>castIdentity().apply(container);
+        return Collectors.<A, R> castIdentity().apply(container);
     }
 
     /**
@@ -1691,7 +1729,7 @@ public class Stream<T> implements Closeable {
      * @return the minimum element
      */
     public Optional<T> min(Comparator<? super T> comparator) {
-        return reduce(BinaryOperator.Util.<T>minBy(comparator));
+        return reduce(BinaryOperator.Util.<T> minBy(comparator));
     }
 
     /**
@@ -1710,7 +1748,7 @@ public class Stream<T> implements Closeable {
      * @return the maximum element
      */
     public Optional<T> max(Comparator<? super T> comparator) {
-        return reduce(BinaryOperator.Util.<T>maxBy(comparator));
+        return reduce(BinaryOperator.Util.<T> maxBy(comparator));
     }
 
     /**
@@ -1842,13 +1880,12 @@ public class Stream<T> implements Closeable {
      *         or {@code Optional.empty()} if stream is empty or no value was found.
      * @since 1.1.8
      */
-    public Optional<IntPair<T>> findIndexed(int from, int step,
-                                            IndexedPredicate<? super T> predicate) {
+    public Optional<IntPair<T>> findIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
         int index = from;
         while (iterator.hasNext()) {
             final T value = iterator.next();
             if (predicate.test(index, value)) {
-                return Optional.of(new IntPair<T>(index, value));
+                return Optional.of(new IntPair<>(index, value));
             }
             index += step;
         }
@@ -1866,7 +1903,7 @@ public class Stream<T> implements Closeable {
      */
     public Optional<T> findFirst() {
         if (iterator.hasNext()) {
-            return Optional.of(iterator.next());
+            return Optional.<T> of(iterator.next());
         }
         return Optional.empty();
     }
@@ -1983,7 +2020,7 @@ public class Stream<T> implements Closeable {
             final Runnable firstHandler = newParams.closeHandler;
             newParams.closeHandler = Compose.runnables(firstHandler, closeHandler);
         }
-        return new Stream<T>(newParams, iterator);
+        return new Stream<>(newParams, iterator);
     }
 
     /**
@@ -2036,5 +2073,5 @@ public class Stream<T> implements Closeable {
         // noneMatch -> true
         return !kindAny;
     }
-//</editor-fold>
+    //</editor-fold>
 }
