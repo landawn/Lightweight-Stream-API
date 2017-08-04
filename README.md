@@ -1,11 +1,11 @@
 Lightweight-Stream-API
 ======================
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.landawn/stream.svg)](https://maven-badges.herokuapp.com/maven-central/com.landawn/stream/)
-[![Javadocs](https://www.javadoc.io/badge/com.landawn/stream.svg)](https://www.javadoc.io/doc/com.landawn/stream)
+[![Maven Central](https://img.shields.io/maven-central/v/com.landawn/stream-lite.svg)](https://maven-badges.herokuapp.com/maven-central/com.landawn/stream-lite/)
+[![Javadocs](https://www.javadoc.io/badge/com.landawn/stream-lite.svg)](https://www.javadoc.io/doc/com.landawn/stream-lite)
 Stream API from Java 8 rewritten on iterators for Java 7 and Android.
 
-Full API documentation is available [here](https://www.javadoc.io/doc/com.landawn/stream).
+Full API documentation is available [here](https://www.javadoc.io/doc/com.landawn/stream-lite).
 
 ### Includes
 
@@ -124,15 +124,15 @@ In addition to backported Java 8 Stream operators, the library provides:
 
 ## Download
 
-Releases are available in [Maven Central](https://repo1.maven.org/maven2/com/landawn/stream/)
+Releases are available in [Maven Central](https://repo1.maven.org/maven2/com/landawn/stream-lite/)
 
 Maven:
 
 ```xml
 <dependency>
   <groupId>com.landawn</groupId>
-  <artifactId>stream</artifactId>
-  <version>2.1</version>
+  <artifactId>stream-lite</artifactId>
+  <version>0.8.1</version>
 </dependency>
 ```
 or Gradle:
