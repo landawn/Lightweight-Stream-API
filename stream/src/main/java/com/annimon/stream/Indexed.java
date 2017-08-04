@@ -11,9 +11,13 @@ public final class Indexed<T> {
     private final int index;
     private final T value;
 
-    public Indexed(int index, T value) {
+    Indexed(int index, T value) {
         this.index = index;
         this.value = value;
+    }
+
+    public static <T> Indexed<T> of(T value, int index) {
+        return new Indexed<>(index, value);
     }
 
     /**
