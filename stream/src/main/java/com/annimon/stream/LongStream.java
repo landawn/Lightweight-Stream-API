@@ -1,7 +1,9 @@
 package com.annimon.stream;
 
 import java.io.Closeable;
+import java.math.BigInteger;
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.LongBinaryOperator;
@@ -106,6 +108,49 @@ public final class LongStream implements Closeable {
         return rangeClosed(startInclusive, endExclusive - 1);
     }
 
+    public static LongStream range(final long startInclusive, final long endExclusive, final long by) {
+        if (by == 0) {
+            throw new IllegalArgumentException("'by' can't be zero");
+        }
+
+        if (endExclusive == startInclusive || endExclusive > startInclusive != by > 0) {
+            return empty();
+        }
+
+        if ((by > 0 && endExclusive - startInclusive < 0) || (by < 0 && startInclusive - endExclusive < 0)) {
+            long m = BigInteger.valueOf(endExclusive).subtract(BigInteger.valueOf(startInclusive)).divide(BigInteger.valueOf(3)).longValue();
+
+            if ((by > 0 && by > m) || (by < 0 && by < m)) {
+                return concat(range(startInclusive, startInclusive + by), range(startInclusive + by, endExclusive));
+            } else {
+                m = m > 0 ? m - m % by : m + m % by;
+                return concat(concat(range(startInclusive, startInclusive + m, by), range(startInclusive + m, (startInclusive + m) + m, by)),
+                        range((startInclusive + m) + m, endExclusive, by));
+            }
+        }
+
+        return of(new PrimitiveIterator.OfLong() {
+            private long next = startInclusive;
+            private long cnt = (endExclusive - startInclusive) / by + ((endExclusive - startInclusive) % by == 0 ? 0 : 1);
+
+            @Override
+            public boolean hasNext() {
+                return cnt > 0;
+            }
+
+            @Override
+            public long nextLong() {
+                if (cnt-- <= 0) {
+                    throw new NoSuchElementException();
+                }
+
+                long result = next;
+                next += by;
+                return result;
+            }
+        });
+    }
+
     /**
      * Returns a sequential ordered {@code LongStream} from {@code startInclusive}
      * (inclusive) to {@code endInclusive} (inclusive) by an incremental step of
@@ -123,6 +168,51 @@ public final class LongStream implements Closeable {
             return of(startInclusive);
         } else
             return new LongStream(new LongRangeClosed(startInclusive, endInclusive));
+    }
+
+    public static LongStream rangeClosed(final long startInclusive, final long endInclusive, final long by) {
+        if (by == 0) {
+            throw new IllegalArgumentException("'by' can't be zero");
+        }
+
+        if (endInclusive == startInclusive) {
+            return of(startInclusive);
+        } else if (endInclusive > startInclusive != by > 0) {
+            return empty();
+        }
+
+        if ((by > 0 && endInclusive - startInclusive < 0) || (by < 0 && startInclusive - endInclusive < 0) || ((endInclusive - startInclusive) / by + 1 <= 0)) {
+            long m = BigInteger.valueOf(endInclusive).subtract(BigInteger.valueOf(startInclusive)).divide(BigInteger.valueOf(3)).longValue();
+
+            if ((by > 0 && by > m) || (by < 0 && by < m)) {
+                return concat(range(startInclusive, startInclusive + by), rangeClosed(startInclusive + by, endInclusive));
+            } else {
+                m = m > 0 ? m - m % by : m + m % by;
+                return concat(concat(range(startInclusive, startInclusive + m, by), range(startInclusive + m, (startInclusive + m) + m, by)),
+                        rangeClosed((startInclusive + m) + m, endInclusive, by));
+            }
+        }
+
+        return of(new PrimitiveIterator.OfLong() {
+            private long next = startInclusive;
+            private long cnt = (endInclusive - startInclusive) / by + 1;
+
+            @Override
+            public boolean hasNext() {
+                return cnt > 0;
+            }
+
+            @Override
+            public long nextLong() {
+                if (cnt-- <= 0) {
+                    throw new NoSuchElementException();
+                }
+
+                long result = next;
+                next += by;
+                return result;
+            }
+        });
     }
 
     /**

@@ -2,6 +2,7 @@ package com.annimon.stream;
 
 import java.io.Closeable;
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.IntBinaryOperator;
@@ -121,6 +122,37 @@ public final class IntStream implements Closeable {
         return rangeClosed(startInclusive, endExclusive - 1);
     }
 
+    public static IntStream range(final int startInclusive, final int endExclusive, final int by) {
+        if (by == 0) {
+            throw new IllegalArgumentException("'by' can't be zero");
+        }
+
+        if (endExclusive == startInclusive || endExclusive > startInclusive != by > 0) {
+            return empty();
+        }
+
+        return of(new PrimitiveIterator.OfInt() {
+            private int next = startInclusive;
+            private long cnt = (endExclusive * 1L - startInclusive) / by + ((endExclusive * 1L - startInclusive) % by == 0 ? 0 : 1);
+
+            @Override
+            public boolean hasNext() {
+                return cnt > 0;
+            }
+
+            @Override
+            public int nextInt() {
+                if (cnt-- <= 0) {
+                    throw new NoSuchElementException();
+                }
+
+                int result = next;
+                next += by;
+                return result;
+            }
+        });
+    }
+
     /**
      * Returns a sequential ordered {@code IntStream} from {@code startInclusive}
      * (inclusive) to {@code endInclusive} (inclusive) by an incremental step of
@@ -139,6 +171,39 @@ public final class IntStream implements Closeable {
         } else {
             return new IntStream(new IntRangeClosed(startInclusive, endInclusive));
         }
+    }
+
+    public static IntStream rangeClosed(final int startInclusive, final int endInclusive, final int by) {
+        if (by == 0) {
+            throw new IllegalArgumentException("'by' can't be zero");
+        }
+
+        if (endInclusive == startInclusive) {
+            return of(startInclusive);
+        } else if (endInclusive > startInclusive != by > 0) {
+            return empty();
+        }
+
+        return of(new PrimitiveIterator.OfInt() {
+            private int next = startInclusive;
+            private long cnt = (endInclusive * 1L - startInclusive) / by + 1;
+
+            @Override
+            public boolean hasNext() {
+                return cnt > 0;
+            }
+
+            @Override
+            public int nextInt() {
+                if (cnt-- <= 0) {
+                    throw new NoSuchElementException();
+                }
+
+                int result = next;
+                next += by;
+                return result;
+            }
+        });
     }
 
     /**
