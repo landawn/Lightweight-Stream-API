@@ -140,7 +140,7 @@ or Gradle:
 ```groovy
 dependencies {
   ...
-  compile 'com.landawn:stream:2.1'
+  compile 'com.landawn:stream-lite:0.8.1'
   ...
 }
 ```
