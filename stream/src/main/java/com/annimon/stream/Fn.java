@@ -39,7 +39,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
 import com.annimon.stream.function.BiConsumer;
-import com.annimon.stream.function.BinaryOperator;
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.IntFunction;
@@ -492,46 +491,6 @@ public final class Fn {
 
     public static <T> Collector<T, ?, Double> averagingDouble(final ToDoubleFunction<? super T> mapper) {
         return Collectors.averagingDouble(mapper);
-    }
-
-    /**
-     * Returns a {@code BinaryOperator} which returns lesser of two elements
-     * according to the specified {@code Comparator}.
-     *
-     * @param <T> the type of the input arguments of the comparator
-     * @param comparator  a {@code Comparator} for comparing the two values
-     * @return a {@code BinaryOperator} which returns the lesser of its operands,
-     *         according to the supplied {@code Comparator}
-     * @throws NullPointerException if the argument is null
-     */
-    static <T> BinaryOperator<T> minBy(final Comparator<? super T> comparator) {
-        Objects.requireNonNull(comparator);
-        return new BinaryOperator<T>() {
-            @Override
-            public T apply(T a, T b) {
-                return comparator.compare(a, b) <= 0 ? a : b;
-            }
-        };
-    }
-
-    /**
-     * Returns a {@code BinaryOperator} which returns greater of two elements
-     * according to the specified {@code Comparator}.
-     *
-     * @param <T> the type of the input arguments of the comparator
-     * @param comparator  a {@code Comparator} for comparing the two values
-     * @return a {@code BinaryOperator} which returns the greater of its operands,
-     *         according to the supplied {@code Comparator}
-     * @throws NullPointerException if the argument is null
-     */
-    static <T> BinaryOperator<T> maxBy(final Comparator<? super T> comparator) {
-        Objects.requireNonNull(comparator);
-        return new BinaryOperator<T>() {
-            @Override
-            public T apply(T a, T b) {
-                return comparator.compare(a, b) >= 0 ? a : b;
-            }
-        };
     }
 
     public static final class Factory {

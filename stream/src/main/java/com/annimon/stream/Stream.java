@@ -1217,7 +1217,7 @@ public class Stream<T> implements Closeable {
      * @return the minimum element
      */
     public Optional<T> min(Comparator<? super T> comparator) {
-        return reduce(Fn.<T> minBy(comparator));
+        return reduce(minBy(comparator));
     }
 
     public <U extends Comparable<? super U>> Optional<T> minBy(final Function<? super T, U> keyExtractor) {
@@ -1240,7 +1240,7 @@ public class Stream<T> implements Closeable {
      * @return the maximum element
      */
     public Optional<T> max(Comparator<? super T> comparator) {
-        return reduce(Fn.<T> maxBy(comparator));
+        return reduce(maxBy(comparator));
     }
 
     public <U extends Comparable<? super U>> Optional<T> maxBy(final Function<? super T, U> keyExtractor) {
@@ -1567,6 +1567,46 @@ public class Stream<T> implements Closeable {
             params.closeHandler.run();
             params.closeHandler = null;
         }
+    }
+
+    /**
+     * Returns a {@code BinaryOperator} which returns lesser of two elements
+     * according to the specified {@code Comparator}.
+     *
+     * @param <T> the type of the input arguments of the comparator
+     * @param comparator  a {@code Comparator} for comparing the two values
+     * @return a {@code BinaryOperator} which returns the lesser of its operands,
+     *         according to the supplied {@code Comparator}
+     * @throws NullPointerException if the argument is null
+     */
+    static <T> BinaryOperator<T> minBy(final Comparator<? super T> comparator) {
+        Objects.requireNonNull(comparator);
+        return new BinaryOperator<T>() {
+            @Override
+            public T apply(T a, T b) {
+                return comparator.compare(a, b) <= 0 ? a : b;
+            }
+        };
+    }
+
+    /**
+     * Returns a {@code BinaryOperator} which returns greater of two elements
+     * according to the specified {@code Comparator}.
+     *
+     * @param <T> the type of the input arguments of the comparator
+     * @param comparator  a {@code Comparator} for comparing the two values
+     * @return a {@code BinaryOperator} which returns the greater of its operands,
+     *         according to the supplied {@code Comparator}
+     * @throws NullPointerException if the argument is null
+     */
+    static <T> BinaryOperator<T> maxBy(final Comparator<? super T> comparator) {
+        Objects.requireNonNull(comparator);
+        return new BinaryOperator<T>() {
+            @Override
+            public T apply(T a, T b) {
+                return comparator.compare(a, b) >= 0 ? a : b;
+            }
+        };
     }
 
     private static final int MATCH_ANY = 0;
