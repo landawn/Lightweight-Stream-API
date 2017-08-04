@@ -1,13 +1,9 @@
 Lightweight-Stream-API
 ======================
 
-[![Join the chat at https://gitter.im/aNNiMON/Lightweight-Stream-API](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/aNNiMON/Lightweight-Stream-API?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.annimon/stream/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.annimon/stream)
-[![Build Status](https://travis-ci.org/aNNiMON/Lightweight-Stream-API.svg?branch=master)](https://travis-ci.org/aNNiMON/Lightweight-Stream-API)
-[![Coverage Status](https://coveralls.io/repos/aNNiMON/Lightweight-Stream-API/badge.svg?branch=master&service=github)](https://coveralls.io/github/aNNiMON/Lightweight-Stream-API?branch=master)
-[![](http://javadoc-badge.appspot.com/com.annimon/stream.svg?label=JavaDocs)](http://www.javadoc.io/doc/com.annimon/stream/)
-
-Stream API from Java 8 rewritten on iterators for Java 7 and below.
+[![Maven Central](https://img.shields.io/maven-central/v/com.landawn/stream.svg)](https://maven-badges.herokuapp.com/maven-central/com.landawn/stream/)
+[![Javadocs](https://www.javadoc.io/badge/com.landawn/stream.svg)](https://www.javadoc.io/doc/com.landawn/stream)
+Stream API from Java 8 rewritten on iterators for Java 7 and Android.
 
 
 ### Includes
@@ -77,17 +73,12 @@ In addition to backported Java 8 Stream operators, the library provides:
 - `select` - filters instances of the given class
 
   ```java
-  // Java 8
-  stream.filter(Integer.class::isInstance)
-  // LSA
-  stream.select(Integer.class)
-  ```
 
-- `withoutNulls` - filters only not null elements
+- `skipNull` - filters only not null elements
 
   ```java
   Stream.of("a", null, "c", "d", null)
-      .withoutNulls() // [a, c, d]
+      .skipNull() // [a, c, d]
   ```
 
 - `sortBy` - sorts by extractor function
@@ -96,7 +87,7 @@ In addition to backported Java 8 Stream operators, the library provides:
   // Java 8
   stream.sorted(Comparator.comparing(Person::getName))
   // LSA
-  stream.sortBy(Person::getName)
+  stream.sortedBy(Person::getName)
   ```
 
 - `groupBy` - groups by extractor function
@@ -122,11 +113,11 @@ In addition to backported Java 8 Stream operators, the library provides:
       .sample(2) // [0, 2, 4, 6, 8, 10]
   ```
 
-- `slidingWindow` - partitions stream into fixed-sized list and sliding over the elements
+- `sliding` - partitions stream into fixed-sized list and sliding over the elements
 
   ```java
   Stream.rangeClosed(0, 10)
-      .slidingWindow(4, 6) // [[0, 1, 2, 3], [6, 7, 8, 9]]
+      .sliding(4, 6) // [[0, 1, 2, 3], [6, 7, 8, 9]]
   ```
 
 - `takeWhile` / `dropWhile` - introduced in Java 9, limits/skips stream by predicate function
@@ -180,13 +171,13 @@ stream.map(Function.Util.safe(FileInputStream::new))
 
 ## Download
 
-Download [latest release](https://github.com/aNNiMON/Lightweight-Stream-API/releases) or grab via Maven:
+Download [latest release](https://github.com/landawn/Lightweight-Stream-API/releases) or grab via Maven:
 
 ```xml
 <dependency>
-  <groupId>com.annimon</groupId>
+  <groupId>com.landawn</groupId>
   <artifactId>stream</artifactId>
-  <version>1.1.8</version>
+  <version>2.0</version>
 </dependency>
 ```
 or Gradle:
@@ -194,11 +185,11 @@ or Gradle:
 ```groovy
 dependencies {
   ...
-  compile 'com.annimon:stream:1.1.8'
+  compile 'com.landawn:stream:2.0'
   ...
 }
 ```
 
 Also included version for **Java ME**. Checkout [javame branch](https://github.com/aNNiMON/Lightweight-Stream-API/tree/javame).
 
-For use lambda expressions in Java 6, Java 7 or Android, take a look at [Retrolambda](https://github.com/orfjackal/retrolambda) repository.
+For use lambda expressions in Java 7 or Android, take a look at [Retrolambda](https://github.com/orfjackal/retrolambda) repository.
