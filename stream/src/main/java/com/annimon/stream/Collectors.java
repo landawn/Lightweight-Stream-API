@@ -1,7 +1,5 @@
 package com.annimon.stream;
 
-import com.annimon.stream.function.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +7,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.annimon.stream.function.BiConsumer;
+import com.annimon.stream.function.BinaryOperator;
+import com.annimon.stream.function.Consumer;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.Predicate;
+import com.annimon.stream.function.Supplier;
+import com.annimon.stream.function.ToDoubleFunction;
+import com.annimon.stream.function.ToIntFunction;
+import com.annimon.stream.function.ToLongFunction;
+import com.annimon.stream.function.UnaryOperator;
 
 /**
  * Common implementations of {@code Collector} interface.
@@ -31,8 +40,9 @@ public final class Collectors {
         }
     };
 
-    private Collectors() { }
-    
+    private Collectors() {
+    }
+
     /**
      * Returns a {@code Collector} that fills new {@code Collection}, provided by {@code collectionSupplier},
      * with input elements.
@@ -43,19 +53,18 @@ public final class Collectors {
      * @return a {@code Collector}
      */
     public static <T, R extends Collection<T>> Collector<T, ?, R> toCollection(Supplier<R> collectionSupplier) {
-        return new CollectorsImpl<T, R, R>(
-                
+        return new CollectorsImpl<>(
+
                 collectionSupplier,
-                
+
                 new BiConsumer<R, T>() {
                     @Override
                     public void accept(R t, T u) {
                         t.add(u);
                     }
-                }
-        );
+                });
     }
-    
+
     /**
      * Returns a {@code Collector} that fills new {@code List} with input elements.
      * 
@@ -63,24 +72,23 @@ public final class Collectors {
      * @return a {@code Collector}
      */
     public static <T> Collector<T, ?, List<T>> toList() {
-        return new CollectorsImpl<T, List<T>, List<T>>(
-                
+        return new CollectorsImpl<>(
+
                 new Supplier<List<T>>() {
                     @Override
                     public List<T> get() {
-                        return new ArrayList<T>();
+                        return new ArrayList<>();
                     }
                 },
-                
+
                 new BiConsumer<List<T>, T>() {
                     @Override
                     public void accept(List<T> t, T u) {
                         t.add(u);
                     }
-                }
-        );
+                });
     }
-    
+
     /**
      * Returns a {@code Collector} that fills new {@code Set} with input elements.
      * 
@@ -88,22 +96,21 @@ public final class Collectors {
      * @return a {@code Collector}
      */
     public static <T> Collector<T, ?, Set<T>> toSet() {
-        return new CollectorsImpl<T, Set<T>, Set<T>>(
-                
+        return new CollectorsImpl<>(
+
                 new Supplier<Set<T>>() {
                     @Override
                     public Set<T> get() {
-                        return new HashSet<T>();
+                        return new HashSet<>();
                     }
                 },
-                
+
                 new BiConsumer<Set<T>, T>() {
                     @Override
                     public void accept(Set<T> t, T u) {
                         t.add(u);
                     }
-                }
-        );
+                });
     }
 
     /**
@@ -115,9 +122,8 @@ public final class Collectors {
      * @return a {@code Collector}
      * @since 1.1.3
      */
-    public static <T, K> Collector<T, ?, Map<K, T>> toMap(
-            final Function<? super T, ? extends K> keyMapper) {
-        return Collectors.<T, K, T>toMap(keyMapper, UnaryOperator.Util.<T>identity());
+    public static <K, T> Collector<T, ?, Map<K, T>> toMap(final Function<? super T, ? extends K> keyMapper) {
+        return Collectors.<T, K, T> toMap(keyMapper, UnaryOperator.Util.<T> identity());
     }
 
     /**
@@ -130,13 +136,11 @@ public final class Collectors {
      * @param valueMapper  a mapping function to produce values
      * @return a {@code Collector}
      */
-    public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(
-            final Function<? super T, ? extends K> keyMapper,
+    public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(final Function<? super T, ? extends K> keyMapper,
             final Function<? super T, ? extends V> valueMapper) {
-        return Collectors.<T, K, V, Map<K, V>>toMap(keyMapper, valueMapper,
-                Collectors.<K, V>hashMapSupplier());
+        return Collectors.<T, K, V, Map<K, V>> toMap(keyMapper, valueMapper, Collectors.<K, V> hashMapSupplier());
     }
-    
+
     /**
      * Returns a {@code Collector} that fills new {@code Map} with input elements.
      * 
@@ -149,14 +153,12 @@ public final class Collectors {
      * @param mapFactory  a supplier function that provides new {@code Map}
      * @return a {@code Collector}
      */
-    public static <T, K, V, M extends Map<K, V>> Collector<T, ?, M> toMap(
-            final Function<? super T, ? extends K> keyMapper,
-            final Function<? super T, ? extends V> valueMapper,
-            final Supplier<M> mapFactory) {
-        return new CollectorsImpl<T, M, M>(
-                
+    public static <T, K, V, M extends Map<K, V>> Collector<T, ?, M> toMap(final Function<? super T, ? extends K> keyMapper,
+            final Function<? super T, ? extends V> valueMapper, final Supplier<M> mapFactory) {
+        return new CollectorsImpl<>(
+
                 mapFactory,
-                
+
                 new BiConsumer<M, T>() {
                     @Override
                     public void accept(M map, T t) {
@@ -170,10 +172,9 @@ public final class Collectors {
                             map.put(key, newValue);
                         }
                     }
-                }
-        );
+                });
     }
-    
+
     /**
      * Returns a {@code Collector} that concatenates input elements into new string.
      * 
@@ -214,20 +215,17 @@ public final class Collectors {
      * @param emptyValue  the string which replaces empty element if exists
      * @return a {@code Collector}
      */
-    public static Collector<CharSequence, ?, String> joining(
-            final CharSequence delimiter,
-            final CharSequence prefix,
-            final CharSequence suffix,
+    public static Collector<CharSequence, ?, String> joining(final CharSequence delimiter, final CharSequence prefix, final CharSequence suffix,
             final String emptyValue) {
-        return new CollectorsImpl<CharSequence, StringBuilder, String>(
-                
+        return new CollectorsImpl<>(
+
                 new Supplier<StringBuilder>() {
                     @Override
                     public StringBuilder get() {
                         return new StringBuilder();
                     }
                 },
-                
+
                 new BiConsumer<StringBuilder, CharSequence>() {
                     @Override
                     public void accept(StringBuilder t, CharSequence u) {
@@ -239,7 +237,7 @@ public final class Collectors {
                         t.append(u);
                     }
                 },
-                
+
                 new Function<StringBuilder, String>() {
                     @Override
                     public String apply(StringBuilder value) {
@@ -250,28 +248,7 @@ public final class Collectors {
                             return value.toString();
                         }
                     }
-                }
-        );
-    }
-
-    /**
-     * Returns a {@code Collector} that calculates average of input elements.
-     * 
-     * @param <T> the type of the input elements
-     * @param mapper  the mapping function which extracts value from element to calculate result
-     * @deprecated  As of release 1.1.3, replaced by
-     *              {@link #averagingDouble(com.annimon.stream.function.ToDoubleFunction)}
-     * @return a {@code Collector}
-     */
-    @Deprecated
-    public static <T> Collector<T, ?, Double> averaging(final Function<? super T, Double> mapper) {
-        return averagingDouble(new ToDoubleFunction<T>() {
-
-            @Override
-            public double applyAsDouble(T t) {
-                return mapper.apply(t);
-            }
-        });
+                });
     }
 
     /**
@@ -311,7 +288,7 @@ public final class Collectors {
     }
 
     private static <T> Collector<T, ?, Double> averagingHelper(final BiConsumer<long[], T> accumulator) {
-        return new CollectorsImpl<T, long[], Double>(
+        return new CollectorsImpl<>(
 
                 LONG_2ELEMENTS_ARRAY_SUPPLIER,
 
@@ -320,11 +297,11 @@ public final class Collectors {
                 new Function<long[], Double>() {
                     @Override
                     public Double apply(long[] t) {
-                        if (t[0] == 0) return 0d;
+                        if (t[0] == 0)
+                            return 0d;
                         return t[1] / (double) t[0];
                     }
-                }
-        );
+                });
     }
 
     /**
@@ -336,7 +313,7 @@ public final class Collectors {
      * @since 1.1.3
      */
     public static <T> Collector<T, ?, Double> averagingDouble(final ToDoubleFunction<? super T> mapper) {
-        return new CollectorsImpl<T, double[], Double>(
+        return new CollectorsImpl<>(
 
                 DOUBLE_2ELEMENTS_ARRAY_SUPPLIER,
 
@@ -351,11 +328,11 @@ public final class Collectors {
                 new Function<double[], Double>() {
                     @Override
                     public Double apply(double[] t) {
-                        if (t[0] == 0) return 0d;
+                        if (t[0] == 0)
+                            return 0d;
                         return t[1] / t[0];
                     }
-                }
-        );
+                });
     }
 
     /**
@@ -367,7 +344,7 @@ public final class Collectors {
      * @since 1.1.3
      */
     public static <T> Collector<T, ?, Integer> summingInt(final ToIntFunction<? super T> mapper) {
-        return new CollectorsImpl<T, int[], Integer>(
+        return new CollectorsImpl<>(
 
                 new Supplier<int[]>() {
                     @Override
@@ -388,8 +365,7 @@ public final class Collectors {
                     public Integer apply(int[] value) {
                         return value[0];
                     }
-                }
-        );
+                });
     }
 
     /**
@@ -401,7 +377,7 @@ public final class Collectors {
      * @since 1.1.3
      */
     public static <T> Collector<T, ?, Long> summingLong(final ToLongFunction<? super T> mapper) {
-        return new CollectorsImpl<T, long[], Long>(
+        return new CollectorsImpl<>(
 
                 LONG_2ELEMENTS_ARRAY_SUPPLIER,
 
@@ -417,8 +393,7 @@ public final class Collectors {
                     public Long apply(long[] value) {
                         return value[0];
                     }
-                }
-        );
+                });
     }
 
     /**
@@ -430,7 +405,7 @@ public final class Collectors {
      * @since 1.1.3
      */
     public static <T> Collector<T, ?, Double> summingDouble(final ToDoubleFunction<? super T> mapper) {
-        return new CollectorsImpl<T, double[], Double>(
+        return new CollectorsImpl<>(
 
                 DOUBLE_2ELEMENTS_ARRAY_SUPPLIER,
 
@@ -446,26 +421,25 @@ public final class Collectors {
                     public Double apply(double[] value) {
                         return value[0];
                     }
-                }
-        );
+                });
     }
-    
+
     /**
      * Returns a {@code Collector} that counts the number of input elements.
      * 
      * @param <T> the type of the input elements
      * @return a {@code Collector}
      */
-    public static <T> Collector<T, ?, Long> counting() {
-        return summingLong(new ToLongFunction<T>() {
+    public static <T> Collector<T, ?, Integer> counting() {
+        return summingInt(new ToIntFunction<T>() {
 
             @Override
-            public long applyAsLong(T t) {
-                return 1L;
+            public int applyAsInt(T t) {
+                return 1;
             }
         });
     }
-    
+
     /**
      * Returns a {@code Collector} that reduces input elements.
      * 
@@ -476,31 +450,30 @@ public final class Collectors {
      * @see #reducing(java.lang.Object, com.annimon.stream.function.Function, com.annimon.stream.function.BinaryOperator) 
      */
     public static <T> Collector<T, ?, T> reducing(final T identity, final BinaryOperator<T> op) {
-        return new CollectorsImpl<T, Tuple1<T>, T>(
-                
+        return new CollectorsImpl<>(
+
                 new Supplier<Tuple1<T>>() {
                     @Override
                     public Tuple1<T> get() {
-                        return new Tuple1<T>(identity);
+                        return new Tuple1<>(identity);
                     }
                 },
-                
+
                 new BiConsumer<Tuple1<T>, T>() {
                     @Override
                     public void accept(Tuple1<T> tuple, T value) {
                         tuple.a = op.apply(tuple.a, value);
                     }
                 },
-                
+
                 new Function<Tuple1<T>, T>() {
                     @Override
                     public T apply(Tuple1<T> tuple) {
                         return tuple.a;
                     }
-                }
-        );
+                });
     }
-    
+
     /**
      * Returns a {@code Collector} that reduces input elements.
      * 
@@ -512,33 +485,29 @@ public final class Collectors {
      * @return a {@code Collector}
      * @see #reducing(java.lang.Object, com.annimon.stream.function.BinaryOperator) 
      */
-    public static <T, R> Collector<T, ?, R> reducing(
-            final R identity,
-            final Function<? super T, ? extends R> mapper,
-            final BinaryOperator<R> op) {
-        return new CollectorsImpl<T, Tuple1<R>, R>(
-                
+    public static <T, R> Collector<T, ?, R> reducing(final R identity, final Function<? super T, ? extends R> mapper, final BinaryOperator<R> op) {
+        return new CollectorsImpl<>(
+
                 new Supplier<Tuple1<R>>() {
                     @Override
                     public Tuple1<R> get() {
-                        return new Tuple1<R>(identity);
+                        return new Tuple1<>(identity);
                     }
                 },
-                
+
                 new BiConsumer<Tuple1<R>, T>() {
                     @Override
                     public void accept(Tuple1<R> tuple, T value) {
                         tuple.a = op.apply(tuple.a, mapper.apply(value));
                     }
                 },
-                
+
                 new Function<Tuple1<R>, R>() {
                     @Override
                     public R apply(Tuple1<R> tuple) {
                         return tuple.a;
                     }
-                }
-        );
+                });
     }
 
     /**
@@ -552,11 +521,9 @@ public final class Collectors {
      * @return a {@code Collector}
      * @since 1.1.3
      */
-    public static <T, A, R> Collector<T, ?, R> filtering(
-            final Predicate<? super T> predicate,
-            final Collector<? super T, A, R> downstream) {
+    public static <T, A, R> Collector<T, ?, R> filtering(final Predicate<? super T> predicate, final Collector<? super T, A, R> downstream) {
         final BiConsumer<A, ? super T> accumulator = downstream.accumulator();
-        return new CollectorsImpl<T, A, R>(
+        return new CollectorsImpl<>(
 
                 downstream.supplier(),
 
@@ -568,10 +535,9 @@ public final class Collectors {
                     }
                 },
 
-                downstream.finisher()
-        );
+                downstream.finisher());
     }
-    
+
     /**
      * Returns a {@code Collector} that performs mapping before accumulation.
      * 
@@ -583,24 +549,21 @@ public final class Collectors {
      * @param downstream  the collector of mapped elements
      * @return a {@code Collector}
      */
-    public static <T, U, A, R> Collector<T, ?, R> mapping(
-            final Function<? super T, ? extends U> mapper,
-            final Collector<? super U, A, R> downstream) {
-        
+    public static <T, U, A, R> Collector<T, ?, R> mapping(final Function<? super T, ? extends U> mapper, final Collector<? super U, A, R> downstream) {
+
         final BiConsumer<A, ? super U> accumulator = downstream.accumulator();
-        return new CollectorsImpl<T, A, R>(
-                
+        return new CollectorsImpl<>(
+
                 downstream.supplier(),
-                
+
                 new BiConsumer<A, T>() {
                     @Override
                     public void accept(A a, T t) {
                         accumulator.accept(a, mapper.apply(t));
                     }
                 },
-                
-                downstream.finisher()
-        );
+
+                downstream.finisher());
     }
 
     /**
@@ -615,12 +578,11 @@ public final class Collectors {
      * @return a {@code Collector}
      * @since 1.1.3
      */
-    public static <T, U, A, R> Collector<T, ?, R> flatMapping(
-            final Function<? super T, ? extends Stream<? extends U>> mapper,
+    public static <T, U, A, R> Collector<T, ?, R> flatMapping(final Function<? super T, ? extends Stream<? extends U>> mapper,
             final Collector<? super U, A, R> downstream) {
 
         final BiConsumer<A, ? super U> accumulator = downstream.accumulator();
-        return new CollectorsImpl<T, A, R>(
+        return new CollectorsImpl<>(
 
                 downstream.supplier(),
 
@@ -628,7 +590,8 @@ public final class Collectors {
                     @Override
                     public void accept(final A a, T t) {
                         final Stream<? extends U> stream = mapper.apply(t);
-                        if (stream == null) return;
+                        if (stream == null)
+                            return;
                         stream.forEach(new Consumer<U>() {
                             @Override
                             public void accept(U u) {
@@ -638,10 +601,9 @@ public final class Collectors {
                     }
                 },
 
-                downstream.finisher()
-        );
+                downstream.finisher());
     }
-    
+
     /**
      * Returns a {@code Collector} that performs additional transformation.
      * 
@@ -653,14 +615,12 @@ public final class Collectors {
      * @param finisher  the final transformation function
      * @return a {@code Collector}
      */
-    public static <T, A, IR, OR> Collector<T, A, OR> collectingAndThen(
-            Collector<T, A, IR> c, Function<IR, OR> finisher) {
+    public static <T, A, IR, OR> Collector<T, A, OR> collectingAndThen(Collector<T, A, IR> c, Function<IR, OR> finisher) {
         Function<A, IR> downstreamFinisher = c.finisher();
         if (downstreamFinisher == null) {
             downstreamFinisher = castIdentity();
         }
-        return new CollectorsImpl<T, A, OR>(c.supplier(), c.accumulator(),
-                Function.Util.andThen(downstreamFinisher, finisher));
+        return new CollectorsImpl<>(c.supplier(), c.accumulator(), Function.Util.andThen(downstreamFinisher, finisher));
     }
 
     /**
@@ -671,13 +631,12 @@ public final class Collectors {
      * @param classifier  the classifier function 
      * @return a {@code Collector}
      * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.Collector) 
-     * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.function.Supplier, com.annimon.stream.Collector) 
+     * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.Collector, com.annimon.stream.function.Supplier) 
      */
-    public static <T, K> Collector<T, ?, Map<K, List<T>>> groupingBy(
-            Function<? super T, ? extends K> classifier) {
-        return groupingBy(classifier, Collectors.<T>toList());
+    public static <T, K> Collector<T, ?, Map<K, List<T>>> groupingBy(Function<? super T, ? extends K> classifier) {
+        return groupingBy(classifier, Collectors.<T> toList());
     }
-    
+
     /**
      * Returns a {@code Collector} that performs grouping operation by given classifier.
      * 
@@ -689,15 +648,12 @@ public final class Collectors {
      * @param downstream  the collector of mapped elements
      * @return a {@code Collector}
      * @see #groupingBy(com.annimon.stream.function.Function) 
-     * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.function.Supplier, com.annimon.stream.Collector) 
+     * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.Collector, com.annimon.stream.function.Supplier) 
      */
-    public static <T, K, A, D> Collector<T, ?, Map<K, D>> groupingBy(
-            Function<? super T, ? extends K> classifier,
-            Collector<? super T, A, D> downstream) {
-        return Collectors.<T, K, D, A, Map<K, D>>groupingBy(classifier,
-                Collectors.<K, D>hashMapSupplier(), downstream);
+    public static <T, K, A, D> Collector<T, ?, Map<K, D>> groupingBy(Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream) {
+        return Collectors.<T, K, D, A, Map<K, D>> groupingBy(classifier, downstream, Collectors.<K, D> hashMapSupplier());
     }
-    
+
     /**
      * Returns a {@code Collector} that performs grouping operation by given classifier.
      * 
@@ -707,16 +663,14 @@ public final class Collectors {
      * @param <D> the result type of downstream reduction
      * @param <M> the type of the resulting {@code Map}
      * @param classifier  the classifier function 
-     * @param mapFactory  a supplier function that provides new {@code Map}
      * @param downstream  the collector of mapped elements
+     * @param mapFactory  a supplier function that provides new {@code Map}
      * @return a {@code Collector}
      * @see #groupingBy(com.annimon.stream.function.Function) 
      * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.Collector) 
      */
-    public static <T, K, D, A, M extends Map<K, D>> Collector<T, ?, M> groupingBy(
-            final Function<? super T, ? extends K> classifier,
-            final Supplier<M> mapFactory,
-            final Collector<? super T, A, D> downstream) {
+    public static <T, K, D, A, M extends Map<K, D>> Collector<T, ?, M> groupingBy(final Function<? super T, ? extends K> classifier,
+            final Collector<? super T, A, D> downstream, final Supplier<M> mapFactory) {
 
         @SuppressWarnings("unchecked")
         final Function<A, A> downstreamFinisher = (Function<A, A>) downstream.finisher();
@@ -740,9 +694,8 @@ public final class Collectors {
 
         @SuppressWarnings("unchecked")
         Supplier<Map<K, A>> castedMapFactory = (Supplier<Map<K, A>>) mapFactory;
-        return new CollectorsImpl<T, Map<K, A>, M>(
-                castedMapFactory,
-                
+        return new CollectorsImpl<>(castedMapFactory,
+
                 new BiConsumer<Map<K, A>, T>() {
                     @Override
                     public void accept(Map<K, A> map, T t) {
@@ -758,42 +711,41 @@ public final class Collectors {
                         downstream.accumulator().accept(container, t);
                     }
                 },
-                
-                finisher
-        );
+
+                finisher);
     }
-    
-    private static <K, V>  Supplier<Map<K, V>> hashMapSupplier() {
+
+    private static <K, V> Supplier<Map<K, V>> hashMapSupplier() {
         return new Supplier<Map<K, V>>() {
 
             @Override
             public Map<K, V> get() {
-                return new HashMap<K, V>();
+                return new HashMap<>();
             }
         };
     }
-    
+
     @SuppressWarnings("unchecked")
     static <A, R> Function<A, R> castIdentity() {
         return new Function<A, R>() {
-            
+
             @Override
             public R apply(A value) {
                 return (R) value;
             }
         };
     }
-    
+
     private static final class Tuple1<A> {
         A a;
-        
+
         Tuple1(A a) {
             this.a = a;
         }
     }
-    
+
     private static final class CollectorsImpl<T, A, R> implements Collector<T, A, R> {
-        
+
         private final Supplier<A> supplier;
         private final BiConsumer<A, T> accumulator;
         private final Function<A, R> finisher;
@@ -801,13 +753,13 @@ public final class Collectors {
         public CollectorsImpl(Supplier<A> supplier, BiConsumer<A, T> accumulator) {
             this(supplier, accumulator, null);
         }
-        
+
         public CollectorsImpl(Supplier<A> supplier, BiConsumer<A, T> accumulator, Function<A, R> finisher) {
             this.supplier = supplier;
             this.accumulator = accumulator;
             this.finisher = finisher;
         }
-        
+
         @Override
         public Supplier<A> supplier() {
             return supplier;
@@ -822,6 +774,6 @@ public final class Collectors {
         public Function<A, R> finisher() {
             return finisher;
         }
-        
+
     }
 }

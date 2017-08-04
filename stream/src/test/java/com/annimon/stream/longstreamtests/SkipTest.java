@@ -12,7 +12,7 @@ public final class SkipTest {
     public void testSkip() {
         LongStream.of(12L, 32L, 22L)
                 .skip(2)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         22L
                 )));
     }
@@ -26,7 +26,7 @@ public final class SkipTest {
     public void testSkipZero() {
         LongStream.of(12L, 32L, 22L)
                 .skip(0)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         12L, 32L, 22L
                 )));
     }
@@ -35,6 +35,6 @@ public final class SkipTest {
     public void testSkipMoreThanCount() {
         LongStream.of(12L, 32L, 22L)
                 .skip(5)
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 }

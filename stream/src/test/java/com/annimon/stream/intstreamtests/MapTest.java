@@ -17,7 +17,7 @@ public final class MapTest {
                         return -operand;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         -5
                 )));
 
@@ -28,7 +28,7 @@ public final class MapTest {
                         return -operand;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         -1, -2, -3, -4, -5
                 )));
     }

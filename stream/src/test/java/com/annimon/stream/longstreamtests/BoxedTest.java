@@ -11,7 +11,7 @@ public final class BoxedTest {
     public void testBoxed() {
         LongStream.of(10L, 20L, 30L)
                 .boxed()
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         10L, 20L, 30L
                 )));
     }

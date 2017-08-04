@@ -21,7 +21,7 @@ public final class PeekTest {
                         fail();
                     }
                 })
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 
     @Test

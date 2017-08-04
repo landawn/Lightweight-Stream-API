@@ -17,7 +17,7 @@ public final class MapToObjTest {
                         return Integer.toString(value);
                     }
                 })
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "2", "3", "4"
                 )));
     }

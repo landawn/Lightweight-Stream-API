@@ -13,7 +13,7 @@ public final class OfIteratorTest {
     public void testStreamOfIterator() {
         Stream.of(Functions.counterIterator())
                 .limit(5)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                       0, 1, 2, 3, 4
                 )));
     }

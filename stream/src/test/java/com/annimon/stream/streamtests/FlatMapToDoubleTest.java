@@ -20,7 +20,7 @@ public final class FlatMapToDoubleTest {
                         return DoubleStream.of(t / 10d, t / 20d);
                     }
                 })
-                .custom(assertElements(array(
+                .chain(assertElements(array(
                         closeTo(0.2, 0.0001),
                         closeTo(0.1, 0.0001),
                         closeTo(0.4, 0.0001),

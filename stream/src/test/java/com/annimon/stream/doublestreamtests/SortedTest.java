@@ -14,7 +14,7 @@ public final class SortedTest {
     public void testSorted() {
         DoubleStream.of(1.2, 3.234, 0.09, 2.2)
                 .sorted()
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         0.09, 1.2, 2.2, 3.234
                 )));
     }
@@ -35,7 +35,7 @@ public final class SortedTest {
                         return Double.compare(o2, o1);
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         3.234, 2.2, 1.2, 0.09
                 )));
     }

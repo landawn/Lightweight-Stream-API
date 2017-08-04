@@ -18,7 +18,7 @@ public final class DistinctTest {
         Stream.of(1, 1, 2, 3, 5, 3, 2, 1, 1, -1)
                 .distinct()
                 .sorted()
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         -1, 1, 2, 3, 5
                 )));
     }
@@ -27,14 +27,14 @@ public final class DistinctTest {
     public void testDistinctEmpty() {
         Stream.<Integer>empty()
                 .distinct()
-                .custom(StreamMatcher.<Integer>assertIsEmpty());
+                .chain(StreamMatcher.<Integer>assertIsEmpty());
     }
 
     @Test
     public void testDistinctPreservesOrder() {
         Stream.of(1, 1, 2, 3, 5, 3, 2, 1, 1, -1)
                 .distinct()
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         1, 2, 3, 5, -1
                 )));
     }

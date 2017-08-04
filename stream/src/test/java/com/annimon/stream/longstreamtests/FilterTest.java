@@ -16,13 +16,13 @@ public final class FilterTest {
         final LongPredicate predicate = Functions.remainderLong(111);
         LongStream.of(322, 555, 666, 1984, 1998)
                 .filter(predicate)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         555L, 666L, 1998L
                 )));
 
         LongStream.of(12, -10)
                 .filter(predicate)
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 
     @Test(expected = NoSuchElementException.class)

@@ -13,7 +13,7 @@ public final class TakeUntilTest {
     public void testTakeUntil() {
         LongStream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(LongPredicate.Util.negate(Functions.remainderLong(2)))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2L, 4L, 6L, 7L
                 )));
     }
@@ -22,7 +22,7 @@ public final class TakeUntilTest {
     public void testTakeUntilFirstMatch() {
         LongStream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(Functions.remainderLong(2))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2L
                 )));
     }
@@ -31,7 +31,7 @@ public final class TakeUntilTest {
     public void testTakeUntilNoneMatch() {
         LongStream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(Functions.remainderLong(128))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2L, 4L, 6L, 7L, 8L, 10L, 11L
                 )));
     }

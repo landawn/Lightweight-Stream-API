@@ -18,7 +18,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         1L, 3L, 6L
                 )));
     }
@@ -32,7 +32,7 @@ public final class ScanTest {
                         return value1 / value2;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         1800L,
                         1800L / 2,
                         1800L / 2 / 3,
@@ -49,7 +49,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 
     @Test
@@ -61,7 +61,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         0L, 1L, 3L, 6L
                 )));
     }
@@ -75,7 +75,7 @@ public final class ScanTest {
                         return value1 / value2;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         1800L,
                         1800L / 2,
                         1800L / 2 / 3,
@@ -92,7 +92,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         9L
                 )));
     }

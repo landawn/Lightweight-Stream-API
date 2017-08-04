@@ -83,31 +83,31 @@ public class IntStreamMatcherTest {
     @Test
     public void testAssertIsEmptyOperator() {
         IntStream.empty()
-                .custom(IntStreamMatcher.assertIsEmpty());
+                .chain(IntStreamMatcher.assertIsEmpty());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertIsEmptyOperatorOnEmptyStream() {
         IntStream.of(1, 2)
-                .custom(IntStreamMatcher.assertIsEmpty());
+                .chain(IntStreamMatcher.assertIsEmpty());
     }
 
     @Test
     public void testAssertHasElementsOperator() {
         IntStream.of(1, 2)
-                .custom(IntStreamMatcher.assertHasElements());
+                .chain(IntStreamMatcher.assertHasElements());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertHasElementsOperatorOnEmptyStream() {
         IntStream.empty()
-                .custom(IntStreamMatcher.assertHasElements());
+                .chain(IntStreamMatcher.assertHasElements());
     }
 
     @Test
     public void testAssertElementsOperator() {
         IntStream.of(-813, 123456, Short.MAX_VALUE)
-                .custom(IntStreamMatcher.assertElements(
+                .chain(IntStreamMatcher.assertElements(
                         arrayContaining(new Integer[] {
                             -813, 123456, (int) Short.MAX_VALUE
                         })));

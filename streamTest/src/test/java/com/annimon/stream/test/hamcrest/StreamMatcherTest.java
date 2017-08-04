@@ -1,9 +1,5 @@
 package com.annimon.stream.test.hamcrest;
 
-import com.annimon.stream.Stream;
-import org.hamcrest.Matcher;
-import org.hamcrest.StringDescription;
-import org.junit.Test;
 import static com.annimon.stream.test.hamcrest.CommonMatcher.description;
 import static com.annimon.stream.test.hamcrest.CommonMatcher.hasOnlyPrivateConstructors;
 import static com.annimon.stream.test.hamcrest.StreamMatcher.elements;
@@ -17,6 +13,13 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.StringDescription;
+import org.junit.Test;
+
+import com.annimon.stream.IntStream;
+import com.annimon.stream.Stream;
 
 public class StreamMatcherTest {
 
@@ -56,48 +59,39 @@ public class StreamMatcherTest {
 
     @Test
     public void testElements() {
-        final Stream<Integer> stream = Stream.range(0, 5);
-        final Integer[] expected = {0, 1, 2, 3, 4};
+        final Stream<Integer> stream = IntStream.range(0, 5).boxed();
+        final Integer[] expected = { 0, 1, 2, 3, 4 };
         final Matcher<Stream<Integer>> matcher = elements(contains(expected));
         assertThat(stream, matcher);
         assertTrue(matcher.matches(stream));
 
-        assertFalse(elements(contains(expected)).matches(Stream.<Integer>empty()));
+        assertFalse(elements(contains(expected)).matches(Stream.<Integer> empty()));
 
-        assertThat(matcher, description(allOf(
-                containsString("Stream elements iterable "),
-                containsString("<0>, <1>, <2>, <3>, <4>")
-        )));
+        assertThat(matcher, description(allOf(containsString("Stream elements iterable "), containsString("<0>, <1>, <2>, <3>, <4>"))));
     }
 
     @Test
     public void testAssertIsEmptyOperator() {
-        Stream.<Integer>empty()
-                .custom(StreamMatcher.<Integer>assertIsEmpty());
+        Stream.<Integer> empty().chain(StreamMatcher.<Integer> assertIsEmpty());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertIsEmptyOperatorOnEmptyStream() {
-        Stream.of(1, 2)
-                .custom(StreamMatcher.<Integer>assertIsEmpty());
+        Stream.of(1, 2).chain(StreamMatcher.<Integer> assertIsEmpty());
     }
 
     @Test
     public void testAssertHasElementsOperator() {
-        Stream.of(1, 2)
-                .custom(StreamMatcher.<Integer>assertHasElements());
+        Stream.of(1, 2).chain(StreamMatcher.<Integer> assertHasElements());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertHasElementsOperatorOnEmptyStream() {
-        Stream.<Integer>empty()
-                .custom(StreamMatcher.<Integer>assertHasElements());
+        Stream.<Integer> empty().chain(StreamMatcher.<Integer> assertHasElements());
     }
 
     @Test
     public void testAssertElementsOperator() {
-        Stream.range(0, 5)
-                .custom(StreamMatcher.assertElements(
-                        contains(0, 1, 2, 3, 4)));
+        IntStream.range(0, 5).boxed().chain(StreamMatcher.assertElements(contains(0, 1, 2, 3, 4)));
     }
 }

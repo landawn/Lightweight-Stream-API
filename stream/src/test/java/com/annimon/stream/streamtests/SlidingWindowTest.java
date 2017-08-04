@@ -12,28 +12,28 @@ public final class SlidingWindowTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testSlidingWindow() {
-        long count = Stream.<Integer>empty().slidingWindow(5, 6).count();
+        long count = Stream.<Integer>empty().sliding(5, 6).count();
         assertEquals(0, count);
 
         Stream.of(                    1, 1, 1, 2, 2, 2, 3, 3, 3)
-                .slidingWindow(3, 3)
-                .custom(assertElements(contains(
+                .sliding(3, 3)
+                .chain(assertElements(contains(
                         Arrays.asList(1, 1, 1),
                         Arrays.asList(         2, 2, 2),
                         Arrays.asList(                  3, 3, 3)
                 )));
 
         Stream.of(                    1, 2, 3, 1, 2, 3, 1, 2, 3)
-                .slidingWindow(2, 3)
-                .custom(assertElements(contains(
+                .sliding(2, 3)
+                .chain(assertElements(contains(
                         Arrays.asList(1, 2),
                         Arrays.asList(         1, 2),
                         Arrays.asList(                  1, 2)
                 )));
 
         Stream.of(                    1, 2, 3, 4, 5, 6)
-                .slidingWindow(3, 1)
-                .custom(assertElements(contains(
+                .sliding(3, 1)
+                .chain(assertElements(contains(
                         Arrays.asList(1, 2, 3),
                         Arrays.asList(   2, 3, 4),
                         Arrays.asList(      3, 4, 5),
@@ -41,8 +41,8 @@ public final class SlidingWindowTest {
                 )));
 
         Stream.of(                    1, 2, 3, 4, 5, 6)
-                .slidingWindow(3)
-                .custom(assertElements(contains(
+                .sliding(3)
+                .chain(assertElements(contains(
                         Arrays.asList(1, 2, 3),
                         Arrays.asList(   2, 3, 4),
                         Arrays.asList(      3, 4, 5),
@@ -50,19 +50,19 @@ public final class SlidingWindowTest {
                 )));
 
         Stream.of(                    1, 2)
-                .slidingWindow(3, 1)
-                .custom(assertElements(contains(
+                .sliding(3, 1)
+                .chain(assertElements(contains(
                         Arrays.asList(1, 2)
                 )));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSlidingWindowWithNegativeWindowSize() {
-        Stream.of(1, 2, 3, 4).slidingWindow(-1, 1).count();
+        Stream.of(1, 2, 3, 4).sliding(-1, 1).count();
     }
 
     @Test(expected = IllegalArgumentException.class, timeout=1000)
     public void testSlidingWindowWithNegativeStepSize() {
-        Stream.of(1, 2, 3, 4).slidingWindow(5, -1).count();
+        Stream.of(1, 2, 3, 4).sliding(5, -1).count();
     }
 }

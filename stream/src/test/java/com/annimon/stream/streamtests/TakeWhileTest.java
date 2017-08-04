@@ -13,7 +13,7 @@ public final class TakeWhileTest {
     public void testTakeWhile() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeWhile(Functions.remainder(2))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         2, 4, 6
                 )));
     }
@@ -22,14 +22,14 @@ public final class TakeWhileTest {
     public void testTakeWhileNonFirstMatch() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeWhile(Functions.remainder(3))
-                .custom(StreamMatcher.<Integer>assertIsEmpty());
+                .chain(StreamMatcher.<Integer>assertIsEmpty());
     }
 
     @Test
     public void testTakeWhileAllMatch() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeWhile(Functions.remainder(1))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         2, 4, 6, 7, 8, 10, 11
                 )));
     }

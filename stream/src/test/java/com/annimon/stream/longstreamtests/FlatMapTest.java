@@ -19,7 +19,7 @@ public final class FlatMapTest {
         };
         LongStream.of(10L, 20L, 30L)
                 .flatMap(twicer)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         10L, 10L,
                         20L, 20L,
                         30L, 30L
@@ -33,7 +33,7 @@ public final class FlatMapTest {
                         return null;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         -30L
                 )));
 
@@ -45,7 +45,7 @@ public final class FlatMapTest {
                         return LongStream.of(value);
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         10L, 20L
                 )));
     }

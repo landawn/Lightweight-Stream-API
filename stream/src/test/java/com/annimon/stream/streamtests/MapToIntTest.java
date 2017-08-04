@@ -21,7 +21,7 @@ public final class MapToIntTest {
 
         Stream.of("[2]", "[3]", "[4]", "[8]", "[25]")
                 .mapToInt(stringToSquareInt)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         4, 9, 16, 64, 625
                 )));
     }

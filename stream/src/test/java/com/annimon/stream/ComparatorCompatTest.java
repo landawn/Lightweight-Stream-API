@@ -64,7 +64,7 @@ public class ComparatorCompatTest {
                         },
                         ComparatorCompat.<Integer>reverseOrder()
                 ))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "abcd", "abc", "ab", "a"
                 )));
     }
@@ -80,7 +80,7 @@ public class ComparatorCompatTest {
                             }
                         }
                 ))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "ab", "abc", "abcd"
                 )));
     }
@@ -96,7 +96,7 @@ public class ComparatorCompatTest {
                             }
                         }
                 ))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "ab", "abc", "abcd"
                 )));
     }
@@ -112,7 +112,7 @@ public class ComparatorCompatTest {
                             }
                         }
                 ))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "ab", "abc", "abcd"
                 )));
     }
@@ -128,7 +128,7 @@ public class ComparatorCompatTest {
                             }
                         }
                 ))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "ab", "abc", "abcd"
                 )));
     }
@@ -137,7 +137,7 @@ public class ComparatorCompatTest {
     public void testNullsFirst() {
         Stream.of("abc", "ab", null, "abcd", null, "a")
                 .sorted(ComparatorCompat.nullsFirst())
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         null, null, "abc", "ab", "abcd", "a"
                 )));
     }
@@ -146,7 +146,7 @@ public class ComparatorCompatTest {
     public void testNullsFirstComparator() {
         Stream.of("abc", "ab", null, "abcd", null, "a")
                 .sorted(ComparatorCompat.nullsFirst(String.CASE_INSENSITIVE_ORDER))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         null, null, "a", "ab", "abc", "abcd"
                 )));
     }
@@ -155,7 +155,7 @@ public class ComparatorCompatTest {
     public void testNullsLast() {
         Stream.of("abc", "ab", null, "abcd", null, "a")
                 .sorted(ComparatorCompat.nullsLast())
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "abc", "ab", "abcd", "a", null, null
                 )));
     }
@@ -164,7 +164,7 @@ public class ComparatorCompatTest {
     public void testNullsLastComparator() {
         Stream.of("abc", "ab", null, "abcd", null, "a")
                 .sorted(ComparatorCompat.nullsLast(String.CASE_INSENSITIVE_ORDER))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "ab", "abc", "abcd", null, null
                 )));
     }
@@ -182,7 +182,7 @@ public class ComparatorCompatTest {
         );
         Stream.of(input)
                 .sorted(comparator)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         Students.STEVE_CS_4,
                         Students.VICTORIA_CS_3,
                         Students.MARIA_CS_1
@@ -203,7 +203,7 @@ public class ComparatorCompatTest {
         );
         Stream.of(input)
                 .sorted(comparator)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         Students.MARIA_CS_1,
                         Students.SERGEY_LAW_1,
                         Students.VICTORIA_CS_3,
@@ -233,7 +233,7 @@ public class ComparatorCompatTest {
         );
         Stream.of(input)
                 .sorted(comparator)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         Students.MARIA_CS_1,
                         Students.VICTORIA_CS_3,
                         Students.STEVE_CS_4,
@@ -306,7 +306,7 @@ public class ComparatorCompatTest {
         );
         Stream.of(input)
                 .sorted(comparator)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         Students.STEVE_CS_4,
                         Students.SOPHIA_ECONOMICS_2,
                         Students.SERGEY_LAW_1,

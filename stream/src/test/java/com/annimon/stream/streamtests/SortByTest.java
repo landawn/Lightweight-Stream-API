@@ -22,7 +22,7 @@ public final class SortByTest {
                         return value.length();
                     }
                 })
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "is", "This", "test"
                 )));
     }
@@ -42,7 +42,7 @@ public final class SortByTest {
                         return student.getName();
                     }
                 })
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         Students.JOHN_CS_2,
                         Students.MARIA_ECONOMICS_1,
                         Students.STEVE_CS_4,
@@ -65,7 +65,7 @@ public final class SortByTest {
                         return -student.getCourse();
                     }
                 })
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         Students.STEVE_CS_4,
                         Students.VICTORIA_CS_3,
                         Students.JOHN_CS_2,

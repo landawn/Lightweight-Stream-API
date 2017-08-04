@@ -11,7 +11,7 @@ public final class BoxedTest {
     public void testBoxed() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .boxed()
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         0.1, 0.2, 0.3
                 )));
     }

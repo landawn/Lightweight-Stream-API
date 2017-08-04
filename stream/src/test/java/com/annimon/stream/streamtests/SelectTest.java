@@ -18,7 +18,7 @@ public final class SelectTest {
                         return value.length() == 1;
                     }
                 })
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                       "a", "b"
                 )));
     }

@@ -2,7 +2,6 @@ package com.annimon.stream;
 
 import java.io.Closeable;
 import java.util.Comparator;
-import java.util.NoSuchElementException;
 
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.LongBinaryOperator;
@@ -53,18 +52,7 @@ public final class LongStream implements Closeable {
     /**
      * Single instance for empty stream. It is safe for multi-thread environment because it has no content.
      */
-    private static final LongStream EMPTY = new LongStream(new PrimitiveIterator.OfLong() {
-
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public long nextLong() {
-            return 0L;
-        }
-    });
+    private static final LongStream EMPTY = of(new long[0]);
 
     /**
      * Returns an empty stream.
@@ -73,18 +61,6 @@ public final class LongStream implements Closeable {
      */
     public static LongStream empty() {
         return EMPTY;
-    }
-
-    /**
-     * Creates a {@code LongStream} from {@code PrimitiveIterator.OfLong}.
-     *
-     * @param iterator  the iterator with elements to be passed to stream
-     * @return the new {@code LongStream}
-     * @throws NullPointerException if {@code iterator} is null
-     */
-    public static LongStream of(PrimitiveIterator.OfLong iterator) {
-        Objects.requireNonNull(iterator);
-        return new LongStream(iterator);
     }
 
     /**
@@ -103,13 +79,15 @@ public final class LongStream implements Closeable {
     }
 
     /**
-     * Returns stream which contains single element passed as param
+     * Creates a {@code LongStream} from {@code PrimitiveIterator.OfLong}.
      *
-     * @param t  element of the stream
-     * @return the new stream
+     * @param iterator  the iterator with elements to be passed to stream
+     * @return the new {@code LongStream}
+     * @throws NullPointerException if {@code iterator} is null
      */
-    public static LongStream of(final long t) {
-        return new LongStream(new LongArray(new long[] { t }));
+    public static LongStream of(PrimitiveIterator.OfLong iterator) {
+        Objects.requireNonNull(iterator);
+        return new LongStream(iterator);
     }
 
     /**
@@ -256,86 +234,6 @@ public final class LongStream implements Closeable {
     }
 
     /**
-     * Applies custom operator on stream.
-     *
-     * Transforming function can return {@code LongStream} for intermediate operations,
-     * or any value for terminal operation.
-     *
-     * <p>Operator examples:
-     * <pre><code>
-     *     // Intermediate operator
-     *     public class Zip implements Function&lt;LongStream, LongStream&gt; {
-     *
-     *         private final LongStream secondStream;
-     *         private final LongBinaryOperator combiner;
-     *
-     *         public Zip(LongStream secondStream, LongBinaryOperator combiner) {
-     *             this.secondStream = secondStream;
-     *             this.combiner = combiner;
-     *         }
-     *
-     *         &#64;Override
-     *         public LongStream apply(LongStream firstStream) {
-     *             final PrimitiveIterator.OfLong it1 = firstStream.iterator();
-     *             final PrimitiveIterator.OfLong it2 = secondStream.iterator();
-     *             return LongStream.of(new PrimitiveIterator.OfLong() {
-     *                 &#64;Override
-     *                 public boolean hasNext() {
-     *                     return it1.hasNext() &amp;&amp; it2.hasNext();
-     *                 }
-     *
-     *                 &#64;Override
-     *                 public long nextLong() {
-     *                     return combiner.applyAsLong(it1.nextLong(), it2.nextLong());
-     *                 }
-     *             });
-     *         }
-     *     }
-     *
-     *     // Intermediate operator based on existing stream operators
-     *     public class SkipAndLimit implements UnaryOperator&lt;LongStream&gt; {
-     *
-     *         private final int skip, limit;
-     *
-     *         public SkipAndLimit(int skip, int limit) {
-     *             this.skip = skip;
-     *             this.limit = limit;
-     *         }
-     *
-     *         &#64;Override
-     *         public LongStream apply(LongStream stream) {
-     *             return stream.skip(skip).limit(limit);
-     *         }
-     *     }
-     *
-     *     // Terminal operator
-     *     public class LongSummaryStatistics implements Function&lt;LongStream, long[]&gt; {
-     *         &#64;Override
-     *         public long[] apply(LongStream stream) {
-     *             long count = 0;
-     *             long sum = 0;
-     *             final PrimitiveIterator.OfLong it = stream.iterator();
-     *             while (it.hasNext()) {
-     *                 count++;
-     *                 sum += it.nextLong();
-     *             }
-     *             return new long[] {count, sum};
-     *         }
-     *     }
-     * </code></pre>
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @see Stream#custom(com.annimon.stream.function.Function)
-     * @throws NullPointerException if {@code function} is null
-     */
-    public <R> R custom(final Function<LongStream, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
      * Returns a {@code Stream} consisting of the elements of this stream,
      * each boxed to an {@code Long}.
      *
@@ -375,7 +273,7 @@ public final class LongStream implements Closeable {
      * @param predicate  the predicate used to filter elements
      * @return the new stream
      */
-    public LongStream filterNot(final LongPredicate predicate) {
+    public LongStream removeIf(final LongPredicate predicate) {
         return filter(LongPredicate.Util.negate(predicate));
     }
 
@@ -886,13 +784,32 @@ public final class LongStream implements Closeable {
      *
      * @return the count of elements in this stream
      */
-    public long count() {
-        long count = 0;
+    public int count() {
+        int count = 0;
         while (iterator.hasNext()) {
             iterator.nextLong();
             count++;
         }
         return count;
+    }
+
+    /**
+    * Returns the average of elements in this stream.
+    *
+    * <p>This is a terminal operation.
+    *
+    * @return the average of elements in this stream
+    */
+    public OptionalDouble average() {
+        long count = 0;
+        long sum = 0;
+        while (iterator.hasNext()) {
+            sum += iterator.nextLong();
+            count++;
+        }
+        if (count == 0)
+            return OptionalDouble.empty();
+        return OptionalDouble.of(((double) sum) / count);
     }
 
     /**
@@ -1024,73 +941,83 @@ public final class LongStream implements Closeable {
     }
 
     /**
-     * Returns the single element of stream.
-     * If stream is empty, throws {@code NoSuchElementException}.
-     * If stream contains more than one element, throws {@code IllegalStateException}.
+     * Applies custom operator on stream.
      *
-     * <p>This is a short-circuiting terminal operation.
+     * Transforming function can return {@code LongStream} for intermediate operations,
+     * or any value for terminal operation.
      *
-     * <p>Example:
-     * <pre>
-     * stream: []
-     * result: NoSuchElementException
+     * <p>Operator examples:
+     * <pre><code>
+     *     // Intermediate operator
+     *     public class Zip implements Function&lt;LongStream, LongStream&gt; {
      *
-     * stream: [1]
-     * result: 1
+     *         private final LongStream secondStream;
+     *         private final LongBinaryOperator combiner;
      *
-     * stream: [1, 2, 3]
-     * result: IllegalStateException
-     * </pre>
+     *         public Zip(LongStream secondStream, LongBinaryOperator combiner) {
+     *             this.secondStream = secondStream;
+     *             this.combiner = combiner;
+     *         }
      *
-     * @return single element of stream
-     * @throws NoSuchElementException if stream is empty
-     * @throws IllegalStateException if stream contains more than one element
+     *         &#64;Override
+     *         public LongStream apply(LongStream firstStream) {
+     *             final PrimitiveIterator.OfLong it1 = firstStream.iterator();
+     *             final PrimitiveIterator.OfLong it2 = secondStream.iterator();
+     *             return LongStream.of(new PrimitiveIterator.OfLong() {
+     *                 &#64;Override
+     *                 public boolean hasNext() {
+     *                     return it1.hasNext() &amp;&amp; it2.hasNext();
+     *                 }
+     *
+     *                 &#64;Override
+     *                 public long nextLong() {
+     *                     return combiner.applyAsLong(it1.nextLong(), it2.nextLong());
+     *                 }
+     *             });
+     *         }
+     *     }
+     *
+     *     // Intermediate operator based on existing stream operators
+     *     public class SkipAndLimit implements UnaryOperator&lt;LongStream&gt; {
+     *
+     *         private final int skip, limit;
+     *
+     *         public SkipAndLimit(int skip, int limit) {
+     *             this.skip = skip;
+     *             this.limit = limit;
+     *         }
+     *
+     *         &#64;Override
+     *         public LongStream apply(LongStream stream) {
+     *             return stream.skip(skip).limit(limit);
+     *         }
+     *     }
+     *
+     *     // Terminal operator
+     *     public class LongSummaryStatistics implements Function&lt;LongStream, long[]&gt; {
+     *         &#64;Override
+     *         public long[] apply(LongStream stream) {
+     *             long count = 0;
+     *             long sum = 0;
+     *             final PrimitiveIterator.OfLong it = stream.iterator();
+     *             while (it.hasNext()) {
+     *                 count++;
+     *                 sum += it.nextLong();
+     *             }
+     *             return new long[] {count, sum};
+     *         }
+     *     }
+     * </code></pre>
+     *
+     * @param <R> the type of the result
+     * @param function  a transforming function
+     * @return a result of the transforming function
+     * @see Stream#chain(com.annimon.stream.function.Function)
+     * @throws NullPointerException if {@code function} is null
      */
-    public long single() {
-        if (!iterator.hasNext()) {
-            throw new NoSuchElementException("LongStream contains no element");
-        }
-
-        final long singleCandidate = iterator.nextLong();
-        if (iterator.hasNext()) {
-            throw new IllegalStateException("LongStream contains more than one element");
-        }
-        return singleCandidate;
-    }
-
-    /**
-     * Returns the single element wrapped by {@code OptionalLong} class.
-     * If stream is empty, returns {@code OptionalLong.empty()}.
-     * If stream contains more than one element, throws {@code IllegalStateException}.
-     *
-     * <p>This is a short-circuiting terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * stream: []
-     * result: OptionalLong.empty()
-     *
-     * stream: [1]
-     * result: OptionalLong.of(1)
-     *
-     * stream: [1, 2, 3]
-     * result: IllegalStateException
-     * </pre>
-     *
-     * @return an {@code OptionalLong} with single element
-     *         or {@code OptionalLong.empty()} if stream is empty
-     * @throws IllegalStateException if stream contains more than one element
-     */
-    public OptionalLong findSingle() {
-        if (!iterator.hasNext()) {
-            return OptionalLong.empty();
-        }
-
-        final long singleCandidate = iterator.nextLong();
-        if (iterator.hasNext()) {
-            throw new IllegalStateException("LongStream contains more than one element");
-        }
-        return OptionalLong.of(singleCandidate);
+    public <R> R chain(final Function<LongStream, R> function) {
+        Objects.requireNonNull(function);
+        return function.apply(this);
     }
 
     /**

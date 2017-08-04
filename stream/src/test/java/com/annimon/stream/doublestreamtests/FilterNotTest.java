@@ -14,13 +14,13 @@ public final class FilterNotTest {
     public void testFilterNot() {
         final DoublePredicate predicate = Functions.greaterThan(Math.PI);
         DoubleStream.of(0.012, 10.347, 3.039, 19.84, 100d)
-                .filterNot(predicate)
-                .custom(assertElements(arrayContaining(
+                .removeIf(predicate)
+                .chain(assertElements(arrayContaining(
                         0.012, 3.039
                 )));
 
         DoubleStream.of(4.096, 12)
-                .filterNot(predicate)
-                .custom(assertIsEmpty());
+                .removeIf(predicate)
+                .chain(assertIsEmpty());
     }
 }

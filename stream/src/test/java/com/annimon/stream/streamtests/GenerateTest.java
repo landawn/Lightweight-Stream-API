@@ -12,7 +12,7 @@ public final class GenerateTest {
     public void testGenerate() {
         Stream.generate(Functions.fibonacci())
                 .limit(10)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         0L, 1L, 1L, 2L, 3L, 5L, 8L, 13L, 21L, 34L
                 )));
     }

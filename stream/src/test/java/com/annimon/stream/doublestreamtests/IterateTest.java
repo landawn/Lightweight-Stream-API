@@ -22,7 +22,7 @@ public final class IterateTest {
 
         DoubleStream.iterate(0.0, operator)
                 .limit(3)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         closeTo(0.00, 0.00001),
                         closeTo(0.01, 0.00001),
                         closeTo(0.02, 0.00001)
@@ -52,7 +52,7 @@ public final class IterateTest {
         };
 
         DoubleStream.iterate(0, condition, increment)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         closeTo(0.00, 0.00001),
                         closeTo(0.05, 0.00001),
                         closeTo(0.10, 0.00001),

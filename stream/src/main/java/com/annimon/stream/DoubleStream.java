@@ -2,7 +2,6 @@ package com.annimon.stream;
 
 import java.io.Closeable;
 import java.util.Comparator;
-import java.util.NoSuchElementException;
 
 import com.annimon.stream.function.DoubleBinaryOperator;
 import com.annimon.stream.function.DoubleConsumer;
@@ -52,18 +51,7 @@ public final class DoubleStream implements Closeable {
     /**
      * Single instance for empty stream. It is safe for multi-thread environment because it has no content.
      */
-    private static final DoubleStream EMPTY = new DoubleStream(new PrimitiveIterator.OfDouble() {
-
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public double nextDouble() {
-            return 0d;
-        }
-    });
+    private static final DoubleStream EMPTY = of(new double[0]);
 
     /**
      * Returns an empty stream.
@@ -72,18 +60,6 @@ public final class DoubleStream implements Closeable {
      */
     public static DoubleStream empty() {
         return EMPTY;
-    }
-
-    /**
-     * Creates a {@code DoubleStream} from {@code PrimitiveIterator.OfDouble}.
-     *
-     * @param iterator  the iterator with elements to be passed to stream
-     * @return the new {@code DoubleStream}
-     * @throws NullPointerException if {@code iterator} is null
-     */
-    public static DoubleStream of(PrimitiveIterator.OfDouble iterator) {
-        Objects.requireNonNull(iterator);
-        return new DoubleStream(iterator);
     }
 
     /**
@@ -102,13 +78,15 @@ public final class DoubleStream implements Closeable {
     }
 
     /**
-     * Returns stream which contains single element passed as param
+     * Creates a {@code DoubleStream} from {@code PrimitiveIterator.OfDouble}.
      *
-     * @param t  element of the stream
-     * @return the new stream
+     * @param iterator  the iterator with elements to be passed to stream
+     * @return the new {@code DoubleStream}
+     * @throws NullPointerException if {@code iterator} is null
      */
-    public static DoubleStream of(final double t) {
-        return new DoubleStream(new DoubleArray(new double[] { t }));
+    public static DoubleStream of(PrimitiveIterator.OfDouble iterator) {
+        Objects.requireNonNull(iterator);
+        return new DoubleStream(iterator);
     }
 
     /**
@@ -219,87 +197,6 @@ public final class DoubleStream implements Closeable {
     }
 
     /**
-     * Applies custom operator on stream.
-     *
-     * Transforming function can return {@code DoubleStream} for intermediate operations,
-     * or any value for terminal operation.
-     *
-     * <p>Operator examples:
-     * <pre><code>
-     *     // Intermediate operator
-     *     public class Zip implements Function&lt;DoubleStream, DoubleStream&gt; {
-     *
-     *         private final DoubleStream secondStream;
-     *         private final DoubleBinaryOperator combiner;
-     *
-     *         public Zip(DoubleStream secondStream, DoubleBinaryOperator combiner) {
-     *             this.secondStream = secondStream;
-     *             this.combiner = combiner;
-     *         }
-     *
-     *         &#64;Override
-     *         public DoubleStream apply(DoubleStream firstStream) {
-     *             final PrimitiveIterator.OfDouble it1 = firstStream.iterator();
-     *             final PrimitiveIterator.OfDouble it2 = secondStream.iterator();
-     *             return DoubleStream.of(new PrimitiveIterator.OfDouble() {
-     *                 &#64;Override
-     *                 public boolean hasNext() {
-     *                     return it1.hasNext() &amp;&amp; it2.hasNext();
-     *                 }
-     *
-     *                 &#64;Override
-     *                 public double nextDouble() {
-     *                     return combiner.applyAsDouble(it1.nextDouble(), it2.nextDouble());
-     *                 }
-     *             });
-     *         }
-     *     }
-     *
-     *     // Intermediate operator based on existing stream operators
-     *     public class SkipAndLimit implements UnaryOperator&lt;DoubleStream&gt; {
-     *
-     *         private final int skip, limit;
-     *
-     *         public SkipAndLimit(int skip, int limit) {
-     *             this.skip = skip;
-     *             this.limit = limit;
-     *         }
-     *
-     *         &#64;Override
-     *         public DoubleStream apply(DoubleStream stream) {
-     *             return stream.skip(skip).limit(limit);
-     *         }
-     *     }
-     *
-     *     // Terminal operator
-     *     public class DoubleSummaryStatistics implements Function&lt;DoubleStream, double[]&gt; {
-     *         &#64;Override
-     *         public double[] apply(DoubleStream stream) {
-     *             long count = 0;
-     *             double sum = 0;
-     *             final PrimitiveIterator.OfDouble it = stream.iterator();
-     *             while (it.hasNext()) {
-     *                 count++;
-     *                 sum += it.nextDouble();
-     *             }
-     *             double average = (count == 0) ? 0 : (sum / (double) count);
-     *             return new double[] {count, sum, average};
-     *         }
-     *     }
-     * </code></pre>
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @see Stream#custom(com.annimon.stream.function.Function)
-     * @throws NullPointerException if {@code function} is null
-     */
-    public <R> R custom(final Function<DoubleStream, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
      * Returns a {@code Stream} consisting of the elements of this stream,
      * each boxed to an {@code Double}.
      *
@@ -339,7 +236,7 @@ public final class DoubleStream implements Closeable {
      * @param predicate  the predicate used to filter elements
      * @return the new stream
      */
-    public DoubleStream filterNot(final DoublePredicate predicate) {
+    public DoubleStream removeIf(final DoublePredicate predicate) {
         return filter(DoublePredicate.Util.negate(predicate));
     }
 
@@ -1007,73 +904,84 @@ public final class DoubleStream implements Closeable {
     }
 
     /**
-     * Returns the single element of stream.
-     * If stream is empty, throws {@code NoSuchElementException}.
-     * If stream contains more than one element, throws {@code IllegalStateException}.
+     * Applies custom operator on stream.
      *
-     * <p>This is a short-circuiting terminal operation.
+     * Transforming function can return {@code DoubleStream} for intermediate operations,
+     * or any value for terminal operation.
      *
-     * <p>Example:
-     * <pre>
-     * stream: []
-     * result: NoSuchElementException
+     * <p>Operator examples:
+     * <pre><code>
+     *     // Intermediate operator
+     *     public class Zip implements Function&lt;DoubleStream, DoubleStream&gt; {
      *
-     * stream: [1]
-     * result: 1
+     *         private final DoubleStream secondStream;
+     *         private final DoubleBinaryOperator combiner;
      *
-     * stream: [1, 2, 3]
-     * result: IllegalStateException
-     * </pre>
+     *         public Zip(DoubleStream secondStream, DoubleBinaryOperator combiner) {
+     *             this.secondStream = secondStream;
+     *             this.combiner = combiner;
+     *         }
      *
-     * @return single element of stream
-     * @throws NoSuchElementException if stream is empty
-     * @throws IllegalStateException if stream contains more than one element
+     *         &#64;Override
+     *         public DoubleStream apply(DoubleStream firstStream) {
+     *             final PrimitiveIterator.OfDouble it1 = firstStream.iterator();
+     *             final PrimitiveIterator.OfDouble it2 = secondStream.iterator();
+     *             return DoubleStream.of(new PrimitiveIterator.OfDouble() {
+     *                 &#64;Override
+     *                 public boolean hasNext() {
+     *                     return it1.hasNext() &amp;&amp; it2.hasNext();
+     *                 }
+     *
+     *                 &#64;Override
+     *                 public double nextDouble() {
+     *                     return combiner.applyAsDouble(it1.nextDouble(), it2.nextDouble());
+     *                 }
+     *             });
+     *         }
+     *     }
+     *
+     *     // Intermediate operator based on existing stream operators
+     *     public class SkipAndLimit implements UnaryOperator&lt;DoubleStream&gt; {
+     *
+     *         private final int skip, limit;
+     *
+     *         public SkipAndLimit(int skip, int limit) {
+     *             this.skip = skip;
+     *             this.limit = limit;
+     *         }
+     *
+     *         &#64;Override
+     *         public DoubleStream apply(DoubleStream stream) {
+     *             return stream.skip(skip).limit(limit);
+     *         }
+     *     }
+     *
+     *     // Terminal operator
+     *     public class DoubleSummaryStatistics implements Function&lt;DoubleStream, double[]&gt; {
+     *         &#64;Override
+     *         public double[] apply(DoubleStream stream) {
+     *             long count = 0;
+     *             double sum = 0;
+     *             final PrimitiveIterator.OfDouble it = stream.iterator();
+     *             while (it.hasNext()) {
+     *                 count++;
+     *                 sum += it.nextDouble();
+     *             }
+     *             double average = (count == 0) ? 0 : (sum / (double) count);
+     *             return new double[] {count, sum, average};
+     *         }
+     *     }
+     * </code></pre>
+     *
+     * @param <R> the type of the result
+     * @param function  a transforming function
+     * @return a result of the transforming function
+     * @see Stream#chain(com.annimon.stream.function.Function)
+     * @throws NullPointerException if {@code function} is null
      */
-    public double single() {
-        if (!iterator.hasNext()) {
-            throw new NoSuchElementException("DoubleStream contains no element");
-        }
-
-        final double singleCandidate = iterator.nextDouble();
-        if (iterator.hasNext()) {
-            throw new IllegalStateException("DoubleStream contains more than one element");
-        }
-        return singleCandidate;
-    }
-
-    /**
-     * Returns the single element wrapped by {@code OptionalDouble} class.
-     * If stream is empty, returns {@code OptionalDouble.empty()}.
-     * If stream contains more than one element, throws {@code IllegalStateException}.
-     *
-     * <p>This is a short-circuiting terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * stream: []
-     * result: OptionalDouble.empty()
-     *
-     * stream: [1]
-     * result: OptionalDouble.of(1)
-     *
-     * stream: [1, 2, 3]
-     * result: IllegalStateException
-     * </pre>
-     *
-     * @return an {@code OptionalDouble} with single element
-     *         or {@code OptionalDouble.empty()} if stream is empty
-     * @throws IllegalStateException if stream contains more than one element
-     */
-    public OptionalDouble findSingle() {
-        if (!iterator.hasNext()) {
-            return OptionalDouble.empty();
-        }
-
-        final double singleCandidate = iterator.nextDouble();
-        if (iterator.hasNext()) {
-            throw new IllegalStateException("DoubleStream contains more than one element");
-        }
-        return OptionalDouble.of(singleCandidate);
+    public <R> R chain(final Function<DoubleStream, R> function) {
+        Objects.requireNonNull(function);
+        return function.apply(this);
     }
 
     /**

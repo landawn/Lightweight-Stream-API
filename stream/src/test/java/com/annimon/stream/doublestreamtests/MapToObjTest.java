@@ -19,12 +19,12 @@ public final class MapToObjTest {
         };
         DoubleStream.of(1.0, 2.12, 3.234)
                 .mapToObj(doubleToString)
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "1.0", "2.12", "3.234"
                 )));
 
         DoubleStream.empty()
                 .mapToObj(doubleToString)
-                .custom(StreamMatcher.<String>assertIsEmpty());
+                .chain(StreamMatcher.<String>assertIsEmpty());
     }
 }

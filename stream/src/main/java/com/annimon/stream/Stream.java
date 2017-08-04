@@ -2,22 +2,19 @@ package com.annimon.stream;
 
 import java.io.Closeable;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.Set;
 
 import com.annimon.stream.function.BiConsumer;
 import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.BinaryOperator;
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
-import com.annimon.stream.function.IndexedBiFunction;
-import com.annimon.stream.function.IndexedConsumer;
-import com.annimon.stream.function.IndexedFunction;
-import com.annimon.stream.function.IndexedPredicate;
 import com.annimon.stream.function.IntFunction;
 import com.annimon.stream.function.Predicate;
 import com.annimon.stream.function.Supplier;
@@ -28,7 +25,6 @@ import com.annimon.stream.function.UnaryOperator;
 import com.annimon.stream.internal.Compose;
 import com.annimon.stream.internal.Operators;
 import com.annimon.stream.internal.Params;
-import com.annimon.stream.iterator.IndexedIterator;
 import com.annimon.stream.iterator.LazyIterator;
 import com.annimon.stream.operator.ObjArray;
 import com.annimon.stream.operator.ObjChunkBy;
@@ -36,9 +32,7 @@ import com.annimon.stream.operator.ObjConcat;
 import com.annimon.stream.operator.ObjDistinct;
 import com.annimon.stream.operator.ObjDistinctBy;
 import com.annimon.stream.operator.ObjDropWhile;
-import com.annimon.stream.operator.ObjDropWhileIndexed;
 import com.annimon.stream.operator.ObjFilter;
-import com.annimon.stream.operator.ObjFilterIndexed;
 import com.annimon.stream.operator.ObjFlatMap;
 import com.annimon.stream.operator.ObjFlatMapToDouble;
 import com.annimon.stream.operator.ObjFlatMapToInt;
@@ -47,7 +41,6 @@ import com.annimon.stream.operator.ObjGenerate;
 import com.annimon.stream.operator.ObjIterate;
 import com.annimon.stream.operator.ObjLimit;
 import com.annimon.stream.operator.ObjMap;
-import com.annimon.stream.operator.ObjMapIndexed;
 import com.annimon.stream.operator.ObjMapToDouble;
 import com.annimon.stream.operator.ObjMapToInt;
 import com.annimon.stream.operator.ObjMapToLong;
@@ -59,9 +52,7 @@ import com.annimon.stream.operator.ObjSkip;
 import com.annimon.stream.operator.ObjSlidingWindow;
 import com.annimon.stream.operator.ObjSorted;
 import com.annimon.stream.operator.ObjTakeUntil;
-import com.annimon.stream.operator.ObjTakeUntilIndexed;
 import com.annimon.stream.operator.ObjTakeWhile;
-import com.annimon.stream.operator.ObjTakeWhileIndexed;
 import com.annimon.stream.operator.ObjZip;
 
 /**
@@ -70,6 +61,10 @@ import com.annimon.stream.operator.ObjZip;
  * @param <T> the type of the stream elements
  */
 public class Stream<T> implements Closeable {
+    static final Object NONE = new Object();
+
+    @SuppressWarnings({ "rawtypes" })
+    static final Stream EMPTY = of(new Object[0]);
 
     /**
      * Returns an empty stream.
@@ -77,65 +72,13 @@ public class Stream<T> implements Closeable {
      * @param <T> the type of the stream elements
      * @return the new empty stream
      */
+    @SuppressWarnings("unchecked")
     public static <T> Stream<T> empty() {
-        return of(Collections.<T> emptyList());
+        return EMPTY;
     }
 
-    /**
-     * Creates a {@code Stream} from {@code Map} entries.
-     *
-     * @param <K> the type of map keys
-     * @param <V> the type of map values
-     * @param map  the map with elements to be passed to stream
-     * @return the new stream
-     * @throws NullPointerException if {@code map} is null
-     */
-    public static <K, V> Stream<Map.Entry<K, V>> of(Map<K, V> map) {
-        Objects.requireNonNull(map);
-        return new Stream<>(map.entrySet());
-    }
-
-    /**
-     * Creates a {@code Stream} from any class that implements {@code Iterator} interface.
-     *
-     * @param <T> the type of the stream elements
-     * @param iterator  the iterator with elements to be passed to stream
-     * @return the new stream
-     * @throws NullPointerException if {@code iterator} is null
-     */
-    public static <T> Stream<T> of(Iterator<? extends T> iterator) {
-        Objects.requireNonNull(iterator);
-        return new Stream<>(iterator);
-    }
-
-    /**
-     * Creates a {@code Stream} from any class that implements {@code Iterable} interface.
-     *
-     * @param <T> the type of the stream elements
-     * @param iterable  the {@code Iterable} with elements to be passed to stream
-     * @return the new stream
-     * @throws NullPointerException if {@code iterable} is null
-     */
-    public static <T> Stream<T> of(Iterable<? extends T> iterable) {
-        Objects.requireNonNull(iterable);
-        return new Stream<>(iterable);
-    }
-
-    /**
-     * Creates a {@code Stream} from the specified values.
-     *
-     * @param <T> the type of the stream elements
-     * @param elements  the elements to be passed to stream
-     * @return the new stream
-     * @throws NullPointerException if {@code elements} is null
-     */
-    @SafeVarargs
-    public static <T> Stream<T> of(final T... elements) {
-        Objects.requireNonNull(elements);
-        if (elements.length == 0) {
-            return Stream.<T> empty();
-        }
-        return new Stream<>(new ObjArray<>(elements));
+    public static <T> Stream<T> just(final T value) {
+        return of(value);
     }
 
     /**
@@ -152,66 +95,67 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * If specified iterable is null, returns an empty {@code Stream},
-     * otherwise returns a {@code Stream} containing elements of this iterable.
+     * Creates a {@code Stream} from the specified values.
      *
      * @param <T> the type of the stream elements
-     * @param iterable  the {@code Iterable} with elements to be passed to stream
+     * @param elements  the elements to be passed to stream
      * @return the new stream
-     * @since 1.1.5
+     * @throws NullPointerException if {@code elements} is null
      */
-    public static <T> Stream<T> ofNullable(Iterable<? extends T> iterable) {
-        return (iterable == null) ? Stream.<T> empty() : Stream.<T> of(iterable);
+    @SafeVarargs
+    public static <T> Stream<T> of(final T... elements) {
+        if (elements == null || elements.length == 0) {
+            return Stream.<T> empty();
+        }
+
+        return new Stream<>(new ObjArray<>(elements));
     }
 
     /**
-     * Creates a {@code Stream<Integer>} from not closed range
-     * (from {@code from} inclusive to {@code to} exclusive and incremental step {@code 1}).
+     * Creates a {@code Stream} from {@code Map} entries.
      *
-     * @param from  the initial value (inclusive)
-     * @param to  the upper bound (exclusive)
+     * @param <K> the type of map keys
+     * @param <V> the type of map values
+     * @param map  the map with elements to be passed to stream
      * @return the new stream
-     * @see IntStream#range(int, int)
+     * @throws NullPointerException if {@code map} is null
      */
-    public static Stream<Integer> range(final int from, final int to) {
-        return IntStream.range(from, to).boxed();
+    public static <T> Stream<T> of(Collection<? extends T> c) {
+        if (c == null || c.size() == 0) {
+            return Stream.<T> empty();
+        }
+
+        return new Stream<>(c);
     }
 
     /**
-     * Creates a {@code Stream<Long>} from not closed range
-     * (from {@code from} inclusive to {@code to} exclusive and incremental step {@code 1}).
+     * Creates a {@code Stream} from {@code Map} entries.
      *
-     * @param from  the initial value (inclusive)
-     * @param to  the upper bound (exclusive)
+     * @param <K> the type of map keys
+     * @param <V> the type of map values
+     * @param map  the map with elements to be passed to stream
      * @return the new stream
+     * @throws NullPointerException if {@code map} is null
      */
-    public static Stream<Long> range(final long from, final long to) {
-        return LongStream.range(from, to).boxed();
+    public static <K, V> Stream<Map.Entry<K, V>> of(Map<K, V> map) {
+        if (map == null || map.size() == 0) {
+            return Stream.<Map.Entry<K, V>> empty();
+        }
+
+        return new Stream<>(map.entrySet());
     }
 
     /**
-     * Creates a {@code Stream<Integer>} from closed range
-     * (from {@code from} inclusive to {@code to} inclusive and incremental step {@code 1}).
+     * Creates a {@code Stream} from any class that implements {@code Iterator} interface.
      *
-     * @param from  the initial value (inclusive)
-     * @param to  the upper bound (inclusive)
+     * @param <T> the type of the stream elements
+     * @param iterator  the iterator with elements to be passed to stream
      * @return the new stream
-     * @see IntStream#rangeClosed(int, int)
+     * @throws NullPointerException if {@code iterator} is null
      */
-    public static Stream<Integer> rangeClosed(final int from, final int to) {
-        return IntStream.rangeClosed(from, to).boxed();
-    }
-
-    /**
-     * Creates a {@code Stream<Long>} from closed range
-     * (from {@code from} inclusive to {@code to} inclusive and incremental step {@code 1}).
-     *
-     * @param from  the initial value (inclusive)
-     * @param to  the upper bound (inclusive)
-     * @return the new stream
-     */
-    public static Stream<Long> rangeClosed(final long from, final long to) {
-        return LongStream.rangeClosed(from, to).boxed();
+    public static <T> Stream<T> of(Iterator<? extends T> iterator) {
+        Objects.requireNonNull(iterator);
+        return new Stream<>(iterator);
     }
 
     /**
@@ -469,82 +413,10 @@ public class Stream<T> implements Closeable {
     /**
      * Returns internal stream iterator.
      *
-     * @deprecated  As of release 1.1.1, replaced by {@link #iterator()}
-     * @return internal stream iterator
-     */
-    @Deprecated
-    public Iterator<? extends T> getIterator() {
-        return iterator;
-    }
-
-    /**
-     * Returns internal stream iterator.
-     *
      * @return internal stream iterator
      */
     public Iterator<? extends T> iterator() {
         return iterator;
-    }
-
-    /**
-     * Applies custom operator on stream.
-     *
-     * Transforming function can return {@code Stream} for intermediate operations,
-     * or any value for terminal operation.
-     *
-     * <p>Operator examples:
-     * <pre><code>
-     *     // Intermediate operator
-     *     public class Reverse&lt;T&gt; implements Function&lt;Stream&lt;T&gt;, Stream&lt;T&gt;&gt; {
-     *         &#64;Override
-     *         public Stream&lt;T&gt; apply(Stream&lt;T&gt; stream) {
-     *             final Iterator&lt;? extends T&gt; iterator = stream.iterator();
-     *             final ArrayDeque&lt;T&gt; deque = new ArrayDeque&lt;T&gt;();
-     *             while (iterator.hasNext()) {
-     *                 deque.addFirst(iterator.next());
-     *             }
-     *             return Stream.of(deque.iterator());
-     *         }
-     *     }
-     *
-     *     // Intermediate operator based on existing stream operators
-     *     public class SkipAndLimit&lt;T&gt; implements UnaryOperator&lt;Stream&lt;T&gt;&gt; {
-     *
-     *         private final int skip, limit;
-     *
-     *         public SkipAndLimit(int skip, int limit) {
-     *             this.skip = skip;
-     *             this.limit = limit;
-     *         }
-     *
-     *         &#64;Override
-     *         public Stream&lt;T&gt; apply(Stream&lt;T&gt; stream) {
-     *             return stream.skip(skip).limit(limit);
-     *         }
-     *     }
-     *
-     *     // Terminal operator
-     *     public class Sum implements Function&lt;Stream&lt;Integer&gt;, Integer&gt; {
-     *         &#64;Override
-     *         public Integer apply(Stream&lt;Integer&gt; stream) {
-     *             return stream.reduce(0, new BinaryOperator&lt;Integer&gt;() {
-     *                 &#64;Override
-     *                 public Integer apply(Integer value1, Integer value2) {
-     *                     return value1 + value2;
-     *                 }
-     *             });
-     *         }
-     *     }
-     * </code></pre>
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @throws NullPointerException if {@code function} is null
-     */
-    public <R> R custom(Function<Stream<T>, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
     }
 
     /**
@@ -567,56 +439,6 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * Returns a {@code Stream} with elements that satisfy the given {@code IndexedPredicate}.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * predicate: (index, value) -&gt; (index + value) &gt; 6
-     * stream: [1, 2, 3, 4, 0, 11]
-     * index:  [0, 1, 2, 3, 4,  5]
-     * sum:    [1, 3, 5, 7, 4, 16]
-     * filter: [         7,    16]
-     * result: [4, 11]
-     * </pre>
-     *
-     * @param predicate  the {@code IndexedPredicate} used to filter elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> filterIndexed(IndexedPredicate<? super T> predicate) {
-        return filterIndexed(0, 1, predicate);
-    }
-
-    /**
-     * Returns a {@code Stream} with elements that satisfy the given {@code IndexedPredicate}.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 4
-     * step: 3
-     * predicate: (index, value) -&gt; (index + value) &gt; 15
-     * stream: [1, 2,  3,  4,  0, 11]
-     * index:  [4, 7, 10, 13, 16, 19]
-     * sum:    [5, 9, 13, 17, 16, 30]
-     * filter: [          17, 16, 30]
-     * result: [4, 0, 11]
-     * </pre>
-     *
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param predicate  the {@code IndexedPredicate} used to filter elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> filterIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        return new Stream<>(params, new ObjFilterIndexed<>(new IndexedIterator<>(from, step, iterator), predicate));
-    }
-
-    /**
      * Returns {@code Stream} with elements that does not satisfy the given predicate.
      *
      * <p>This is an intermediate operation.
@@ -624,7 +446,7 @@ public class Stream<T> implements Closeable {
      * @param predicate  the predicate used to filter elements
      * @return the new stream
      */
-    public Stream<T> filterNot(final Predicate<? super T> predicate) {
+    public Stream<T> removeIf(final Predicate<? super T> predicate) {
         return filter(Predicate.Util.negate(predicate));
     }
 
@@ -656,20 +478,8 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      * @since 1.1.6
      */
-    public Stream<T> withoutNulls() {
+    public Stream<T> skipNull() {
         return filter(Predicate.Util.<T> notNull());
-    }
-
-    /**
-     * Returns {@code Stream} with elements that is null only.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> nullsOnly() {
-        return filterNot(Predicate.Util.<T> notNull());
     }
 
     /**
@@ -690,54 +500,6 @@ public class Stream<T> implements Closeable {
      */
     public <R> Stream<R> map(final Function<? super T, ? extends R> mapper) {
         return new Stream<>(params, new ObjMap<>(iterator, mapper));
-    }
-
-    /**
-     * Returns a {@code Stream} with elements that obtained by applying the given {@code IndexedFunction}.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * predicate: (index, value) -&gt; (index * value)
-     * stream: [1, 2, 3,  4]
-     * index:  [0, 1, 2,  3]
-     * result: [0, 2, 6, 12]
-     * </pre>
-     *
-     * @param <R> the type of elements in resulting stream
-     * @param mapper  the mapper function used to apply to each element
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public <R> Stream<R> mapIndexed(IndexedFunction<? super T, ? extends R> mapper) {
-        return this.<R> mapIndexed(0, 1, mapper);
-    }
-
-    /**
-     * Returns a {@code Stream} with elements that obtained by applying the given {@code IndexedFunction}.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: -2
-     * step: 2
-     * predicate: (index, value) -&gt; (index * value)
-     * stream: [ 1, 2, 3,  4]
-     * index:  [-2, 0, 2,  4]
-     * result: [-2, 0, 6, 16]
-     * </pre>
-     *
-     * @param <R> the type of elements in resulting stream
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param mapper  the mapper function used to apply to each element
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public <R> Stream<R> mapIndexed(int from, int step, IndexedFunction<? super T, ? extends R> mapper) {
-        return new Stream<>(params, new ObjMapIndexed<>(new IndexedIterator<>(from, step, iterator), mapper));
     }
 
     /**
@@ -803,6 +565,26 @@ public class Stream<T> implements Closeable {
         return new Stream<>(params, new ObjFlatMap<>(iterator, mapper));
     }
 
+    public <R> Stream<R> flatMap2(final Function<? super T, ? extends Collection<? extends R>> mapper) {
+        return flatMap(new Function<T, Stream<R>>() {
+            @Override
+            public Stream<R> apply(T t) {
+                final Collection<? extends R> c = mapper.apply(t);
+                return c == null || c.size() == 0 ? Stream.<R> empty() : Stream.of(c);
+            }
+        });
+    }
+
+    public <R> Stream<R> flatMap3(final Function<? super T, ? extends R[]> mapper) {
+        return flatMap(new Function<T, Stream<R>>() {
+            @Override
+            public Stream<R> apply(T t) {
+                final R[] a = mapper.apply(t);
+                return a == null || a.length == 0 ? Stream.<R> empty() : Stream.of(a);
+            }
+        });
+    }
+
     /**
      * Returns a stream consisting of the results of replacing each element of
      * this stream with the contents of a mapped stream produced by applying
@@ -863,33 +645,13 @@ public class Stream<T> implements Closeable {
      * @return the new {@code IntPair} stream
      * @since 1.1.2
      */
-    public Stream<IntPair<T>> indexed() {
-        return indexed(0, 1);
-    }
-
-    /**
-     * Returns {@code Stream} with indexed elements.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 5, step: 10
-     * stream: ["a", "b", "c"]
-     * result: [(5, "a"), (15, "b"), (25, "c")]
-     * </pre>
-     *
-     * @param from  the initial value (inclusive)
-     * @param step  the step
-     * @return the new {@code IntPair} stream
-     * @since 1.1.2
-     */
-    public Stream<IntPair<T>> indexed(final int from, final int step) {
-        return mapIndexed(from, step, new IndexedFunction<T, IntPair<T>>() {
+    public Stream<Indexed<T>> indexed() {
+        return map(new Function<T, Indexed<T>>() {
+            private int index = 0;
 
             @Override
-            public IntPair<T> apply(int index, T t) {
-                return new IntPair<>(index, t);
+            public Indexed<T> apply(T t) {
+                return new Indexed<>(index++, t);
             }
         });
     }
@@ -996,7 +758,7 @@ public class Stream<T> implements Closeable {
      * @param f  the transformation function
      * @return the new stream
      */
-    public <R extends Comparable<? super R>> Stream<T> sortBy(final Function<? super T, ? extends R> f) {
+    public <U extends Comparable<? super U>> Stream<T> sortBy(final Function<? super T, ? extends U> f) {
         return sorted(ComparatorCompat.comparing(f));
     }
 
@@ -1017,7 +779,19 @@ public class Stream<T> implements Closeable {
      * @return the new stream
      */
     public <K> Stream<Map.Entry<K, List<T>>> groupBy(final Function<? super T, ? extends K> classifier) {
-        Map<K, List<T>> map = collect(Collectors.<T, K> groupingBy(classifier));
+        final Map<K, List<T>> map = collect(Collectors.<T, K> groupingBy(classifier));
+        return new Stream<>(params, map.entrySet());
+    }
+
+    public <K, A, D> Stream<Map.Entry<K, D>> groupBy(Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream) {
+        final Map<K, D> map = collect(Collectors.groupingBy(classifier, downstream));
+        return new Stream<>(params, map.entrySet());
+    }
+
+    public <K, A, D> Stream<Map.Entry<K, D>> groupBy(final Function<? super T, ? extends K> classifier, final Collector<? super T, A, D> downstream,
+            final Supplier<Map<K, D>> mapFactory) {
+        final Map<K, D> map = collect(Collectors.groupingBy(classifier, downstream, mapFactory));
+
         return new Stream<>(params, map.entrySet());
     }
 
@@ -1045,39 +819,14 @@ public class Stream<T> implements Closeable {
         return new Stream<>(params, new ObjChunkBy<>(iterator, classifier));
     }
 
-    /**
-     * Samples the {@code Stream} by emitting every n-th element.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * stepWidth: 3
-     * stream: [1, 2, 3, 4, 5, 6, 7, 8]
-     * result: [1, 4, 7]
-     * </pre>
-     *
-     * @param stepWidth  step width
-     * @return the new stream
-     * @throws IllegalArgumentException if {@code stepWidth} is zero or negative
-     */
-    public Stream<T> sample(final int stepWidth) {
-        if (stepWidth <= 0)
-            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1)
-            return this;
-        return slidingWindow(1, stepWidth).map(new Function<List<T>, T>() {
-            @Override
-            public T apply(List<T> list) {
-                return list.get(0);
-            }
-        });
+    public Stream<List<T>> split(final int size) {
+        return sliding(size, size);
     }
 
     /**
      * Partitions {@code Stream} into {@code List}s of fixed size by sliding over the elements of the stream.
      * It starts with the first element and in each iteration moves by 1. This method yields the same results
-     * as calling {@link #slidingWindow(int, int)} with a {@code stepWidth} of 1.
+     * as calling {@link #sliding(int, int)} with a {@code stepWidth} of 1.
      *
      * <p>This is an intermediate operation.
      *
@@ -1090,10 +839,10 @@ public class Stream<T> implements Closeable {
      *
      * @param windowSize  number of elements that will be emitted together in a list
      * @return the new stream
-     * @see #slidingWindow(int, int)
+     * @see #sliding(int, int)
      */
-    public Stream<List<T>> slidingWindow(final int windowSize) {
-        return slidingWindow(windowSize, 1);
+    public Stream<List<T>> sliding(final int windowSize) {
+        return sliding(windowSize, 1);
     }
 
     /**
@@ -1126,7 +875,7 @@ public class Stream<T> implements Closeable {
      * @throws IllegalArgumentException if {@code windowSize} is zero or negative
      * @throws IllegalArgumentException if {@code stepWidth} is zero or negative
      */
-    public Stream<List<T>> slidingWindow(final int windowSize, final int stepWidth) {
+    public Stream<List<T>> sliding(final int windowSize, final int stepWidth) {
         if (windowSize <= 0)
             throw new IllegalArgumentException("windowSize cannot be zero or negative");
         if (stepWidth <= 0)
@@ -1219,54 +968,6 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * Takes elements while the {@code IndexedPredicate} returns {@code true}.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * predicate: (index, value) -&gt; (index + value) &lt; 5
-     * stream: [1, 2, 3,  4, -5, -6, -7]
-     * index:  [0, 1, 2,  3,  4,  5,  6]
-     * sum:    [1, 3, 5,  7, -1, -1, -1]
-     * result: [1, 2]
-     * </pre>
-     *
-     * @param predicate  the {@code IndexedPredicate} used to take elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> takeWhileIndexed(IndexedPredicate<? super T> predicate) {
-        return takeWhileIndexed(0, 1, predicate);
-    }
-
-    /**
-     * Takes elements while the {@code IndexedPredicate} returns {@code true}.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 2
-     * step: 2
-     * predicate: (index, value) -&gt; (index + value) &lt; 8
-     * stream: [1, 2, 3,  4, -5, -6, -7]
-     * index:  [2, 4, 6,  8, 10, 12, 14]
-     * sum:    [3, 6, 9, 12,  5,  6,  7]
-     * result: [1, 2]
-     * </pre>
-     *
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param predicate  the {@code IndexedPredicate} used to take elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> takeWhileIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        return new Stream<>(params, new ObjTakeWhileIndexed<>(new IndexedIterator<>(from, step, iterator), predicate));
-    }
-
-    /**
      * Takes elements while the predicate returns {@code false}.
      * Once predicate condition is satisfied by an element, the stream
      * finishes with this element.
@@ -1289,58 +990,6 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * Takes elements while the {@code IndexedPredicate} returns {@code false}.
-     * Once predicate condition is satisfied by an element, the stream
-     * finishes with this element.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * stopPredicate: (index, value) -&gt; (index + value) &gt; 4
-     * stream: [1, 2, 3, 4, 0, 1, 2]
-     * index:  [0, 1, 2, 3, 4, 5, 6]
-     * sum:    [1, 3, 5, 7, 4, 6, 8]
-     * result: [1, 2, 3]
-     * </pre>
-     *
-     * @param stopPredicate  the {@code IndexedPredicate} used to take elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> takeUntilIndexed(IndexedPredicate<? super T> stopPredicate) {
-        return takeUntilIndexed(0, 1, stopPredicate);
-    }
-
-    /**
-     * Takes elements while the {@code IndexedPredicate} returns {@code false}.
-     * Once predicate condition is satisfied by an element, the stream
-     * finishes with this element.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 2
-     * step: 2
-     * stopPredicate: (index, value) -&gt; (index + value) &gt; 8
-     * stream: [1, 2, 3,  4,  0,  1,  2]
-     * index:  [2, 4, 6,  8, 10, 11, 14]
-     * sum:    [3, 6, 9, 12, 10, 12, 16]
-     * result: [1, 2, 3]
-     * </pre>
-     *
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param stopPredicate  the {@code IndexedPredicate} used to take elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> takeUntilIndexed(int from, int step, IndexedPredicate<? super T> stopPredicate) {
-        return new Stream<>(params, new ObjTakeUntilIndexed<>(new IndexedIterator<>(from, step, iterator), stopPredicate));
-    }
-
-    /**
      * Drops elements while the predicate is true, then returns the rest.
      *
      * <p>This is an intermediate operation.
@@ -1357,54 +1006,6 @@ public class Stream<T> implements Closeable {
      */
     public Stream<T> dropWhile(final Predicate<? super T> predicate) {
         return new Stream<>(params, new ObjDropWhile<>(iterator, predicate));
-    }
-
-    /**
-     * Drops elements while the {@code IndexedPredicate} is true, then returns the rest.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * predicate: (index, value) -&gt; (index + value) &lt; 5
-     * stream: [1, 2, 3, 4, 0, 1, 2]
-     * index:  [0, 1, 2, 3, 4, 5, 6]
-     * sum:    [1, 3, 5, 7, 4, 6, 8]
-     * result: [3, 4, 0, 1, 2]
-     * </pre>
-     *
-     * @param predicate  the {@code IndexedPredicate} used to drop elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> dropWhileIndexed(IndexedPredicate<? super T> predicate) {
-        return dropWhileIndexed(0, 1, predicate);
-    }
-
-    /**
-     * Drops elements while the {@code IndexedPredicate} is true, then returns the rest.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 2
-     * step: 2
-     * predicate: (index, value) -&gt; (index + value) &lt; 10
-     * stream: [1, 2, 3,  4, -5, -6, -7]
-     * index:  [2, 4, 6,  8, 10, 12, 14]
-     * sum:    [3, 6, 9, 12,  5,  6,  7]
-     * result: [4, -5, -6, -7]
-     * </pre>
-     *
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param predicate  the {@code IndexedPredicate} used to drop elements
-     * @return the new stream
-     * @since 1.1.6
-     */
-    public Stream<T> dropWhileIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        return new Stream<>(params, new ObjDropWhileIndexed<>(new IndexedIterator<>(from, step, iterator), predicate));
     }
 
     /**
@@ -1464,308 +1065,6 @@ public class Stream<T> implements Closeable {
         if (n == 0)
             return this;
         return new Stream<>(params, new ObjSkip<>(iterator, n));
-    }
-
-    /**
-     * Performs the given action on each element.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param action  the action to be performed on each element
-     */
-    public void forEach(final Consumer<? super T> action) {
-        while (iterator.hasNext()) {
-            action.accept(iterator.next());
-        }
-    }
-
-    /**
-     * Performs the given indexed action on each element.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param action  the action to be performed on each element
-     * @since 1.1.6
-     */
-    public void forEachIndexed(IndexedConsumer<? super T> action) {
-        forEachIndexed(0, 1, action);
-    }
-
-    /**
-     * Performs the given indexed action on each element.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param action  the action to be performed on each element
-     * @since 1.1.6
-     */
-    public void forEachIndexed(int from, int step, IndexedConsumer<? super T> action) {
-        int index = from;
-        while (iterator.hasNext()) {
-            action.accept(index, iterator.next());
-            index += step;
-        }
-    }
-
-    /**
-     * Reduces the elements using provided identity value and the associative accumulation function.
-     *
-     * <p>This is a terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * identity: 0
-     * accumulator: (a, b) -&gt; a + b
-     * stream: [1, 2, 3, 4, 5]
-     * result: 15
-     * </pre>
-     *
-     * @param <R> the type of the result
-     * @param identity  the initial value
-     * @param accumulator  the accumulation function
-     * @return the result of the reduction
-     */
-    public <R> R reduce(R identity, BiFunction<? super R, ? super T, ? extends R> accumulator) {
-        R result = identity;
-        while (iterator.hasNext()) {
-            final T value = iterator.next();
-            result = accumulator.apply(result, value);
-        }
-        return result;
-    }
-
-    /**
-     * Reduces the elements using provided identity value and
-     * the associative accumulation indexed function.
-     *
-     * <p>This is a terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * identity: 10
-     * accumulator: (index, a, b) -&gt; index + a + b
-     * stream: [1, 2, 3, 4, 5]
-     * index:  [0, 1, 2, 3, 4]
-     * result: 10 + 1 + 3 + 5 + 7 + 9 = 35
-     * </pre>
-     *
-     * @param <R> the type of the result
-     * @param identity  the initial value
-     * @param accumulator  the accumulation function
-     * @return the result of the reduction
-     * @since 1.1.6
-     */
-    public <R> R reduceIndexed(R identity, IndexedBiFunction<? super R, ? super T, ? extends R> accumulator) {
-        return reduceIndexed(0, 1, identity, accumulator);
-    }
-
-    /**
-     * Reduces the elements using provided identity value and
-     * the associative accumulation indexed function.
-     *
-     * <p>This is a terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 1
-     * step: 2
-     * identity: 10
-     * accumulator: (index, a, b) -&gt; index + a + b
-     * stream: [1, 2, 3, 4, 5]
-     * index:  [1, 3, 5, 7, 9]
-     * result: 10 + 2 + 5 + 8 + 11 + 14 = 50
-     * </pre>
-     *
-     * @param <R> the type of the result
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param identity  the initial value
-     * @param accumulator  the accumulation function
-     * @return the result of the reduction
-     * @since 1.1.6
-     */
-    public <R> R reduceIndexed(int from, int step, R identity, IndexedBiFunction<? super R, ? super T, ? extends R> accumulator) {
-        R result = identity;
-        int index = from;
-        while (iterator.hasNext()) {
-            final T value = iterator.next();
-            result = accumulator.apply(index, result, value);
-            index += step;
-        }
-        return result;
-    }
-
-    /**
-     * Reduces the elements using provided associative accumulation function.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param accumulator  the accumulation function
-     * @return the result of the reduction
-     * @see #reduce(java.lang.Object, com.annimon.stream.function.BiFunction)
-     */
-    public Optional<T> reduce(BiFunction<T, T, T> accumulator) {
-        boolean foundAny = false;
-        T result = null;
-        while (iterator.hasNext()) {
-            final T value = iterator.next();
-            if (!foundAny) {
-                foundAny = true;
-                result = value;
-            } else {
-                result = accumulator.apply(result, value);
-            }
-        }
-        return foundAny ? Optional.of(result) : Optional.<T> empty();
-    }
-
-    /**
-     * Collects elements to an array.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @return the result of collect elements
-     * @see #toArray(com.annimon.stream.function.IntFunction)
-     */
-    public Object[] toArray() {
-        return toArray(new IntFunction<Object[]>() {
-
-            @Override
-            public Object[] apply(int value) {
-                return new Object[value];
-            }
-        });
-    }
-
-    /**
-     * Collects elements to an array, the {@code generator} constructor of provided.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param <R> the type of the result
-     * @param generator  the array constructor reference that accommodates future array of assigned size
-     * @return the result of collect elements
-     */
-    public <R> R[] toArray(IntFunction<R[]> generator) {
-        return Operators.toArray(iterator, generator);
-    }
-
-    /**
-     * Collects elements to a new {@code List}.
-     *
-     * <p>This implementation <strong>does not</strong> call {@code collect(Collectors.toList())}, so
-     * it can be faster by reducing method calls.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @return a new {@code List}
-     * @since 1.1.5
-     * @see Collectors#toList()
-     */
-    public List<T> toList() {
-        final List<T> result = new ArrayList<>();
-        while (iterator.hasNext()) {
-            result.add(iterator.next());
-        }
-        return result;
-    }
-
-    /**
-     * Collects elements to {@code supplier} provided container by applying the given accumulation function.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param <R> the type of the result
-     * @param supplier  the supplier function that provides container
-     * @param accumulator  the accumulation function
-     * @return the result of collect elements
-     * @see #collect(com.annimon.stream.Collector)
-     */
-    public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator) {
-        final R result = supplier.get();
-        while (iterator.hasNext()) {
-            final T value = iterator.next();
-            accumulator.accept(result, value);
-        }
-        return result;
-    }
-
-    /**
-     * Collects elements with {@code collector} that encapsulates supplier, accumulator and combiner functions.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @param <R> the type of result
-     * @param <A> the intermediate used by {@code Collector}
-     * @param collector  the {@code Collector}
-     * @return the result of collect elements
-     * @see #collect(com.annimon.stream.function.Supplier, com.annimon.stream.function.BiConsumer)
-     */
-    public <R, A> R collect(Collector<? super T, A, R> collector) {
-        A container = collector.supplier().get();
-        while (iterator.hasNext()) {
-            final T value = iterator.next();
-            collector.accumulator().accept(container, value);
-        }
-        if (collector.finisher() != null)
-            return collector.finisher().apply(container);
-        return Collectors.<A, R> castIdentity().apply(container);
-    }
-
-    /**
-     * Finds the minimum element according to the given comparator.
-     *
-     * <p>This is a terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * comparator: (a, b) -&gt; a.compareTo(b)
-     * stream: [1, 2, 3, 4, 5]
-     * result: 1
-     * </pre>
-     *
-     * @param comparator  the {@code Comparator} to compare elements
-     * @return the minimum element
-     */
-    public Optional<T> min(Comparator<? super T> comparator) {
-        return reduce(BinaryOperator.Util.<T> minBy(comparator));
-    }
-
-    /**
-     * Finds the maximum element according to the given comparator.
-     *
-     * <p>This is a terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * comparator: (a, b) -&gt; a.compareTo(b)
-     * stream: [1, 2, 3, 4, 5]
-     * result: 5
-     * </pre>
-     *
-     * @param comparator  the {@code Comparator} to compare elements
-     * @return the maximum element
-     */
-    public Optional<T> max(Comparator<? super T> comparator) {
-        return reduce(BinaryOperator.Util.<T> maxBy(comparator));
-    }
-
-    /**
-     * Returns the count of elements in this stream.
-     *
-     * <p>This is a terminal operation.
-     *
-     * @return the count of elements
-     */
-    public long count() {
-        long count = 0;
-        while (iterator.hasNext()) {
-            iterator.next();
-            count++;
-        }
-        return count;
     }
 
     /**
@@ -1838,62 +1137,6 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * Finds the first element and its index that matches the given predicate.
-     *
-     * <p>This is a short-circuiting terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * predicate: (index, value) -&gt; index + value == 7
-     * stream: [1, 2, 3, 4, 5, 2, 0]
-     * index:  [0, 1, 2, 3, 4, 5, 6]
-     * result: Optional.of(IntPair(3, 4))
-     * </pre>
-     *
-     * @param predicate  the predicate to find value
-     * @return an {@code Optional} with {@code IntPair}
-     *         or {@code Optional.empty()} if stream is empty or no value was found.
-     * @since 1.1.8
-     */
-    public Optional<IntPair<T>> findIndexed(IndexedPredicate<? super T> predicate) {
-        return findIndexed(0, 1, predicate);
-    }
-
-    /**
-     * Finds the first element and its index that matches the given predicate.
-     *
-     * <p>This is a short-circuiting terminal operation.
-     *
-     * <p>Example:
-     * <pre>
-     * from: 0
-     * step: 10
-     * predicate: (index, value) -&gt; index + value == 42
-     * stream: [1, 11, 22, 12, 40]
-     * index:  [0, 10, 20, 30, 40]
-     * result: Optional.of(IntPair(20, 22))
-     * </pre>
-     *
-     * @param from  the initial value of the index (inclusive)
-     * @param step  the step of the index
-     * @param predicate  the predicate to find value
-     * @return an {@code Optional} with {@code IntPair}
-     *         or {@code Optional.empty()} if stream is empty or no value was found.
-     * @since 1.1.8
-     */
-    public Optional<IntPair<T>> findIndexed(int from, int step, IndexedPredicate<? super T> predicate) {
-        int index = from;
-        while (iterator.hasNext()) {
-            final T value = iterator.next();
-            if (predicate.test(index, value)) {
-                return Optional.of(new IntPair<>(index, value));
-            }
-            index += step;
-        }
-        return Optional.empty();
-    }
-
-    /**
      * Returns the first element wrapped by {@code Optional} class.
      * If stream is empty, returns {@code Optional.empty()}.
      *
@@ -1929,76 +1172,333 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * Returns the single element of stream.
-     * If stream is empty, throws {@code NoSuchElementException}.
-     * If stream contains more than one element, throws {@code IllegalStateException}.
+     * Finds the minimum element according to the given comparator.
      *
-     * <p>This is a short-circuiting terminal operation.
+     * <p>This is a terminal operation.
      *
      * <p>Example:
      * <pre>
-     * stream: []
-     * result: NoSuchElementException
-     *
-     * stream: [1]
+     * comparator: (a, b) -&gt; a.compareTo(b)
+     * stream: [1, 2, 3, 4, 5]
      * result: 1
-     *
-     * stream: [1, 2, 3]
-     * result: IllegalStateException
      * </pre>
      *
-     * @return single element of stream
-     * @throws NoSuchElementException if stream is empty
-     * @throws IllegalStateException if stream contains more than one element
-     * @since 1.1.2
+     * @param comparator  the {@code Comparator} to compare elements
+     * @return the minimum element
      */
-    public T single() {
-        if (iterator.hasNext()) {
-            T singleCandidate = iterator.next();
-            if (iterator.hasNext()) {
-                throw new IllegalStateException("Stream contains more than one element");
-            } else {
-                return singleCandidate;
-            }
-        } else {
-            throw new NoSuchElementException("Stream contains no element");
+    public Optional<T> min(Comparator<? super T> comparator) {
+        return reduce(BinaryOperator.Util.<T> minBy(comparator));
+    }
+
+    public <U extends Comparable<? super U>> Optional<T> minBy(final Function<? super T, ? extends U> f) {
+        return min(ComparatorCompat.comparing(f));
+    }
+
+    /**
+     * Finds the maximum element according to the given comparator.
+     *
+     * <p>This is a terminal operation.
+     *
+     * <p>Example:
+     * <pre>
+     * comparator: (a, b) -&gt; a.compareTo(b)
+     * stream: [1, 2, 3, 4, 5]
+     * result: 5
+     * </pre>
+     *
+     * @param comparator  the {@code Comparator} to compare elements
+     * @return the maximum element
+     */
+    public Optional<T> max(Comparator<? super T> comparator) {
+        return reduce(BinaryOperator.Util.<T> maxBy(comparator));
+    }
+
+    public <U extends Comparable<? super U>> Optional<T> maxBy(final Function<? super T, ? extends U> f) {
+        return max(ComparatorCompat.comparing(f));
+    }
+
+    /**
+     * Performs the given action on each element.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @param action  the action to be performed on each element
+     */
+    public void forEach(final Consumer<? super T> action) {
+        while (iterator.hasNext()) {
+            action.accept(iterator.next());
         }
     }
 
     /**
-     * Returns the single element wrapped by {@code Optional} class.
-     * If stream is empty, returns {@code Optional.empty()}.
-     * If stream contains more than one element, throws {@code IllegalStateException}.
+     * Reduces the elements using provided identity value and the associative accumulation function.
      *
-     * <p>This is a short-circuiting terminal operation.
+     * <p>This is a terminal operation.
      *
      * <p>Example:
      * <pre>
-     * stream: []
-     * result: Optional.empty()
-     *
-     * stream: [1]
-     * result: Optional.of(1)
-     *
-     * stream: [1, 2, 3]
-     * result: IllegalStateException
+     * identity: 0
+     * accumulator: (a, b) -&gt; a + b
+     * stream: [1, 2, 3, 4, 5]
+     * result: 15
      * </pre>
      *
-     * @return an {@code Optional} with single element or {@code Optional.empty()} if stream is empty
-     * @throws IllegalStateException if stream contains more than one element
-     * @since 1.1.2
+     * @param <R> the type of the result
+     * @param identity  the initial value
+     * @param accumulator  the accumulation function
+     * @return the result of the reduction
      */
-    public Optional<T> findSingle() {
-        if (iterator.hasNext()) {
-            T singleCandidate = iterator.next();
-            if (iterator.hasNext()) {
-                throw new IllegalStateException("Stream contains more than one element");
-            } else {
-                return Optional.of(singleCandidate);
-            }
-        } else {
-            return Optional.empty();
+    public <R> R reduce(R identity, BiFunction<? super R, ? super T, ? extends R> accumulator) {
+        R result = identity;
+        while (iterator.hasNext()) {
+            final T value = iterator.next();
+            result = accumulator.apply(result, value);
         }
+        return result;
+    }
+
+    /**
+     * Reduces the elements using provided associative accumulation function.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @param accumulator  the accumulation function
+     * @return the result of the reduction
+     * @see #reduce(java.lang.Object, com.annimon.stream.function.BiFunction)
+     */
+    public Optional<T> reduce(BiFunction<T, T, T> accumulator) {
+        boolean foundAny = false;
+        T result = null;
+        while (iterator.hasNext()) {
+            final T value = iterator.next();
+            if (!foundAny) {
+                foundAny = true;
+                result = value;
+            } else {
+                result = accumulator.apply(result, value);
+            }
+        }
+        return foundAny ? Optional.of(result) : Optional.<T> empty();
+    }
+
+    /**
+     * Collects elements to {@code supplier} provided container by applying the given accumulation function.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @param <R> the type of the result
+     * @param supplier  the supplier function that provides container
+     * @param accumulator  the accumulation function
+     * @return the result of collect elements
+     * @see #collect(com.annimon.stream.Collector)
+     */
+    public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator) {
+        final R result = supplier.get();
+        while (iterator.hasNext()) {
+            final T value = iterator.next();
+            accumulator.accept(result, value);
+        }
+        return result;
+    }
+
+    /**
+     * Collects elements with {@code collector} that encapsulates supplier, accumulator and combiner functions.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @param <R> the type of result
+     * @param <A> the intermediate used by {@code Collector}
+     * @param collector  the {@code Collector}
+     * @return the result of collect elements
+     * @see #collect(com.annimon.stream.function.Supplier, com.annimon.stream.function.BiConsumer)
+     */
+    public <R, A> R collect(Collector<? super T, A, R> collector) {
+        A container = collector.supplier().get();
+        while (iterator.hasNext()) {
+            final T value = iterator.next();
+            collector.accumulator().accept(container, value);
+        }
+        if (collector.finisher() != null)
+            return collector.finisher().apply(container);
+        return Collectors.<A, R> castIdentity().apply(container);
+    }
+
+    /**
+     * Returns the count of elements in this stream.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @return the count of elements
+     */
+    public int count() {
+        int count = 0;
+        while (iterator.hasNext()) {
+            iterator.next();
+            count++;
+        }
+        return count;
+    }
+
+    /**
+     * Collects elements to an array.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @return the result of collect elements
+     * @see #toArray(com.annimon.stream.function.IntFunction)
+     */
+    public Object[] toArray() {
+        return toArray(new IntFunction<Object[]>() {
+
+            @Override
+            public Object[] apply(int value) {
+                return new Object[value];
+            }
+        });
+    }
+
+    /**
+     * Collects elements to an array, the {@code generator} constructor of provided.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @param <R> the type of the result
+     * @param generator  the array constructor reference that accommodates future array of assigned size
+     * @return the result of collect elements
+     */
+    public <R> R[] toArray(IntFunction<R[]> generator) {
+        return Operators.toArray(iterator, generator);
+    }
+
+    /**
+     * Collects elements to a new {@code List}.
+     *
+     * <p>This implementation <strong>does not</strong> call {@code collect(Collectors.toList())}, so
+     * it can be faster by reducing method calls.
+     *
+     * <p>This is a terminal operation.
+     *
+     * @return a new {@code List}
+     * @since 1.1.5
+     * @see Collectors#toList()
+     */
+    public List<T> toList() {
+        final List<T> result = new ArrayList<>();
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+        return result;
+    }
+
+    public Set<T> toSet() {
+        final Set<T> result = new HashSet<>();
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+        return result;
+    }
+
+    public <C extends Collection<T>> C toCollection(Supplier<C> supplier) {
+        final C result = supplier.get();
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+        return result;
+    }
+
+    /**
+     * 
+     * @param keyMapper
+     * @return
+     * @see Collectors#toMap(Function)
+     */
+    public <K> Map<K, T> toMap(final Function<? super T, ? extends K> keyMapper) {
+        return collect(Collectors.toMap(keyMapper));
+    }
+
+    /**
+     * 
+     * @param keyMapper
+     * @param valueMapper
+     * @return
+     * @see Collectors#toMap(Function, Function)
+     */
+    public <K, V> Map<K, V> toMap(final Function<? super T, ? extends K> keyMapper, final Function<? super T, ? extends V> valueMapper) {
+        return collect(Collectors.toMap(keyMapper, valueMapper));
+    }
+
+    /**
+     * 
+     * @param keyMapper
+     * @param valueMapper
+     * @param mapFactory
+     * @return
+     * @see Collectors#toMap(Function, Function, Supplier)
+     */
+    public <K, V, M extends Map<K, V>> M toMap(final Function<? super T, ? extends K> keyMapper, final Function<? super T, ? extends V> valueMapper,
+            final Supplier<M> mapFactory) {
+        return collect(Collectors.toMap(keyMapper, valueMapper, mapFactory));
+    }
+
+    /**
+     * Applies custom operator on stream.
+     *
+     * Transforming function can return {@code Stream} for intermediate operations,
+     * or any value for terminal operation.
+     *
+     * <p>Operator examples:
+     * <pre><code>
+     *     // Intermediate operator
+     *     public class Reverse&lt;T&gt; implements Function&lt;Stream&lt;T&gt;, Stream&lt;T&gt;&gt; {
+     *         &#64;Override
+     *         public Stream&lt;T&gt; apply(Stream&lt;T&gt; stream) {
+     *             final Iterator&lt;? extends T&gt; iterator = stream.iterator();
+     *             final ArrayDeque&lt;T&gt; deque = new ArrayDeque&lt;T&gt;();
+     *             while (iterator.hasNext()) {
+     *                 deque.addFirst(iterator.next());
+     *             }
+     *             return Stream.of(deque.iterator());
+     *         }
+     *     }
+     *
+     *     // Intermediate operator based on existing stream operators
+     *     public class SkipAndLimit&lt;T&gt; implements UnaryOperator&lt;Stream&lt;T&gt;&gt; {
+     *
+     *         private final int skip, limit;
+     *
+     *         public SkipAndLimit(int skip, int limit) {
+     *             this.skip = skip;
+     *             this.limit = limit;
+     *         }
+     *
+     *         &#64;Override
+     *         public Stream&lt;T&gt; apply(Stream&lt;T&gt; stream) {
+     *             return stream.skip(skip).limit(limit);
+     *         }
+     *     }
+     *
+     *     // Terminal operator
+     *     public class Sum implements Function&lt;Stream&lt;Integer&gt;, Integer&gt; {
+     *         &#64;Override
+     *         public Integer apply(Stream&lt;Integer&gt; stream) {
+     *             return stream.reduce(0, new BinaryOperator&lt;Integer&gt;() {
+     *                 &#64;Override
+     *                 public Integer apply(Integer value1, Integer value2) {
+     *                     return value1 + value2;
+     *                 }
+     *             });
+     *         }
+     *     }
+     * </code></pre>
+     *
+     * @param <R> the type of the result
+     * @param function  a transforming function
+     * @return a result of the transforming function
+     * @throws NullPointerException if {@code function} is null
+     */
+    public <R> R chain(Function<Stream<T>, R> function) {
+        Objects.requireNonNull(function);
+        return function.apply(this);
     }
 
     /**

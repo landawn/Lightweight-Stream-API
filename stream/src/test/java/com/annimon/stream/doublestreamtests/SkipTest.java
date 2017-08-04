@@ -12,7 +12,7 @@ public final class SkipTest {
     public void testSkip() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .skip(2)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         0.3
                 )));
     }
@@ -26,7 +26,7 @@ public final class SkipTest {
     public void testSkipZero() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .skip(0)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         0.1, 0.2, 0.3
                 )));
     }
@@ -35,6 +35,6 @@ public final class SkipTest {
     public void testSkipMoreThanCount() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .skip(5)
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 }

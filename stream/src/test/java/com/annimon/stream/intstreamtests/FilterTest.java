@@ -21,7 +21,7 @@ public final class FilterTest {
     public void testFilter() {
         IntStream.rangeClosed(1, 10)
                 .filter(Functions.remainderInt(2))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2, 4, 6, 8, 10
                 )));
 
@@ -55,7 +55,7 @@ public final class FilterTest {
                         return Integer.toString(value);
                     }
                 })
-                .custom(StreamMatcher.assertElements(contains(
+                .chain(StreamMatcher.assertElements(contains(
                         "0", "2", "4"
                 )));
     }

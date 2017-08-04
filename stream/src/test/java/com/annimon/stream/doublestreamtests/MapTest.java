@@ -19,12 +19,12 @@ public final class MapTest {
         };
         DoubleStream.of(0.012, 3.039, 100d)
                 .map(negator)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         -0.012, -3.039, -100d
                 )));
 
         DoubleStream.empty()
                 .map(negator)
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 }

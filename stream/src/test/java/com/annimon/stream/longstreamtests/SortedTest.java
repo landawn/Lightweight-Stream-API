@@ -14,13 +14,13 @@ public final class SortedTest {
     public void testSorted() {
         LongStream.of(12, 32, 9, 22)
                 .sorted()
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         9L, 12L, 22L, 32L
                 )));
 
         LongStream.empty()
                 .sorted()
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 
     @Test
@@ -33,7 +33,7 @@ public final class SortedTest {
                         return Objects.compareLong(o2, o1);
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         32L, 22L, 12L, 9L
                 )));
     }

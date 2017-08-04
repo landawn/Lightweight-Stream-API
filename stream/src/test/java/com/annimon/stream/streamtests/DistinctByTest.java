@@ -13,7 +13,7 @@ public final class DistinctByTest {
     public void testDistinct() {
         Stream.of("a", "bc", "d", "ef", "ghij")
                 .distinctBy(stringLengthExtractor())
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         "a", "bc", "ghij"
                 )));
     }
@@ -22,7 +22,7 @@ public final class DistinctByTest {
     public void testDistinctEmpty() {
         Stream.<String>empty()
                 .distinctBy(stringLengthExtractor())
-                .custom(StreamMatcher.<String>assertIsEmpty());
+                .chain(StreamMatcher.<String>assertIsEmpty());
     }
 
     private Function<String, Integer> stringLengthExtractor() {

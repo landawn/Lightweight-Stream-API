@@ -10,7 +10,7 @@ public final class OfDoubleTest {
     @Test
     public void testStreamOfDouble() {
         DoubleStream.of(1.234)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         1.234
                 )));
     }

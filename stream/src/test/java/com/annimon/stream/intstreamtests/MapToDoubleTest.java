@@ -19,7 +19,7 @@ public final class MapToDoubleTest {
                         return value / 10d;
                     }
                 })
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         closeTo(0.2, 0.00001),
                         closeTo(0.3, 0.00001),
                         closeTo(0.4, 0.00001)

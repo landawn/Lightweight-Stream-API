@@ -69,11 +69,11 @@ public class RatingsTest {
                     }
                 })
                 // calculate sum by line and store in pair <int, string>
-                .map(new Function<String[], IntPair<String>>() {
+                .map(new Function<String[], Indexed<String>>() {
                     @Override
-                    public IntPair<String> apply(String[] arr) {
+                    public Indexed<String> apply(String[] arr) {
                         // <sum of marks, name>
-                        return new IntPair<String>(
+                        return new Indexed<String>(
                                 Stream.of(arr)
                                         .skip(1)
                                         .mapToInt(new ToIntFunction<String>() {
@@ -88,35 +88,35 @@ public class RatingsTest {
                     }
                 })
                 // Group by name
-                .groupBy(new Function<IntPair<String>, String>() {
+                .groupBy(new Function<Indexed<String>, String>() {
                     @Override
-                    public String apply(IntPair<String> t) {
-                        return t.getSecond();
+                    public String apply(Indexed<String> t) {
+                        return t.value();
                     }
                 })
                 // Calculate summary ratings
-                .map(new Function<Map.Entry<String, List<IntPair<String>>>, IntPair<String>>() {
+                .map(new Function<Map.Entry<String, List<Indexed<String>>>, Indexed<String>>() {
                     @Override
-                    public IntPair<String> apply(Map.Entry<String, List<IntPair<String>>> entry) {
+                    public Indexed<String> apply(Map.Entry<String, List<Indexed<String>>> entry) {
                         final String name = entry.getKey();
                         final int ratings = Stream.of(entry.getValue())
                                 .mapToInt(Functions.<String>intPairIndex())
                                 .sum();
-                        return new IntPair<String>(ratings, name);
+                        return new Indexed<String>(ratings, name);
                     }
                 })
                 // Sort by total rating descending
-                .sortBy(new Function<IntPair<String>, Integer>() {
+                .sortBy(new Function<Indexed<String>, Integer>() {
                     @Override
-                    public Integer apply(IntPair<String> value) {
-                        return -value.getFirst();
+                    public Integer apply(Indexed<String> value) {
+                        return -value.index();
                     }
                 })
                 // Convert to formatted string
-                .map(new Function<IntPair<String>, String>() {
+                .map(new Function<Indexed<String>, String>() {
                     @Override
-                    public String apply(IntPair<String> value) {
-                        return String.format("%12s: %d", value.getSecond(), value.getFirst());
+                    public String apply(Indexed<String> value) {
+                        return String.format("%12s: %d", value.value(), value.index());
                     }
                 })
                 // lines to string

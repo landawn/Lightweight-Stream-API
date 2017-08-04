@@ -81,12 +81,12 @@ public final class Functions {
             }
         };
     }
-    public static <T> ToIntFunction<IntPair<T>> intPairIndex() {
-        return new ToIntFunction<IntPair<T>>() {
+    public static <T> ToIntFunction<Indexed<T>> intPairIndex() {
+        return new ToIntFunction<Indexed<T>>() {
 
             @Override
-            public int applyAsInt(IntPair<T> t) {
-                return t.getFirst();
+            public int applyAsInt(Indexed<T> t) {
+                return t.index();
             }
         };
     }

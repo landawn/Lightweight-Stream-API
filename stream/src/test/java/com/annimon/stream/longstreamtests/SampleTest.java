@@ -11,14 +11,14 @@ public final class SampleTest {
     public void testSample() {
         LongStream.of(12, 32, 9, 22, 41, 42)
                 .sample(2)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         12L, 9L, 41L
                 )));
 
         LongStream.of(12, 32, 9, 22, 41, 42)
                 .skip(1)
                 .sample(2)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         32L, 22L, 42L
                 )));
     }
@@ -27,7 +27,7 @@ public final class SampleTest {
     public void testSampleWithStep1() {
         LongStream.of(12, 32, 9, 22, 41, 42)
                 .sample(1)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         12L, 32L, 9L, 22L, 41L, 42L
                 )));
     }

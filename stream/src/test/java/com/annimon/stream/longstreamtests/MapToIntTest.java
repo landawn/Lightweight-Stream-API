@@ -18,7 +18,7 @@ public final class MapToIntTest {
         };
         LongStream.of(10L, 20L, 30L, 40L)
                 .mapToInt(mapper)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         1, 2, 3, 4
                 )));
     }

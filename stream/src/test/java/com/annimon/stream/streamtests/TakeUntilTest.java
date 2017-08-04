@@ -14,7 +14,7 @@ public final class TakeUntilTest {
     public void testTakeUntil() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(Predicate.Util.negate(Functions.remainder(2)))
-                .custom(assertElements(contains(
+                .chain(assertElements(contains(
                         2, 4, 6, 7
                 )));
     }
@@ -23,6 +23,6 @@ public final class TakeUntilTest {
     public void testTakeUntilOnEmptyStream() {
         Stream.<Integer>empty()
                 .takeUntil(Functions.remainder(2))
-                .custom(StreamMatcher.<Integer>assertIsEmpty());
+                .chain(StreamMatcher.<Integer>assertIsEmpty());
     }
 }

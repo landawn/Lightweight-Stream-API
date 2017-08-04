@@ -13,7 +13,7 @@ public final class TakeUntilTest {
     public void testTakeUntil() {
         IntStream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(IntPredicate.Util.negate(Functions.remainderInt(2)))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2, 4, 6, 7
                 )));
     }
@@ -22,7 +22,7 @@ public final class TakeUntilTest {
     public void testTakeUntilFirstMatch() {
         IntStream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(Functions.remainderInt(2))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2
                 )));
     }
@@ -31,7 +31,7 @@ public final class TakeUntilTest {
     public void testTakeUntilNoneMatch() {
         IntStream.of(2, 4, 6, 7, 8, 10, 11)
                 .takeUntil(Functions.remainderInt(128))
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         2, 4, 6, 7, 8, 10, 11
                 )));
     }

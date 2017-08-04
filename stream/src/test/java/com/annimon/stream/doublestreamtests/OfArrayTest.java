@@ -11,7 +11,7 @@ public final class OfArrayTest {
     @Test
     public void testStreamOfDoubles() {
         DoubleStream.of(3.2, 2.8)
-                .custom(assertElements(arrayContaining(
+                .chain(assertElements(arrayContaining(
                         3.2, 2.8
                 )));
     }
@@ -24,6 +24,6 @@ public final class OfArrayTest {
     @Test
     public void testStreamOfEmptyArray() {
         DoubleStream.of(new double[0])
-                .custom(assertIsEmpty());
+                .chain(assertIsEmpty());
     }
 }
