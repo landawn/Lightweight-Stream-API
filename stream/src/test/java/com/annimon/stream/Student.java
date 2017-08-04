@@ -41,11 +41,12 @@ public final class Student implements Comparable<Student> {
 
     @Override
     public int compareTo(Student o) {
-        return ComparatorCompat
-                .comparing(Students.studentName)
-                .thenComparing(Students.speciality)
-                .thenComparing(Students.course)
-                .compare(this, o);
+        //        return ComparatorCompat
+        //                .comparing(Students.studentName)
+        //                .thenComparing(Students.speciality)
+        //                .thenComparing(Students.course)
+        //                .compare(this, o);
+        return 0;
     }
 
     @Override

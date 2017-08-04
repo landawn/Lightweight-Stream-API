@@ -1,6 +1,7 @@
 package com.annimon.stream;
 
 import java.io.Closeable;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.annimon.stream.function.BiConsumer;
@@ -390,7 +392,7 @@ public class Stream<T> implements Closeable {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Implementation">
-    private final Iterator<? extends T> iterator;
+    private final Iterator<T> iterator;
     private final Params params;
 
     private Stream(Iterator<? extends T> iterator) {
@@ -405,9 +407,10 @@ public class Stream<T> implements Closeable {
         this(params, new LazyIterator<>(iterable));
     }
 
+    @SuppressWarnings("unchecked")
     Stream(Params params, Iterator<? extends T> iterator) {
         this.params = params;
-        this.iterator = iterator;
+        this.iterator = (Iterator<T>) iterator;
     }
 
     /**
@@ -415,7 +418,7 @@ public class Stream<T> implements Closeable {
      *
      * @return internal stream iterator
      */
-    public Iterator<? extends T> iterator() {
+    public Iterator<T> iterator() {
         return iterator;
     }
 
@@ -531,6 +534,25 @@ public class Stream<T> implements Closeable {
         return new DoubleStream(params, new ObjMapToDouble<>(iterator, mapper));
     }
 
+    @SuppressWarnings("unchecked")
+    public <K, V> EntryStream<K, V> mapToEntry(Function<? super T, Map.Entry<K, V>> mapper) {
+        final Function<?, ?> identityMapper = Fn.identity();
+        if (mapper == identityMapper) {
+            return new EntryStream<>((Stream<Map.Entry<K, V>>) this);
+        } else {
+            return new EntryStream<>(this.map(mapper));
+        }
+    }
+
+    public <K, V> EntryStream<K, V> mapToEntry(final Function<? super T, K> keyMapper, final Function<? super T, V> valueMapper) {
+        return new EntryStream<>(this.map(new Function<T, Map.Entry<K, V>>() {
+            @Override
+            public Entry<K, V> apply(T t) {
+                return new AbstractMap.SimpleImmutableEntry<>(keyMapper.apply(t), valueMapper.apply(t));
+            }
+        }));
+    }
+
     /**
      * Returns a stream consisting of the results of replacing each element of
      * this stream with the contents of a mapped stream produced by applying
@@ -618,6 +640,21 @@ public class Stream<T> implements Closeable {
         return new DoubleStream(params, new ObjFlatMapToDouble<>(iterator, mapper));
     }
 
+    public <K, V> EntryStream<K, V> flatMapToEntry(Function<? super T, ? extends Stream<? extends Map.Entry<K, V>>> mapper) {
+        return EntryStream.of(flatMap(mapper));
+    }
+
+    public <K, V> EntryStream<K, V> flatMapToEntry2(final Function<? super T, ? extends Map<K, V>> mapper) {
+        final Function<T, Stream<Map.Entry<K, V>>> mapper2 = new Function<T, Stream<Map.Entry<K, V>>>() {
+            @Override
+            public Stream<Entry<K, V>> apply(T t) {
+                return Stream.of(mapper.apply(t));
+            }
+        };
+
+        return EntryStream.of(flatMap(mapper2));
+    }
+
     /**
      * Returns {@code Stream} with indexed elements.
      * Indexing starts from 0 with step 1.
@@ -674,12 +711,12 @@ public class Stream<T> implements Closeable {
      * result: ["a", "bc", "ghij"]
      * </pre>
      *
-     * @param classifier  the classifier function
+     * @param keyExtractor  the classifier function
      * @return the new stream
      * @since 1.1.8
      */
-    public <K> Stream<T> distinctBy(Function<? super T, ? extends K> classifier) {
-        return new Stream<>(params, new ObjDistinctBy<>(iterator, classifier));
+    public <K> Stream<T> distinctBy(Function<? super T, ? extends K> keyExtractor) {
+        return new Stream<>(params, new ObjDistinctBy<>(iterator, keyExtractor));
     }
 
     /**
@@ -743,11 +780,11 @@ public class Stream<T> implements Closeable {
      * </pre>
      *
      * @param <R> the type of the result of transforming function
-     * @param f  the transformation function
+     * @param keyExtractor  the transformation function
      * @return the new stream
      */
-    public <U extends Comparable<? super U>> Stream<T> sortBy(final Function<? super T, ? extends U> f) {
-        return sorted(ComparatorCompat.comparing(f));
+    public <U extends Comparable<? super U>> Stream<T> sortedBy(final Function<? super T, U> keyExtractor) {
+        return sorted(Comparators.comparingBy(keyExtractor));
     }
 
     /**
@@ -781,6 +818,31 @@ public class Stream<T> implements Closeable {
         final Map<K, D> map = collect(Collectors.groupingBy(classifier, downstream, mapFactory));
 
         return new Stream<>(params, map.entrySet());
+    }
+
+    public <K> EntryStream<K, List<T>> groupByToEntry(final Function<? super T, ? extends K> classifier) {
+        final Function<Map.Entry<K, List<T>>, Map.Entry<K, List<T>>> mapper = Fn.identity();
+        @SuppressWarnings("unchecked")
+        final Function<T, K> classifier2 = (Function<T, K>) classifier;
+
+        return groupBy(classifier2).mapToEntry(mapper);
+    }
+
+    public <K, A, D> EntryStream<K, D> groupByToEntry(Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream) {
+        final Function<Map.Entry<K, D>, Map.Entry<K, D>> mapper = Fn.identity();
+        @SuppressWarnings("unchecked")
+        final Function<T, K> classifier2 = (Function<T, K>) classifier;
+
+        return groupBy(classifier2, downstream).mapToEntry(mapper);
+    }
+
+    public <K, A, D> EntryStream<K, D> groupByToEntry(final Function<? super T, ? extends K> classifier, final Collector<? super T, A, D> downstream,
+            final Supplier<Map<K, D>> mapFactory) {
+        final Function<Map.Entry<K, D>, Map.Entry<K, D>> mapper = Fn.identity();
+        @SuppressWarnings("unchecked")
+        final Function<T, K> classifier2 = (Function<T, K>) classifier;
+
+        return groupBy(classifier2, downstream, mapFactory).mapToEntry(mapper);
     }
 
     /**
@@ -1178,8 +1240,8 @@ public class Stream<T> implements Closeable {
         return reduce(Fn.<T> minBy(comparator));
     }
 
-    public <U extends Comparable<? super U>> Optional<T> minBy(final Function<? super T, ? extends U> f) {
-        return min(ComparatorCompat.comparing(f));
+    public <U extends Comparable<? super U>> Optional<T> minBy(final Function<? super T, U> keyExtractor) {
+        return min(Comparators.comparingBy(keyExtractor));
     }
 
     /**
@@ -1201,8 +1263,8 @@ public class Stream<T> implements Closeable {
         return reduce(Fn.<T> maxBy(comparator));
     }
 
-    public <U extends Comparable<? super U>> Optional<T> maxBy(final Function<? super T, ? extends U> f) {
-        return max(ComparatorCompat.comparing(f));
+    public <U extends Comparable<? super U>> Optional<T> maxBy(final Function<? super T, U> keyExtractor) {
+        return max(Comparators.comparingBy(keyExtractor));
     }
 
     /**
