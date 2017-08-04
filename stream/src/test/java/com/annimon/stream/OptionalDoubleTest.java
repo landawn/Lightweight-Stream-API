@@ -194,7 +194,7 @@ public class OptionalDoubleTest {
     //                .custom(new Function<OptionalDouble, Double>() {
     //                    @Override
     //                    public Double apply(OptionalDouble optional) {
-    //                        return optional.orElse(0);
+    //                        return optional.or(0);
     //                    }
     //                });
     //
@@ -365,20 +365,20 @@ public class OptionalDoubleTest {
     //
     //    @Test
     //    public void testOrElse() {
-    //        assertThat(OptionalDouble.empty().orElse(10.123), closeTo(10.123, 0.0001));
-    //        assertThat(OptionalDouble.of(10.123).orElse(0d), closeTo(10.123, 0.0001));
+    //        assertThat(OptionalDouble.empty().or(10.123), closeTo(10.123, 0.0001));
+    //        assertThat(OptionalDouble.of(10.123).or(0d), closeTo(10.123, 0.0001));
     //    }
 
     @Test
     public void testOrElseGet() {
-        assertThat(OptionalDouble.empty().orElseGet(new DoubleSupplier() {
+        assertThat(OptionalDouble.empty().orGet(new DoubleSupplier() {
             @Override
             public double getAsDouble() {
                 return 21.098;
             }
         }), closeTo(21.098, 0.0001));
 
-        assertThat(OptionalDouble.of(21.098).orElseGet(new DoubleSupplier() {
+        assertThat(OptionalDouble.of(21.098).orGet(new DoubleSupplier() {
             @Override
             public double getAsDouble() {
                 throw new IllegalStateException();
@@ -389,7 +389,7 @@ public class OptionalDoubleTest {
     @Test
     public void testOrElseThrow() {
         try {
-            assertThat(OptionalDouble.of(10.123).orElseThrow(new Supplier<NoSuchElementException>() {
+            assertThat(OptionalDouble.of(10.123).orThrow(new Supplier<NoSuchElementException>() {
                 @Override
                 public NoSuchElementException get() {
                     throw new IllegalStateException();
@@ -402,7 +402,7 @@ public class OptionalDoubleTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testOrElseThrow2() {
-        OptionalDouble.empty().orElseThrow(new Supplier<NoSuchElementException>() {
+        OptionalDouble.empty().orThrow(new Supplier<NoSuchElementException>() {
             @Override
             public NoSuchElementException get() {
                 return new NoSuchElementException();

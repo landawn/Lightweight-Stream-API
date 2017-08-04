@@ -133,7 +133,7 @@ public final class OptionalInt {
      * @param other  the value to be returned if there is no value present
      * @return the value, if present, otherwise {@code other}
      */
-    public int orElse(int other) {
+    public int or(int other) {
         return isPresent ? value : other;
     }
 
@@ -147,7 +147,7 @@ public final class OptionalInt {
      * @throws NullPointerException if value is not present and {@code other} is
      *         null
      */
-    public int orElseGet(IntSupplier other) {
+    public int orGet(IntSupplier other) {
         return isPresent ? value : other.getAsInt();
     }
 
@@ -159,7 +159,7 @@ public final class OptionalInt {
      * @return inner value if present
      * @throws X if inner value is not present
      */
-    public <X extends Throwable> int orElseThrow(Supplier<X> exceptionSupplier) throws X {
+    public <X extends Throwable> int orThrow(Supplier<X> exceptionSupplier) throws X {
         if (isPresent) {
             return value;
         } else {

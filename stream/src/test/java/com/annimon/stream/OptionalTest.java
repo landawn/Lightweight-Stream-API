@@ -202,7 +202,7 @@ public final class OptionalTest {
     //                .custom(new Function<Optional<Integer>, Integer>() {
     //                    @Override
     //                    public Integer apply(Optional<Integer> optional) {
-    //                        return optional.orElse(0);
+    //                        return optional.or(0);
     //                    }
     //                });
     //
@@ -428,18 +428,18 @@ public final class OptionalTest {
     //
     //    @Test
     //    public void testOrElseWithPresentValue() {
-    //        int value = Optional.<Integer>empty().orElse(42);
+    //        int value = Optional.<Integer>empty().or(42);
     //        assertEquals(42, value);
     //    }
 
     @Test
     public void testOrElseOnEmptyOptional() {
-        assertEquals("Lena", Optional.<Student> empty().orElse(student).getName());
+        assertEquals("Lena", Optional.<Student> empty().or(student).getName());
     }
 
     @Test
     public void testOrElseGet() {
-        int value = Optional.<Integer> empty().orElseGet(new Supplier<Integer>() {
+        int value = Optional.<Integer> empty().orGet(new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return 42;
@@ -450,7 +450,7 @@ public final class OptionalTest {
 
     @Test(expected = ArithmeticException.class)
     public void testOrElseThrow() {
-        Optional.empty().orElseThrow(new Supplier<RuntimeException>() {
+        Optional.empty().orThrow(new Supplier<RuntimeException>() {
 
             @Override
             public RuntimeException get() {

@@ -194,7 +194,7 @@ public class OptionalIntTest {
     //                .custom(new Function<OptionalInt, Integer>() {
     //                    @Override
     //                    public Integer apply(OptionalInt optional) {
-    //                        return optional.orElse(0);
+    //                        return optional.or(0);
     //                    }
     //                });
     //
@@ -364,20 +364,20 @@ public class OptionalIntTest {
     //
     //    @Test
     //    public void testOrElse() {
-    //        assertEquals(17, OptionalInt.empty().orElse(17));
-    //        assertEquals(17, OptionalInt.of(17).orElse(0));
+    //        assertEquals(17, OptionalInt.empty().or(17));
+    //        assertEquals(17, OptionalInt.of(17).or(0));
     //    }
 
     @Test
     public void testOrElseGet() {
-        assertEquals(21, OptionalInt.empty().orElseGet(new IntSupplier() {
+        assertEquals(21, OptionalInt.empty().orGet(new IntSupplier() {
             @Override
             public int getAsInt() {
                 return 21;
             }
         }));
 
-        assertEquals(21, OptionalInt.of(21).orElseGet(new IntSupplier() {
+        assertEquals(21, OptionalInt.of(21).orGet(new IntSupplier() {
             @Override
             public int getAsInt() {
                 throw new IllegalStateException();
@@ -388,7 +388,7 @@ public class OptionalIntTest {
     @Test
     public void testOrElseThrow() {
         try {
-            assertEquals(25, OptionalInt.of(25).orElseThrow(new Supplier<NoSuchElementException>() {
+            assertEquals(25, OptionalInt.of(25).orThrow(new Supplier<NoSuchElementException>() {
                 @Override
                 public NoSuchElementException get() {
                     throw new IllegalStateException();
@@ -401,7 +401,7 @@ public class OptionalIntTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testOrElseThrow2() {
-        assertEquals(25, OptionalInt.empty().orElseThrow(new Supplier<NoSuchElementException>() {
+        assertEquals(25, OptionalInt.empty().orThrow(new Supplier<NoSuchElementException>() {
             @Override
             public NoSuchElementException get() {
                 return new NoSuchElementException();

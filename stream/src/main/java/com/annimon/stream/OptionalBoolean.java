@@ -108,7 +108,7 @@ public final class OptionalBoolean {
      * @param other  the value to be returned if there is no value present
      * @return the value, if present, otherwise {@code other}
      */
-    public boolean orElse(boolean other) {
+    public boolean or(boolean other) {
         return isPresent ? value : other;
     }
 
@@ -119,7 +119,7 @@ public final class OptionalBoolean {
      * @return the value if present otherwise the result of {@code other.getAsBoolean()}
      * @throws NullPointerException if value is not present and {@code other} is null
      */
-    public boolean orElseGet(BooleanSupplier other) {
+    public boolean orGet(BooleanSupplier other) {
         return isPresent ? value : other.getAsBoolean();
     }
 
@@ -131,7 +131,7 @@ public final class OptionalBoolean {
      * @return inner value if present
      * @throws X if inner value is not present
      */
-    public <X extends Throwable> boolean orElseThrow(Supplier<X> exceptionSupplier) throws X {
+    public <X extends Throwable> boolean orThrow(Supplier<X> exceptionSupplier) throws X {
         if (isPresent) {
             return value;
         } else {

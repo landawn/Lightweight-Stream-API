@@ -192,7 +192,7 @@ public class OptionalBooleanTest {
     //                .custom(new Function<OptionalBoolean, Boolean>() {
     //                    @Override
     //                    public Boolean apply(OptionalBoolean optional) {
-    //                        return optional.orElse(false);
+    //                        return optional.or(false);
     //                    }
     //                });
     //
@@ -328,20 +328,20 @@ public class OptionalBooleanTest {
     //
     //    @Test
     //    public void testOrElse() {
-    //        assertTrue(OptionalBoolean.empty().orElse(true));
-    //        assertFalse(OptionalBoolean.empty().orElse(false));
+    //        assertTrue(OptionalBoolean.empty().or(true));
+    //        assertFalse(OptionalBoolean.empty().or(false));
     //    }
     //
     //    @Test
     //    public void testOrElseGet() {
-    //        assertTrue(OptionalBoolean.empty().orElseGet(new BooleanSupplier() {
+    //        assertTrue(OptionalBoolean.empty().orGet(new BooleanSupplier() {
     //            @Override
     //            public boolean getAsBoolean() {
     //                return true;
     //            }
     //        }));
     //
-    //        assertTrue(OptionalBoolean.of(true).orElseGet(new BooleanSupplier() {
+    //        assertTrue(OptionalBoolean.of(true).orGet(new BooleanSupplier() {
     //            @Override
     //            public boolean getAsBoolean() {
     //                throw new IllegalStateException();
@@ -352,7 +352,7 @@ public class OptionalBooleanTest {
     //    @Test
     //    public void testOrElseThrow() {
     //        try {
-    //            assertFalse(OptionalBoolean.of(false).orElseThrow(new Supplier<NoSuchElementException>() {
+    //            assertFalse(OptionalBoolean.of(false).orThrow(new Supplier<NoSuchElementException>() {
     //                @Override
     //                public NoSuchElementException get() {
     //                    throw new IllegalStateException();
@@ -365,7 +365,7 @@ public class OptionalBooleanTest {
     //
     //    @Test(expected = NoSuchElementException.class)
     //    public void testOrElseThrow2() {
-    //        OptionalBoolean.empty().orElseThrow(new Supplier<NoSuchElementException>() {
+    //        OptionalBoolean.empty().orThrow(new Supplier<NoSuchElementException>() {
     //            @Override
     //            public NoSuchElementException get() {
     //                return new NoSuchElementException();

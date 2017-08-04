@@ -53,6 +53,6 @@ public final class ReduceTest {
         Optional<Integer> result = Stream.<Integer> empty().reduce(Functions.addition());
 
         assertThat(result, isEmpty());
-        assertEquals(119, (int) result.orElse(119));
+        assertEquals(119, (int) result.or(119));
     }
 }
