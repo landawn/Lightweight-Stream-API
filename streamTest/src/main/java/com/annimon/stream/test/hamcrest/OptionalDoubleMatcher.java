@@ -68,7 +68,7 @@ public class OptionalDoubleMatcher {
                 mismatchDescription.appendText("OptionalDouble was empty");
                 return false;
             }
-            final Double value = optional.getAsDouble();
+            final Double value = optional.get();
             mismatchDescription.appendText("OptionalDouble value ");
             matcher.describeMismatch(value, mismatchDescription);
             return matcher.matches(value);

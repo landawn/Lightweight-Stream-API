@@ -1,27 +1,20 @@
 package com.annimon.stream;
 
-import com.annimon.stream.function.DoubleConsumer;
-import com.annimon.stream.function.DoubleFunction;
-import com.annimon.stream.function.DoubleSupplier;
-import com.annimon.stream.function.DoubleToIntFunction;
-import com.annimon.stream.function.DoubleToLongFunction;
-import com.annimon.stream.function.DoubleUnaryOperator;
-import com.annimon.stream.function.Function;
-import com.annimon.stream.function.Supplier;
-import com.annimon.stream.test.hamcrest.OptionalMatcher;
-import java.util.NoSuchElementException;
-import org.hamcrest.Matchers;
-import org.junit.Test;
-import static com.annimon.stream.test.hamcrest.OptionalDoubleMatcher.hasValueThat;
-import static com.annimon.stream.test.hamcrest.OptionalDoubleMatcher.isEmpty;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.NoSuchElementException;
+
+import org.junit.Test;
+
+import com.annimon.stream.function.DoubleConsumer;
+import com.annimon.stream.function.DoubleSupplier;
+import com.annimon.stream.function.Supplier;
 
 /**
  * Tests for {@link OptionalDouble}
@@ -30,13 +23,13 @@ public class OptionalDoubleTest {
 
     @Test
     public void testGetWithPresentValue() {
-        double value = OptionalDouble.of(10.123).getAsDouble();
+        double value = OptionalDouble.of(10.123).get();
         assertThat(value, closeTo(10.123, 0.0001));
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testGetOnEmptyOptional() {
-        OptionalDouble.empty().getAsDouble();
+        OptionalDouble.empty().get();
     }
 
     @Test
@@ -136,245 +129,245 @@ public class OptionalDoubleTest {
         }, null);
     }
 
-    @Test
-    public void testExecuteIfPresent() {
-        double value = OptionalDouble.of(10.123)
-                .executeIfPresent(new DoubleConsumer() {
-                    @Override
-                    public void accept(double value) {
-                        assertThat(value, closeTo(10.123, 0.0001));
-                    }
-                })
-                .getAsDouble();
-        assertThat(value, closeTo(10.123, 0.0001));
-    }
-
-    @Test
-    public void testExecuteIfPresentOnAbsentValue() {
-        OptionalDouble.empty()
-                .executeIfPresent(new DoubleConsumer() {
-                    @Override
-                    public void accept(double value) {
-                        fail();
-                    }
-                });
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testExecuteIfAbsent() {
-        OptionalDouble.empty()
-                .executeIfAbsent(new Runnable() {
-                    @Override
-                    public void run() {
-                        throw new RuntimeException();
-                    }
-                });
-    }
-
-    @Test
-    public void testExecuteIfAbsentOnPresentValue() {
-        OptionalDouble.of(10.123)
-                .executeIfAbsent(new Runnable() {
-                    @Override
-                    public void run() {
-                        fail();
-                    }
-                });
-    }
-
-    @Test
-    public void testCustomIntermediate() {
-        OptionalDouble result = OptionalDouble.of(10)
-                .custom(new Function<OptionalDouble, OptionalDouble>() {
-                    @Override
-                    public OptionalDouble apply(OptionalDouble optional) {
-                        return optional.filter(Functions.greaterThan(Math.PI));
-                    }
-                });
-
-        assertThat(result, hasValueThat(closeTo(10, 0.0001)));
-    }
-
-    @Test
-    public void testCustomTerminal() {
-        Double result = OptionalDouble.empty()
-                .custom(new Function<OptionalDouble, Double>() {
-                    @Override
-                    public Double apply(OptionalDouble optional) {
-                        return optional.orElse(0);
-                    }
-                });
-
-        assertThat(result, closeTo(0, 0.0001));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testCustomException() {
-        OptionalDouble.empty().custom(null);
-    }
-
-    @Test
-    public void testFilter() {
-        OptionalDouble result;
-        result = OptionalDouble.of(10d)
-                .filter(Functions.greaterThan(Math.PI));
-        assertThat(result, hasValueThat(closeTo(10d, 0.000001)));
-
-        result = OptionalDouble.empty()
-                .filter(Functions.greaterThan(Math.PI));
-        assertThat(result, isEmpty());
-
-        result = OptionalDouble.of(1.19)
-                .filter(Functions.greaterThan(Math.PI));
-        assertThat(result, isEmpty());
-    }
-
-    @Test
-    public void testFilterNot() {
-        OptionalDouble result;
-        result = OptionalDouble.of(1.19)
-                .filterNot(Functions.greaterThan(Math.PI));
-        assertThat(result, hasValueThat(closeTo(1.19, 0.000001)));
-
-        result = OptionalDouble.empty()
-                .filterNot(Functions.greaterThan(Math.PI));
-        assertThat(result, isEmpty());
-
-        result = OptionalDouble.of(10d)
-                .filterNot(Functions.greaterThan(Math.PI));
-        assertThat(result, isEmpty());
-    }
-
-    @Test
-    public void testMap() {
-        final DoubleUnaryOperator negatorFunction = new DoubleUnaryOperator() {
-
-            @Override
-            public double applyAsDouble(double operand) {
-                return -operand;
-            }
-        };
-
-        OptionalDouble result;
-        result = OptionalDouble.empty().map(negatorFunction);
-        assertThat(result, isEmpty());
-
-        result = OptionalDouble.of(10.123).map(negatorFunction);
-        assertThat(result, hasValueThat(closeTo(-10.123, 0.0001)));
-    }
-
-    @Test
-    public void testMapToObj() {
-        final DoubleFunction<String> asciiToString = new DoubleFunction<String>() {
-
-            @Override
-            public String apply(double value) {
-                return String.valueOf((char) value);
-            }
-        };
-
-        Optional<String> result;
-        result = OptionalDouble.empty().mapToObj(asciiToString);
-        assertThat(result, OptionalMatcher.isEmpty());
-
-        result = OptionalDouble.of(65d).mapToObj(asciiToString);
-        assertThat(result, OptionalMatcher.hasValue("A"));
-
-        result = OptionalDouble.empty().mapToObj(new DoubleFunction<String>() {
-            @Override
-            public String apply(double value) {
-                return null;
-            }
-        });
-        assertThat(result, OptionalMatcher.isEmpty());
-    }
-
-    @Test
-    public void testMapToInt() {
-        assertThat(OptionalDouble.of(0.2).mapToInt(new DoubleToIntFunction() {
-            @Override
-            public int applyAsInt(double value) {
-                return (int) (value * 10);
-            }
-        }).getAsInt(), is(2));
-
-        assertFalse(OptionalDouble.empty().mapToInt(new DoubleToIntFunction() {
-            @Override
-            public int applyAsInt(double value) {
-                fail();
-                return 0;
-            }
-        }).isPresent());
-    }
-
-    @Test
-    public void testMapToLong() {
-        assertThat(OptionalDouble.of(0.2).mapToLong(new DoubleToLongFunction() {
-            @Override
-            public long applyAsLong(double value) {
-                return (long) (value * 10);
-            }
-        }).getAsLong(), is(2L));
-
-        assertFalse(OptionalDouble.empty().mapToLong(new DoubleToLongFunction() {
-            @Override
-            public long applyAsLong(double value) {
-                fail();
-                return 0;
-            }
-        }).isPresent());
-    }
-
-    @Test
-    public void testStream() {
-        long count = OptionalDouble.of(10d).stream().count();
-        assertThat(count, is(1L));
-    }
-
-    @Test
-    public void testStreamOnEmptyOptional() {
-        long count = OptionalDouble.empty().stream().count();
-        assertThat(count, is(0L));
-    }
-
-    @Test
-    public void testOr() {
-        double value = OptionalDouble.of(10.123).or(new Supplier<OptionalDouble>() {
-            @Override
-            public OptionalDouble get() {
-                return OptionalDouble.of(19);
-            }
-        }).getAsDouble();
-        assertThat(value, closeTo(10.123, 0.0001));
-    }
-
-    @Test
-    public void testOrOnEmptyOptional() {
-        double value = OptionalDouble.empty().or(new Supplier<OptionalDouble>() {
-            @Override
-            public OptionalDouble get() {
-                return OptionalDouble.of(Math.PI);
-            }
-        }).getAsDouble();
-        assertThat(value, closeTo(Math.PI, 0.0001));
-    }
-
-    @Test
-    public void testOrOnEmptyOptionalAndEmptySupplierOptional() {
-        final OptionalDouble optional = OptionalDouble.empty().or(new Supplier<OptionalDouble>() {
-            @Override
-            public OptionalDouble get() {
-                return OptionalDouble.empty();
-            }
-        });
-        assertThat(optional, isEmpty());
-    }
-
-    @Test
-    public void testOrElse() {
-        assertThat(OptionalDouble.empty().orElse(10.123), closeTo(10.123, 0.0001));
-        assertThat(OptionalDouble.of(10.123).orElse(0d), closeTo(10.123, 0.0001));
-    }
+    //    @Test
+    //    public void testExecuteIfPresent() {
+    //        double value = OptionalDouble.of(10.123)
+    //                .executeIfPresent(new DoubleConsumer() {
+    //                    @Override
+    //                    public void accept(double value) {
+    //                        assertThat(value, closeTo(10.123, 0.0001));
+    //                    }
+    //                })
+    //                .get();
+    //        assertThat(value, closeTo(10.123, 0.0001));
+    //    }
+    //
+    //    @Test
+    //    public void testExecuteIfPresentOnAbsentValue() {
+    //        OptionalDouble.empty()
+    //                .executeIfPresent(new DoubleConsumer() {
+    //                    @Override
+    //                    public void accept(double value) {
+    //                        fail();
+    //                    }
+    //                });
+    //    }
+    //
+    //    @Test(expected = RuntimeException.class)
+    //    public void testExecuteIfAbsent() {
+    //        OptionalDouble.empty()
+    //                .executeIfAbsent(new Runnable() {
+    //                    @Override
+    //                    public void run() {
+    //                        throw new RuntimeException();
+    //                    }
+    //                });
+    //    }
+    //
+    //    @Test
+    //    public void testExecuteIfAbsentOnPresentValue() {
+    //        OptionalDouble.of(10.123)
+    //                .executeIfAbsent(new Runnable() {
+    //                    @Override
+    //                    public void run() {
+    //                        fail();
+    //                    }
+    //                });
+    //    }
+    //
+    //    @Test
+    //    public void testCustomIntermediate() {
+    //        OptionalDouble result = OptionalDouble.of(10)
+    //                .custom(new Function<OptionalDouble, OptionalDouble>() {
+    //                    @Override
+    //                    public OptionalDouble apply(OptionalDouble optional) {
+    //                        return optional.filter(Functions.greaterThan(Math.PI));
+    //                    }
+    //                });
+    //
+    //        assertThat(result, hasValueThat(closeTo(10, 0.0001)));
+    //    }
+    //
+    //    @Test
+    //    public void testCustomTerminal() {
+    //        Double result = OptionalDouble.empty()
+    //                .custom(new Function<OptionalDouble, Double>() {
+    //                    @Override
+    //                    public Double apply(OptionalDouble optional) {
+    //                        return optional.orElse(0);
+    //                    }
+    //                });
+    //
+    //        assertThat(result, closeTo(0, 0.0001));
+    //    }
+    //
+    //    @Test(expected = NullPointerException.class)
+    //    public void testCustomException() {
+    //        OptionalDouble.empty().custom(null);
+    //    }
+    //
+    //    @Test
+    //    public void testFilter() {
+    //        OptionalDouble result;
+    //        result = OptionalDouble.of(10d)
+    //                .filter(Functions.greaterThan(Math.PI));
+    //        assertThat(result, hasValueThat(closeTo(10d, 0.000001)));
+    //
+    //        result = OptionalDouble.empty()
+    //                .filter(Functions.greaterThan(Math.PI));
+    //        assertThat(result, isEmpty());
+    //
+    //        result = OptionalDouble.of(1.19)
+    //                .filter(Functions.greaterThan(Math.PI));
+    //        assertThat(result, isEmpty());
+    //    }
+    //
+    //    @Test
+    //    public void testFilterNot() {
+    //        OptionalDouble result;
+    //        result = OptionalDouble.of(1.19)
+    //                .filterNot(Functions.greaterThan(Math.PI));
+    //        assertThat(result, hasValueThat(closeTo(1.19, 0.000001)));
+    //
+    //        result = OptionalDouble.empty()
+    //                .filterNot(Functions.greaterThan(Math.PI));
+    //        assertThat(result, isEmpty());
+    //
+    //        result = OptionalDouble.of(10d)
+    //                .filterNot(Functions.greaterThan(Math.PI));
+    //        assertThat(result, isEmpty());
+    //    }
+    //
+    //    @Test
+    //    public void testMap() {
+    //        final DoubleUnaryOperator negatorFunction = new DoubleUnaryOperator() {
+    //
+    //            @Override
+    //            public double applyAsDouble(double operand) {
+    //                return -operand;
+    //            }
+    //        };
+    //
+    //        OptionalDouble result;
+    //        result = OptionalDouble.empty().map(negatorFunction);
+    //        assertThat(result, isEmpty());
+    //
+    //        result = OptionalDouble.of(10.123).map(negatorFunction);
+    //        assertThat(result, hasValueThat(closeTo(-10.123, 0.0001)));
+    //    }
+    //
+    //    @Test
+    //    public void testMapToObj() {
+    //        final DoubleFunction<String> asciiToString = new DoubleFunction<String>() {
+    //
+    //            @Override
+    //            public String apply(double value) {
+    //                return String.valueOf((char) value);
+    //            }
+    //        };
+    //
+    //        Optional<String> result;
+    //        result = OptionalDouble.empty().mapToObj(asciiToString);
+    //        assertThat(result, OptionalMatcher.isEmpty());
+    //
+    //        result = OptionalDouble.of(65d).mapToObj(asciiToString);
+    //        assertThat(result, OptionalMatcher.hasValue("A"));
+    //
+    //        result = OptionalDouble.empty().mapToObj(new DoubleFunction<String>() {
+    //            @Override
+    //            public String apply(double value) {
+    //                return null;
+    //            }
+    //        });
+    //        assertThat(result, OptionalMatcher.isEmpty());
+    //    }
+    //
+    //    @Test
+    //    public void testMapToInt() {
+    //        assertThat(OptionalDouble.of(0.2).mapToInt(new DoubleToIntFunction() {
+    //            @Override
+    //            public int applyAsInt(double value) {
+    //                return (int) (value * 10);
+    //            }
+    //        }).get(), is(2));
+    //
+    //        assertFalse(OptionalDouble.empty().mapToInt(new DoubleToIntFunction() {
+    //            @Override
+    //            public int applyAsInt(double value) {
+    //                fail();
+    //                return 0;
+    //            }
+    //        }).isPresent());
+    //    }
+    //
+    //    @Test
+    //    public void testMapToLong() {
+    //        assertThat(OptionalDouble.of(0.2).mapToLong(new DoubleToLongFunction() {
+    //            @Override
+    //            public long applyAsLong(double value) {
+    //                return (long) (value * 10);
+    //            }
+    //        }).getAsLong(), is(2L));
+    //
+    //        assertFalse(OptionalDouble.empty().mapToLong(new DoubleToLongFunction() {
+    //            @Override
+    //            public long applyAsLong(double value) {
+    //                fail();
+    //                return 0;
+    //            }
+    //        }).isPresent());
+    //    }
+    //
+    //    @Test
+    //    public void testStream() {
+    //        long count = OptionalDouble.of(10d).stream().count();
+    //        assertThat(count, is(1L));
+    //    }
+    //
+    //    @Test
+    //    public void testStreamOnEmptyOptional() {
+    //        long count = OptionalDouble.empty().stream().count();
+    //        assertThat(count, is(0L));
+    //    }
+    //
+    //    @Test
+    //    public void testOr() {
+    //        double value = OptionalDouble.of(10.123).or(new Supplier<OptionalDouble>() {
+    //            @Override
+    //            public OptionalDouble get() {
+    //                return OptionalDouble.of(19);
+    //            }
+    //        }).get();
+    //        assertThat(value, closeTo(10.123, 0.0001));
+    //    }
+    //
+    //    @Test
+    //    public void testOrOnEmptyOptional() {
+    //        double value = OptionalDouble.empty().or(new Supplier<OptionalDouble>() {
+    //            @Override
+    //            public OptionalDouble get() {
+    //                return OptionalDouble.of(Math.PI);
+    //            }
+    //        }).get();
+    //        assertThat(value, closeTo(Math.PI, 0.0001));
+    //    }
+    //
+    //    @Test
+    //    public void testOrOnEmptyOptionalAndEmptySupplierOptional() {
+    //        final OptionalDouble optional = OptionalDouble.empty().or(new Supplier<OptionalDouble>() {
+    //            @Override
+    //            public OptionalDouble get() {
+    //                return OptionalDouble.empty();
+    //            }
+    //        });
+    //        assertThat(optional, isEmpty());
+    //    }
+    //
+    //    @Test
+    //    public void testOrElse() {
+    //        assertThat(OptionalDouble.empty().orElse(10.123), closeTo(10.123, 0.0001));
+    //        assertThat(OptionalDouble.of(10.123).orElse(0d), closeTo(10.123, 0.0001));
+    //    }
 
     @Test
     public void testOrElseGet() {

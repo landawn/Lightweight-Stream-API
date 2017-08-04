@@ -15,7 +15,7 @@ public final class OfArrayTest {
         int[] data3 = {};
 
         assertTrue(IntStream.of(data1).count() == 5);
-        assertTrue(IntStream.of(data2).findFirst().getAsInt() == 42);
+        assertTrue(IntStream.of(data2).findFirst().get() == 42);
         assertFalse(IntStream.of(data3).findFirst().isPresent());
     }
 

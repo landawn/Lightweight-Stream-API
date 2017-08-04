@@ -439,18 +439,6 @@ public class Stream<T> implements Closeable {
     }
 
     /**
-     * Returns {@code Stream} with elements that does not satisfy the given predicate.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * @param predicate  the predicate used to filter elements
-     * @return the new stream
-     */
-    public Stream<T> removeIf(final Predicate<? super T> predicate) {
-        return filter(Predicate.Util.negate(predicate));
-    }
-
-    /**
      * Returns a stream consisting of the elements of this stream which are
      * instances of given class.
      *
@@ -479,7 +467,7 @@ public class Stream<T> implements Closeable {
      * @since 1.1.6
      */
     public Stream<T> skipNull() {
-        return filter(Predicate.Util.<T> notNull());
+        return filter(Fn.notNull());
     }
 
     /**
@@ -1187,7 +1175,7 @@ public class Stream<T> implements Closeable {
      * @return the minimum element
      */
     public Optional<T> min(Comparator<? super T> comparator) {
-        return reduce(BinaryOperator.Util.<T> minBy(comparator));
+        return reduce(Fn.<T> minBy(comparator));
     }
 
     public <U extends Comparable<? super U>> Optional<T> minBy(final Function<? super T, ? extends U> f) {
@@ -1210,7 +1198,7 @@ public class Stream<T> implements Closeable {
      * @return the maximum element
      */
     public Optional<T> max(Comparator<? super T> comparator) {
-        return reduce(BinaryOperator.Util.<T> maxBy(comparator));
+        return reduce(Fn.<T> maxBy(comparator));
     }
 
     public <U extends Comparable<? super U>> Optional<T> maxBy(final Function<? super T, ? extends U> f) {

@@ -32,7 +32,6 @@ import com.annimon.stream.operator.DoubleMapToInt;
 import com.annimon.stream.operator.DoubleMapToLong;
 import com.annimon.stream.operator.DoubleMapToObj;
 import com.annimon.stream.operator.DoublePeek;
-import com.annimon.stream.operator.DoubleSample;
 import com.annimon.stream.operator.DoubleScan;
 import com.annimon.stream.operator.DoubleScanIdentity;
 import com.annimon.stream.operator.DoubleSkip;
@@ -229,18 +228,6 @@ public final class DoubleStream implements Closeable {
     }
 
     /**
-     * Returns {@code DoubleStream} with elements that does not satisfy the given predicate.
-     *
-     * <p> This is an intermediate operation.
-     *
-     * @param predicate  the predicate used to filter elements
-     * @return the new stream
-     */
-    public DoubleStream removeIf(final DoublePredicate predicate) {
-        return filter(DoublePredicate.Util.negate(predicate));
-    }
-
-    /**
      * Returns an {@code DoubleStream} consisting of the results of applying the given
      * function to the elements of this stream.
      *
@@ -375,31 +362,6 @@ public final class DoubleStream implements Closeable {
      */
     public DoubleStream sorted(Comparator<Double> comparator) {
         return boxed().sorted(comparator).mapToDouble(UNBOX_FUNCTION);
-    }
-
-    /**
-     * Samples the {@code DoubleStream} by emitting every n-th element.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * stepWidth: 3
-     * stream: [1, 2, 3, 4, 5, 6, 7, 8]
-     * result: [1, 4, 7]
-     * </pre>
-     *
-     * @param stepWidth  step width
-     * @return the new {@code DoubleStream}
-     * @throws IllegalArgumentException if {@code stepWidth} is zero or negative
-     * @see Stream#sample(int)
-     */
-    public DoubleStream sample(final int stepWidth) {
-        if (stepWidth <= 0)
-            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1)
-            return this;
-        return new DoubleStream(params, new DoubleSample(iterator, stepWidth));
     }
 
     /**

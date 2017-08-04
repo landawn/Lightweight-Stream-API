@@ -14,23 +14,4 @@ public interface IntUnaryOperator {
      * @return the operator result
      */
     int applyAsInt(int operand);
-
-    class Util {
-
-        private Util() { }
-
-        /**
-         * Returns a unary operator that always returns its input argument.
-         *
-         * @return a unary operator that always returns its input argument
-         */
-        public static IntUnaryOperator identity() {
-            return new IntUnaryOperator() {
-                @Override
-                public int applyAsInt(int operand) {
-                    return operand;
-                }
-            };
-        }
-    }
 }

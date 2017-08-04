@@ -6,9 +6,6 @@ import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Predicate;
 import com.annimon.stream.function.Supplier;
-import com.annimon.stream.function.ToDoubleFunction;
-import com.annimon.stream.function.ToIntFunction;
-import com.annimon.stream.function.ToLongFunction;
 
 /**
  * A container object which may or may not contain a non-null value.
@@ -116,47 +113,6 @@ public class Optional<T> {
     }
 
     /**
-     * Invokes consumer function with the value if present.
-     * This method same as {@code ifPresent}, but does not breaks chaining
-     *
-     * @param consumer  consumer function
-     * @return this {@code Optional}
-     * @see #ifPresent(com.annimon.stream.function.Consumer)
-     * @since 1.1.2
-     */
-    public Optional<T> executeIfPresent(Consumer<? super T> consumer) {
-        ifPresent(consumer);
-        return this;
-    }
-
-    /**
-     * Invokes action function if value is absent.
-     *
-     * @param action  action that invokes if value absent
-     * @return this {@code Optional}
-     * @since 1.1.2
-     */
-    public Optional<T> executeIfAbsent(Runnable action) {
-        if (value == null)
-            action.run();
-        return this;
-    }
-
-    /**
-     * Applies custom operator on {@code Optional}.
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @throws NullPointerException if {@code function} is null
-     * @since 1.1.9
-     */
-    public <R> R custom(Function<Optional<T>, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
      * Performs filtering on inner value if it is present.
      * 
      * @param predicate  a predicate function
@@ -167,18 +123,6 @@ public class Optional<T> {
         if (!isPresent())
             return this;
         return predicate.test(value) ? this : Optional.<T> empty();
-    }
-
-    /**
-     * Performs negated filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code Optional} if the value is present and doesn't matches predicate,
-     *              otherwise an empty {@code Optional}
-     * @since 1.1.9
-     */
-    public Optional<T> filterNot(Predicate<? super T> predicate) {
-        return filter(Predicate.Util.negate(predicate));
     }
 
     /**
@@ -195,54 +139,6 @@ public class Optional<T> {
         if (!isPresent())
             return empty();
         return Optional.<U> ofNullable(mapper.apply(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalInt} with transformed value if present,
-     *         otherwise an empty {@code OptionalInt}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.3
-     */
-    public OptionalInt mapToInt(ToIntFunction<? super T> mapper) {
-        if (!isPresent())
-            return OptionalInt.empty();
-        return OptionalInt.of(mapper.applyAsInt(value));
-    }
-
-    /**
-     * Invokes mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalLong} with transformed value if present,
-     *         otherwise an empty {@code OptionalLong}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.4
-     */
-    public OptionalLong mapToLong(ToLongFunction<? super T> mapper) {
-        if (!isPresent())
-            return OptionalLong.empty();
-        return OptionalLong.of(mapper.applyAsLong(value));
-    }
-
-    /**
-     * Invokes mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalDouble} with transformed value if present,
-     *         otherwise an empty {@code OptionalDouble}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.4
-     */
-    public OptionalDouble mapToDouble(ToDoubleFunction<? super T> mapper) {
-        if (!isPresent())
-            return OptionalDouble.empty();
-        return OptionalDouble.of(mapper.applyAsDouble(value));
     }
 
     /**
@@ -267,38 +163,6 @@ public class Optional<T> {
         if (!isPresent())
             return Stream.empty();
         return Stream.of(value);
-    }
-
-    /**
-     * Keeps inner value only if is present and instance of given class.
-     *
-     * @param <R> a type of instance to select.
-     * @param clazz a class which instance should be selected
-     * @return an {@code Optional} with value of type class if present, otherwise an empty {@code Optional}
-     */
-    @SuppressWarnings("unchecked")
-    public <R> Optional<R> select(Class<R> clazz) {
-        Objects.requireNonNull(clazz);
-        if (!isPresent())
-            return empty();
-        return (Optional<R>) Optional.ofNullable(clazz.isInstance(value) ? value : null);
-    }
-
-    /**
-     * Returns current {@code Optional} if value is present, otherwise
-     * returns an {@code Optional} produced by supplier function.
-     *
-     * @param supplier  supplier function that produces an {@code Optional} to be returned
-     * @return this {@code Optional} if value is present, otherwise
-     *         an {@code Optional} produced by supplier function
-     * @throws NullPointerException if value is not present and
-     *         {@code supplier} or value produced by it is {@code null}
-     */
-    public Optional<T> or(Supplier<Optional<T>> supplier) {
-        if (isPresent())
-            return this;
-        Objects.requireNonNull(supplier);
-        return Objects.requireNonNull(supplier.get());
     }
 
     /**

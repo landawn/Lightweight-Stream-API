@@ -3,10 +3,7 @@ package com.annimon.stream;
 import java.util.NoSuchElementException;
 
 import com.annimon.stream.function.BooleanConsumer;
-import com.annimon.stream.function.BooleanFunction;
-import com.annimon.stream.function.BooleanPredicate;
 import com.annimon.stream.function.BooleanSupplier;
-import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
 
 /**
@@ -60,7 +57,7 @@ public final class OptionalBoolean {
      * @throws NoSuchElementException if there is no value present
      * @see OptionalBoolean#isPresent()
      */
-    public boolean getAsBoolean() {
+    public boolean get() {
         if (!isPresent) {
             throw new NoSuchElementException("No value present");
         }
@@ -103,123 +100,6 @@ public final class OptionalBoolean {
         } else {
             emptyAction.run();
         }
-    }
-
-    /**
-     * Invokes consumer function with the value if present.
-     * This method same as {@code ifPresent}, but does not breaks chaining
-     *
-     * @param consumer  consumer function
-     * @return this {@code OptionalBoolean}
-     * @see #ifPresent(BooleanConsumer)
-     */
-    public OptionalBoolean executeIfPresent(BooleanConsumer consumer) {
-        ifPresent(consumer);
-        return this;
-    }
-
-    /**
-     * Invokes action function if value is absent.
-     *
-     * @param action  action that invokes if value absent
-     * @return this {@code OptionalBoolean}
-     */
-    public OptionalBoolean executeIfAbsent(Runnable action) {
-        if (!isPresent()) {
-            action.run();
-        }
-        return this;
-    }
-
-    /**
-     * Applies custom operator on {@code OptionalBoolean}.
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @throws NullPointerException if {@code function} is null
-     * @since 1.1.9
-     */
-    public <R> R custom(Function<OptionalBoolean, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
-     * Performs filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalBoolean} if the value is present and matches predicate,
-     *         otherwise an empty {@code OptionalBoolean}
-     */
-    public OptionalBoolean filter(BooleanPredicate predicate) {
-        if (!isPresent())
-            return this;
-        return predicate.test(value) ? this : OptionalBoolean.empty();
-    }
-
-    /**
-     * Performs negated filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalBoolean} if the value is present and doesn't matches predicate,
-     *              otherwise an empty {@code OptionalBoolean}
-     * @since 1.1.9
-     */
-    public OptionalBoolean filterNot(BooleanPredicate predicate) {
-        return filter(BooleanPredicate.Util.negate(predicate));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalBoolean} with transformed value if present,
-     *         otherwise an empty {@code OptionalBoolean}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public OptionalBoolean map(BooleanPredicate mapper) {
-        if (!isPresent()) {
-            return empty();
-        }
-        Objects.requireNonNull(mapper);
-        return OptionalBoolean.of(mapper.test(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param <U> the type of result value
-     * @param mapper  mapping function
-     * @return an {@code Optional} with transformed value if present,
-     *         otherwise an empty {@code Optional}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public <U> Optional<U> mapToObj(BooleanFunction<U> mapper) {
-        if (!isPresent()) {
-            return Optional.empty();
-        }
-        Objects.requireNonNull(mapper);
-        return Optional.ofNullable(mapper.apply(value));
-    }
-
-    /**
-     * Returns current {@code OptionalBoolean} if value is present, otherwise
-     * returns an {@code OptionalBoolean} produced by supplier function.
-     *
-     * @param supplier  supplier function that produces an {@code OptionalBoolean} to be returned
-     * @return this {@code OptionalBoolean} if value is present, otherwise
-     *         an {@code OptionalBoolean} produced by supplier function
-     * @throws NullPointerException if value is not present and
-     *         {@code supplier} or value produced by it is {@code null}
-     */
-    public OptionalBoolean or(Supplier<OptionalBoolean> supplier) {
-        if (isPresent())
-            return this;
-        Objects.requireNonNull(supplier);
-        return Objects.requireNonNull(supplier.get());
     }
 
     /**

@@ -18,7 +18,7 @@ public final class SortedTest {
     @Test
     public void testSorted() {
         assertTrue(IntStream.empty().sorted().count() == 0);
-        assertTrue(IntStream.of(42).sorted().findFirst().getAsInt() == 42);
+        assertTrue(IntStream.of(42).sorted().findFirst().get() == 42);
 
         final boolean[] wrongOrder = new boolean[]{false};
 

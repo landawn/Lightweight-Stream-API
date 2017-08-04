@@ -68,7 +68,7 @@ public class OptionalBooleanMatcher {
                 mismatchDescription.appendText("OptionalBoolean was empty");
                 return false;
             }
-            final Boolean value = optional.getAsBoolean();
+            final Boolean value = optional.get();
             mismatchDescription.appendText("OptionalBoolean value ");
             matcher.describeMismatch(value, mismatchDescription);
             return matcher.matches(value);

@@ -17,7 +17,6 @@ import com.annimon.stream.function.Supplier;
 import com.annimon.stream.function.ToDoubleFunction;
 import com.annimon.stream.function.ToIntFunction;
 import com.annimon.stream.function.ToLongFunction;
-import com.annimon.stream.function.UnaryOperator;
 
 /**
  * Common implementations of {@code Collector} interface.
@@ -123,7 +122,7 @@ public final class Collectors {
      * @since 1.1.3
      */
     public static <K, T> Collector<T, ?, Map<K, T>> toMap(final Function<? super T, ? extends K> keyMapper) {
-        return Collectors.<T, K, T> toMap(keyMapper, UnaryOperator.Util.<T> identity());
+        return Collectors.<T, K, T> toMap(keyMapper, Fn.<T> identity());
     }
 
     /**
@@ -615,12 +614,18 @@ public final class Collectors {
      * @param finisher  the final transformation function
      * @return a {@code Collector}
      */
-    public static <T, A, IR, OR> Collector<T, A, OR> collectingAndThen(Collector<T, A, IR> c, Function<IR, OR> finisher) {
-        Function<A, IR> downstreamFinisher = c.finisher();
-        if (downstreamFinisher == null) {
-            downstreamFinisher = castIdentity();
-        }
-        return new CollectorsImpl<>(c.supplier(), c.accumulator(), Function.Util.andThen(downstreamFinisher, finisher));
+    public static <T, A, IR, OR> Collector<T, A, OR> collectingAndThen(final Collector<T, A, IR> c, final Function<IR, OR> finisher) {
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        final Function<A, IR> downstreamFinisher = c.finisher() == null ? (Function) castIdentity() : c.finisher();
+
+        final Function<A, OR> newFinisher = new Function<A, OR>() {
+            @Override
+            public OR apply(A t) {
+                return finisher.apply(downstreamFinisher.apply(t));
+            }
+        };
+
+        return new CollectorsImpl<>(c.supplier(), c.accumulator(), newFinisher);
     }
 
     /**

@@ -289,20 +289,6 @@ public final class IntStream implements Closeable {
     }
 
     /**
-     * Returns a stream consisting of the elements of this stream that don't
-     * match the given predicate.
-     *
-     * <p> This is an intermediate operation.
-     *
-     * @param predicate non-interfering, stateless predicate to apply to each
-     *                  element to determine if it should not be included
-     * @return the new stream
-     */
-    public IntStream removeIf(final IntPredicate predicate) {
-        return filter(IntPredicate.Util.negate(predicate));
-    }
-
-    /**
      * Returns an {@code IntStream} consisting of the results of applying the given
      * function to the elements of this stream.
      *

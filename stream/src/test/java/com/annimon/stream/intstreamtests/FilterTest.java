@@ -35,7 +35,7 @@ public final class FilterTest {
             public boolean test(int value) {
                 return value == 0;
             }
-        }).findFirst().getAsInt() == 0);
+        }).findFirst().get() == 0);
     }
 
     @Test

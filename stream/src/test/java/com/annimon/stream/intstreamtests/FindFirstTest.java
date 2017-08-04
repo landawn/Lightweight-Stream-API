@@ -11,7 +11,7 @@ public final class FindFirstTest {
     @Test
     public void testFindFirst() {
         assertFalse(IntStream.empty().findFirst().isPresent());
-        assertEquals(IntStream.of(42).findFirst().getAsInt(), 42);
+        assertEquals(IntStream.of(42).findFirst().get(), 42);
         assertTrue(IntStream.rangeClosed(2, 5).findFirst().isPresent());
     }
 }

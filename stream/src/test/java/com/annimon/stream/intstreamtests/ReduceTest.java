@@ -49,7 +49,7 @@ public final class ReduceTest {
             public int applyAsInt(int left, int right) {
                 throw new IllegalStateException();
             }
-        }).getAsInt(), 42);
+        }).get(), 42);
 
         assertEquals(IntStream.of(41, 42).reduce(new IntBinaryOperator() {
             @Override
@@ -58,6 +58,6 @@ public final class ReduceTest {
                     return right;
                 return left;
             }
-        }).getAsInt(), 42);
+        }).get(), 42);
     }
 }

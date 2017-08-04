@@ -71,14 +71,14 @@ public class CollectorsTest {
         assertThat(chars, allOf(hasEntry('a', "a"), hasEntry('b', "b"), hasEntry('c', "c"), hasEntry('d', "d")));
     }
 
-    @Test
-    public void testToMapWithIdentityValueMapper() {
-        final Function<String, Character> keyMapper = Functions.firstCharacterExtractor();
-        Map<Character, String> chars = Stream.of("a", "b", "c", "d").collect(Collectors.toMap(keyMapper, UnaryOperator.Util.<String> identity()));
-
-        assertThat(chars.size(), is(4));
-        assertThat(chars, allOf(hasEntry('a', "a"), hasEntry('b', "b"), hasEntry('c', "c"), hasEntry('d', "d")));
-    }
+    //    @Test
+    //    public void testToMapWithIdentityValueMapper() {
+    //        final Function<String, Character> keyMapper = Functions.firstCharacterExtractor();
+    //        Map<Character, String> chars = Stream.of("a", "b", "c", "d").collect(Collectors.toMap(keyMapper, UnaryOperator.Util.<String> identity()));
+    //
+    //        assertThat(chars.size(), is(4));
+    //        assertThat(chars, allOf(hasEntry('a', "a"), hasEntry('b', "b"), hasEntry('c', "c"), hasEntry('d', "d")));
+    //    }
 
     @Test
     public void testToMapWithCustomValueMapper() {

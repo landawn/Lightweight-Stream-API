@@ -17,23 +17,4 @@ public interface DoubleUnaryOperator {
      * @return the operator result
      */
     double applyAsDouble(double operand);
-
-    class Util {
-
-        private Util() { }
-
-        /**
-         * Returns a unary operator that always returns its input argument.
-         *
-         * @return a unary operator that always returns its input argument
-         */
-        public static DoubleUnaryOperator identity() {
-            return new DoubleUnaryOperator() {
-                @Override
-                public double applyAsDouble(double operand) {
-                    return operand;
-                }
-            };
-        }
-    }
 }

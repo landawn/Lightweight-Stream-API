@@ -2,14 +2,8 @@ package com.annimon.stream;
 
 import java.util.NoSuchElementException;
 
-import com.annimon.stream.function.Function;
 import com.annimon.stream.function.IntConsumer;
-import com.annimon.stream.function.IntFunction;
-import com.annimon.stream.function.IntPredicate;
 import com.annimon.stream.function.IntSupplier;
-import com.annimon.stream.function.IntToDoubleFunction;
-import com.annimon.stream.function.IntToLongFunction;
-import com.annimon.stream.function.IntUnaryOperator;
 import com.annimon.stream.function.Supplier;
 
 /**
@@ -76,7 +70,7 @@ public final class OptionalInt {
      *
      * @see OptionalInt#isPresent()
      */
-    public int getAsInt() {
+    public int get() {
         if (!isPresent) {
             throw new NoSuchElementException("No value present");
         }
@@ -123,138 +117,6 @@ public final class OptionalInt {
     }
 
     /**
-     * Invokes consumer function with value if present.
-     * This method same as {@code ifPresent}, but does not break chaining
-     *
-     * @param consumer  consumer function
-     * @return this {@code OptionalInt}
-     * @see #ifPresent(com.annimon.stream.function.IntConsumer)
-     * @since 1.1.2
-     */
-    public OptionalInt executeIfPresent(IntConsumer consumer) {
-        ifPresent(consumer);
-        return this;
-    }
-
-    /**
-     * Invokes action function if value is absent.
-     *
-     * @param action  action that invokes if value absent
-     * @return this {@code OptionalInt}
-     * @since 1.1.2
-     */
-    public OptionalInt executeIfAbsent(Runnable action) {
-        if (!isPresent())
-            action.run();
-        return this;
-    }
-
-    /**
-     * Applies custom operator on {@code OptionalInt}.
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @throws NullPointerException if {@code function} is null
-     * @since 1.1.9
-     */
-    public <R> R custom(Function<OptionalInt, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
-     * Performs filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalInt} if the value is present and matches predicate,
-     *         otherwise an empty {@code OptionalInt}
-     * @since 1.1.4
-     */
-    public OptionalInt filter(IntPredicate predicate) {
-        if (!isPresent())
-            return this;
-        return predicate.test(value) ? this : OptionalInt.empty();
-    }
-
-    /**
-     * Performs negated filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalInt} if the value is present and doesn't matches predicate,
-     *              otherwise an empty {@code OptionalInt}
-     * @since 1.1.9
-     */
-    public OptionalInt filterNot(IntPredicate predicate) {
-        return filter(IntPredicate.Util.negate(predicate));
-    }
-
-    /**
-     * Invokes mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalInt} with transformed value if present,
-     *         otherwise an empty {@code OptionalInt}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.3
-     */
-    public OptionalInt map(IntUnaryOperator mapper) {
-        if (!isPresent())
-            return empty();
-        return OptionalInt.of(mapper.applyAsInt(value));
-    }
-
-    /**
-     * Invokes mapping function on inner value if present.
-     *
-     * @param <U> the type of result value
-     * @param mapper  mapping function
-     * @return an {@code Optional} with transformed value if present,
-     *         otherwise an empty {@code Optional}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.3
-     */
-    public <U> Optional<U> mapToObj(IntFunction<U> mapper) {
-        if (!isPresent())
-            return Optional.empty();
-        return Optional.ofNullable(mapper.apply(value));
-    }
-
-    /**
-     * Invokes mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalLong} with transformed value if present,
-     *         otherwise an empty {@code OptionalLong}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.4
-     */
-    public OptionalLong mapToLong(IntToLongFunction mapper) {
-        if (!isPresent())
-            return OptionalLong.empty();
-        return OptionalLong.of(mapper.applyAsLong(value));
-    }
-
-    /**
-     * Invokes mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalDouble} with transformed value if present,
-     *         otherwise an empty {@code OptionalDouble}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     * @since 1.1.4
-     */
-    public OptionalDouble mapToDouble(IntToDoubleFunction mapper) {
-        if (!isPresent())
-            return OptionalDouble.empty();
-        return OptionalDouble.of(mapper.applyAsDouble(value));
-    }
-
-    /**
      * Wraps a value into {@code IntStream} if present, otherwise returns an empty {@code IntStream}.
      *
      * @return the optional value as an {@code IntStream}
@@ -263,23 +125,6 @@ public final class OptionalInt {
         if (!isPresent())
             return IntStream.empty();
         return IntStream.of(value);
-    }
-
-    /**
-     * Returns current {@code OptionalInt} if value is present, otherwise
-     * returns an {@code OptionalInt} produced by supplier function.
-     *
-     * @param supplier  supplier function that produces an {@code OptionalInt} to be returned
-     * @return this {@code OptionalInt} if value is present, otherwise
-     *         an {@code OptionalInt} produced by supplier function
-     * @throws NullPointerException if value is not present and
-     *         {@code supplier} or value produced by it is {@code null}
-     */
-    public OptionalInt or(Supplier<OptionalInt> supplier) {
-        if (isPresent())
-            return this;
-        Objects.requireNonNull(supplier);
-        return Objects.requireNonNull(supplier.get());
     }
 
     /**

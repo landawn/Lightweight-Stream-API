@@ -17,23 +17,4 @@ public interface LongUnaryOperator {
      * @return the operator result
      */
     long applyAsLong(long operand);
-
-    class Util {
-
-        private Util() { }
-
-        /**
-         * Returns a unary operator that always returns its input argument.
-         *
-         * @return a unary operator that always returns its input argument
-         */
-        public static LongUnaryOperator identity() {
-            return new LongUnaryOperator() {
-                @Override
-                public long applyAsLong(long operand) {
-                    return operand;
-                }
-            };
-        }
-    }
 }

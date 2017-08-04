@@ -3,13 +3,7 @@ package com.annimon.stream;
 import java.util.NoSuchElementException;
 
 import com.annimon.stream.function.DoubleConsumer;
-import com.annimon.stream.function.DoubleFunction;
-import com.annimon.stream.function.DoublePredicate;
 import com.annimon.stream.function.DoubleSupplier;
-import com.annimon.stream.function.DoubleToIntFunction;
-import com.annimon.stream.function.DoubleToLongFunction;
-import com.annimon.stream.function.DoubleUnaryOperator;
-import com.annimon.stream.function.Function;
 import com.annimon.stream.function.Supplier;
 
 /**
@@ -61,7 +55,7 @@ public final class OptionalDouble {
      * @throws NoSuchElementException if there is no value present
      * @see OptionalDouble#isPresent()
      */
-    public double getAsDouble() {
+    public double get() {
         if (!isPresent) {
             throw new NoSuchElementException("No value present");
         }
@@ -107,140 +101,6 @@ public final class OptionalDouble {
     }
 
     /**
-     * Invokes consumer function with the value if present.
-     * This method same as {@code ifPresent}, but does not breaks chaining
-     *
-     * @param consumer  consumer function
-     * @return this {@code OptionalDouble}
-     * @see #ifPresent(com.annimon.stream.function.DoubleConsumer)
-     */
-    public OptionalDouble executeIfPresent(DoubleConsumer consumer) {
-        ifPresent(consumer);
-        return this;
-    }
-
-    /**
-     * Invokes action function if value is absent.
-     *
-     * @param action  action that invokes if value absent
-     * @return this {@code OptionalDouble}
-     */
-    public OptionalDouble executeIfAbsent(Runnable action) {
-        if (!isPresent()) {
-            action.run();
-        }
-        return this;
-    }
-
-    /**
-     * Applies custom operator on {@code OptionalDouble}.
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @throws NullPointerException if {@code function} is null
-     * @since 1.1.9
-     */
-    public <R> R custom(Function<OptionalDouble, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
-     * Performs filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalDouble} if the value is present and matches predicate,
-     *         otherwise an empty {@code OptionalDouble}
-     */
-    public OptionalDouble filter(DoublePredicate predicate) {
-        if (!isPresent())
-            return this;
-        return predicate.test(value) ? this : OptionalDouble.empty();
-    }
-
-    /**
-     * Performs negated filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalDouble} if the value is present and doesn't matches predicate,
-     *              otherwise an empty {@code OptionalDouble}
-     * @since 1.1.9
-     */
-    public OptionalDouble filterNot(DoublePredicate predicate) {
-        return filter(DoublePredicate.Util.negate(predicate));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalDouble} with transformed value if present,
-     *         otherwise an empty {@code OptionalDouble}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public OptionalDouble map(DoubleUnaryOperator mapper) {
-        if (!isPresent()) {
-            return empty();
-        }
-        Objects.requireNonNull(mapper);
-        return OptionalDouble.of(mapper.applyAsDouble(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param <U> the type of result value
-     * @param mapper  mapping function
-     * @return an {@code Optional} with transformed value if present,
-     *         otherwise an empty {@code Optional}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public <U> Optional<U> mapToObj(DoubleFunction<U> mapper) {
-        if (!isPresent()) {
-            return Optional.empty();
-        }
-        Objects.requireNonNull(mapper);
-        return Optional.ofNullable(mapper.apply(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalInt} with transformed value if present,
-     *         otherwise an empty {@code OptionalInt}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public OptionalInt mapToInt(DoubleToIntFunction mapper) {
-        if (!isPresent()) {
-            return OptionalInt.empty();
-        }
-        Objects.requireNonNull(mapper);
-        return OptionalInt.of(mapper.applyAsInt(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalLong} with transformed value if present,
-     *         otherwise an empty {@code OptionalLong}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public OptionalLong mapToLong(DoubleToLongFunction mapper) {
-        if (!isPresent()) {
-            return OptionalLong.empty();
-        }
-        Objects.requireNonNull(mapper);
-        return OptionalLong.of(mapper.applyAsLong(value));
-    }
-
-    /**
      * Wraps a value into {@code DoubleStream} if present,
      * otherwise returns an empty {@code DoubleStream}.
      *
@@ -251,23 +111,6 @@ public final class OptionalDouble {
             return DoubleStream.empty();
         }
         return DoubleStream.of(value);
-    }
-
-    /**
-     * Returns current {@code OptionalDouble} if value is present, otherwise
-     * returns an {@code OptionalDouble} produced by supplier function.
-     *
-     * @param supplier  supplier function that produces an {@code OptionalDouble} to be returned
-     * @return this {@code OptionalDouble} if value is present, otherwise
-     *         an {@code OptionalDouble} produced by supplier function
-     * @throws NullPointerException if value is not present and
-     *         {@code supplier} or value produced by it is {@code null}
-     */
-    public OptionalDouble or(Supplier<OptionalDouble> supplier) {
-        if (isPresent())
-            return this;
-        Objects.requireNonNull(supplier);
-        return Objects.requireNonNull(supplier.get());
     }
 
     /**

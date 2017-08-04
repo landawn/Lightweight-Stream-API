@@ -2,13 +2,8 @@ package com.annimon.stream;
 
 import java.util.NoSuchElementException;
 
-import com.annimon.stream.function.Function;
 import com.annimon.stream.function.LongConsumer;
-import com.annimon.stream.function.LongFunction;
-import com.annimon.stream.function.LongPredicate;
 import com.annimon.stream.function.LongSupplier;
-import com.annimon.stream.function.LongToIntFunction;
-import com.annimon.stream.function.LongUnaryOperator;
 import com.annimon.stream.function.Supplier;
 
 /**
@@ -106,123 +101,6 @@ public final class OptionalLong {
     }
 
     /**
-     * Invokes consumer function with the value if present.
-     * This method same as {@code ifPresent}, but does not breaks chaining
-     *
-     * @param consumer  consumer function
-     * @return this {@code OptionalLong}
-     * @see #ifPresent(com.annimon.stream.function.LongConsumer)
-     */
-    public OptionalLong executeIfPresent(LongConsumer consumer) {
-        ifPresent(consumer);
-        return this;
-    }
-
-    /**
-     * Invokes action function if value is absent.
-     *
-     * @param action  action that invokes if value absent
-     * @return this {@code OptionalLong}
-     */
-    public OptionalLong executeIfAbsent(Runnable action) {
-        if (!isPresent()) {
-            action.run();
-        }
-        return this;
-    }
-
-    /**
-     * Applies custom operator on {@code OptionalLong}.
-     *
-     * @param <R> the type of the result
-     * @param function  a transforming function
-     * @return a result of the transforming function
-     * @throws NullPointerException if {@code function} is null
-     * @since 1.1.9
-     */
-    public <R> R custom(Function<OptionalLong, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
-    }
-
-    /**
-     * Performs filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalLong} if the value is present and matches predicate,
-     *         otherwise an empty {@code OptionalLong}
-     */
-    public OptionalLong filter(LongPredicate predicate) {
-        if (!isPresent())
-            return this;
-        return predicate.test(value) ? this : OptionalLong.empty();
-    }
-
-    /**
-     * Performs negated filtering on inner value if it is present.
-     *
-     * @param predicate  a predicate function
-     * @return this {@code OptionalLong} if the value is present and doesn't matches predicate,
-     *              otherwise an empty {@code OptionalLong}
-     * @since 1.1.9
-     */
-    public OptionalLong filterNot(LongPredicate predicate) {
-        return filter(LongPredicate.Util.negate(predicate));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalLong} with transformed value if present,
-     *         otherwise an empty {@code OptionalLong}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public OptionalLong map(LongUnaryOperator mapper) {
-        if (!isPresent()) {
-            return empty();
-        }
-        Objects.requireNonNull(mapper);
-        return OptionalLong.of(mapper.applyAsLong(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param <U> the type of result value
-     * @param mapper  mapping function
-     * @return an {@code Optional} with transformed value if present,
-     *         otherwise an empty {@code Optional}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public <U> Optional<U> mapToObj(LongFunction<U> mapper) {
-        if (!isPresent()) {
-            return Optional.empty();
-        }
-        Objects.requireNonNull(mapper);
-        return Optional.ofNullable(mapper.apply(value));
-    }
-
-    /**
-     * Invokes the given mapping function on inner value if present.
-     *
-     * @param mapper  mapping function
-     * @return an {@code OptionalInt} with transformed value if present,
-     *         otherwise an empty {@code OptionalInt}
-     * @throws NullPointerException if value is present and
-     *         {@code mapper} is {@code null}
-     */
-    public OptionalInt mapToInt(LongToIntFunction mapper) {
-        if (!isPresent()) {
-            return OptionalInt.empty();
-        }
-        Objects.requireNonNull(mapper);
-        return OptionalInt.of(mapper.applyAsInt(value));
-    }
-
-    /**
      * Wraps a value into {@code LongStream} if present,
      * otherwise returns an empty {@code LongStream}.
      *
@@ -233,23 +111,6 @@ public final class OptionalLong {
             return LongStream.empty();
         }
         return LongStream.of(value);
-    }
-
-    /**
-     * Returns current {@code OptionalLong} if value is present, otherwise
-     * returns an {@code OptionalLong} produced by supplier function.
-     *
-     * @param supplier  supplier function that produces an {@code OptionalLong} to be returned
-     * @return this {@code OptionalLong} if value is present, otherwise
-     *         an {@code OptionalLong} produced by supplier function
-     * @throws NullPointerException if value is not present and
-     *         {@code supplier} or value produced by it is {@code null}
-     */
-    public OptionalLong or(Supplier<OptionalLong> supplier) {
-        if (isPresent())
-            return this;
-        Objects.requireNonNull(supplier);
-        return Objects.requireNonNull(supplier.get());
     }
 
     /**

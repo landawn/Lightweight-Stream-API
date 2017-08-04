@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.contains;
 
 import org.junit.Test;
 
-import com.annimon.stream.IntStream;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
 
@@ -35,16 +34,16 @@ public final class MapTest {
         Stream.of("[2]", "[3]", "[4]", "[8]", "[25]").map(stringToSquareInt).chain(assertElements(contains(4, 9, 16, 64, 625)));
     }
 
-    @Test
-    public void testMapWithComposedFunction() {
-        final Function<Integer, Integer> mapPlus1 = new Function<Integer, Integer>() {
-            @Override
-            public Integer apply(Integer x) {
-                return x + 1;
-            }
-        };
-        final Function<Integer, Integer> mapPlus2 = Function.Util.compose(mapPlus1, mapPlus1);
-        IntStream.range(-10, 0).boxed().map(mapPlus2).map(mapPlus2).map(mapPlus2).map(mapPlus2).map(mapPlus2)
-                .chain(assertElements(contains(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
-    }
+    //    @Test
+    //    public void testMapWithComposedFunction() {
+    //        final Function<Integer, Integer> mapPlus1 = new Function<Integer, Integer>() {
+    //            @Override
+    //            public Integer apply(Integer x) {
+    //                return x + 1;
+    //            }
+    //        };
+    //        final Function<Integer, Integer> mapPlus2 = Function.Util.compose(mapPlus1, mapPlus1);
+    //        IntStream.range(-10, 0).boxed().map(mapPlus2).map(mapPlus2).map(mapPlus2).map(mapPlus2).map(mapPlus2)
+    //                .chain(assertElements(contains(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
+    //    }
 }

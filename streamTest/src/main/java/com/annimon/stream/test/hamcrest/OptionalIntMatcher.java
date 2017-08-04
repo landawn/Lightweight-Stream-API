@@ -68,7 +68,7 @@ public class OptionalIntMatcher {
                 mismatchDescription.appendText("OptionalInt was empty");
                 return false;
             }
-            final Integer value = optional.getAsInt();
+            final Integer value = optional.get();
             mismatchDescription.appendText("OptionalInt value ");
             matcher.describeMismatch(value, mismatchDescription);
             return matcher.matches(value);

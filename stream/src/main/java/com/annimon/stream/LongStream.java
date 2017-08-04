@@ -33,7 +33,6 @@ import com.annimon.stream.operator.LongMapToInt;
 import com.annimon.stream.operator.LongMapToObj;
 import com.annimon.stream.operator.LongPeek;
 import com.annimon.stream.operator.LongRangeClosed;
-import com.annimon.stream.operator.LongSample;
 import com.annimon.stream.operator.LongScan;
 import com.annimon.stream.operator.LongScanIdentity;
 import com.annimon.stream.operator.LongSkip;
@@ -266,18 +265,6 @@ public final class LongStream implements Closeable {
     }
 
     /**
-     * Returns {@code LongStream} with elements that does not satisfy the given predicate.
-     *
-     * <p> This is an intermediate operation.
-     *
-     * @param predicate  the predicate used to filter elements
-     * @return the new stream
-     */
-    public LongStream removeIf(final LongPredicate predicate) {
-        return filter(LongPredicate.Util.negate(predicate));
-    }
-
-    /**
      * Returns an {@code LongStream} consisting of the results of applying the given
      * function to the elements of this stream.
      *
@@ -412,31 +399,6 @@ public final class LongStream implements Closeable {
      */
     public LongStream sorted(Comparator<Long> comparator) {
         return boxed().sorted(comparator).mapToLong(UNBOX_FUNCTION);
-    }
-
-    /**
-     * Samples the {@code LongStream} by emitting every n-th element.
-     *
-     * <p>This is an intermediate operation.
-     *
-     * <p>Example:
-     * <pre>
-     * stepWidth: 3
-     * stream: [1, 2, 3, 4, 5, 6, 7, 8]
-     * result: [1, 4, 7]
-     * </pre>
-     *
-     * @param stepWidth  step width
-     * @return the new {@code LongStream}
-     * @throws IllegalArgumentException if {@code stepWidth} is zero or negative
-     * @see Stream#sample(int)
-     */
-    public LongStream sample(final int stepWidth) {
-        if (stepWidth <= 0)
-            throw new IllegalArgumentException("stepWidth cannot be zero or negative");
-        if (stepWidth == 1)
-            return this;
-        return new LongStream(params, new LongSample(iterator, stepWidth));
     }
 
     /**

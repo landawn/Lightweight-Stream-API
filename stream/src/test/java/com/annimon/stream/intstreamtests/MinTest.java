@@ -13,9 +13,9 @@ public final class MinTest {
         assertFalse(IntStream.empty().min().isPresent());
 
         assertTrue(IntStream.of(42).min().isPresent());
-        assertEquals(IntStream.of(42).min().getAsInt(), 42);
+        assertEquals(IntStream.of(42).min().get(), 42);
 
         assertEquals(IntStream.of(-1, -2, -3, -2, -3, -5, -2, Integer.MIN_VALUE, Integer.MAX_VALUE)
-                .min().getAsInt(), Integer.MIN_VALUE);
+                .min().get(), Integer.MIN_VALUE);
     }
 }

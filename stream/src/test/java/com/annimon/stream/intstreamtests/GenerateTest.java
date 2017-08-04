@@ -16,7 +16,7 @@ public final class GenerateTest {
             }
         };
 
-        assertTrue(IntStream.generate(s).findFirst().getAsInt() == 42);
+        assertTrue(IntStream.generate(s).findFirst().get() == 42);
     }
 
     @Test(expected = NullPointerException.class)
