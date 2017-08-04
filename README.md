@@ -5,6 +5,7 @@ Lightweight-Stream-API
 [![Javadocs](https://www.javadoc.io/badge/com.landawn/stream.svg)](https://www.javadoc.io/doc/com.landawn/stream)
 Stream API from Java 8 rewritten on iterators for Java 7 and Android.
 
+Full API documentation is available [here](https://www.javadoc.io/doc/com.landawn/stream).
 
 ### Includes
 
@@ -123,7 +124,9 @@ In addition to backported Java 8 Stream operators, the library provides:
 
 ## Download
 
-Download [latest release](https://github.com/landawn/Lightweight-Stream-API/releases) or grab via Maven:
+Releases are available in [Maven Central](https://repo1.maven.org/maven2/com/landawn/stream/)
+
+Maven:
 
 ```xml
 <dependency>
