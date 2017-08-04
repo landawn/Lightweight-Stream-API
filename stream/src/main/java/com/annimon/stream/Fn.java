@@ -287,7 +287,7 @@ public final class Fn {
         return new Predicate<T>() {
             @Override
             public boolean test(T value) {
-                return compare(value, target) > 0;
+                return Objects.compare(value, target) > 0;
             }
         };
     }
@@ -297,7 +297,7 @@ public final class Fn {
         return new Predicate<T>() {
             @Override
             public boolean test(T value) {
-                return compare(value, target) >= 0;
+                return Objects.compare(value, target) >= 0;
             }
         };
     }
@@ -307,7 +307,7 @@ public final class Fn {
         return new Predicate<T>() {
             @Override
             public boolean test(T value) {
-                return compare(value, target) < 0;
+                return Objects.compare(value, target) < 0;
             }
         };
     }
@@ -317,7 +317,7 @@ public final class Fn {
         return new Predicate<T>() {
             @Override
             public boolean test(T value) {
-                return compare(value, target) <= 0;
+                return Objects.compare(value, target) <= 0;
             }
         };
     }
@@ -492,10 +492,6 @@ public final class Fn {
 
     public static <T> Collector<T, ?, Double> averagingDouble(final ToDoubleFunction<? super T> mapper) {
         return Collectors.averagingDouble(mapper);
-    }
-
-    static <T extends Comparable<? super T>> int compare(final T a, final T b) {
-        return a == null ? (b == null ? 0 : -1) : (b == null ? 1 : a.compareTo(b));
     }
 
     /**

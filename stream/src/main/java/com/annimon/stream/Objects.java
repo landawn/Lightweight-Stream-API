@@ -7,7 +7,8 @@ import java.util.Comparator;
  */
 public final class Objects {
 
-    private Objects() { }
+    private Objects() {
+    }
 
     /**
      * Checks equality of two objects.
@@ -37,7 +38,8 @@ public final class Objects {
      * @return the hash code
      */
     public static int hash(Object... values) {
-        if (values == null) return 0;
+        if (values == null)
+            return 0;
 
         int result = 1;
         for (Object element : values)
@@ -54,6 +56,10 @@ public final class Objects {
      */
     public static String toString(Object o, String nullDefault) {
         return (o != null) ? o.toString() : nullDefault;
+    }
+
+    public static <T extends Comparable<? super T>> int compare(final T a, final T b) {
+        return a == null ? (b == null ? 0 : -1) : (b == null ? 1 : a.compareTo(b));
     }
 
     /**

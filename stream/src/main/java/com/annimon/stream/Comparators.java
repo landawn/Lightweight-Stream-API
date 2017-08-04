@@ -99,7 +99,7 @@ public final class Comparators {
         return new Comparator<T>() {
             @Override
             public int compare(T a, T b) {
-                return Fn.compare(keyExtractor.apply(a), keyExtractor.apply(b));
+                return Objects.compare(keyExtractor.apply(a), keyExtractor.apply(b));
             }
         };
     }
@@ -111,7 +111,7 @@ public final class Comparators {
         return new Comparator<T>() {
             @Override
             public int compare(T a, T b) {
-                return Fn.compare(keyExtractor.apply(b), keyExtractor.apply(a));
+                return Objects.compare(keyExtractor.apply(b), keyExtractor.apply(a));
             }
         };
     }
@@ -166,7 +166,7 @@ public final class Comparators {
         return new Comparator<Map.Entry<K, V>>() {
             @Override
             public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b) {
-                return Fn.compare(a.getKey(), b.getKey());
+                return Objects.compare(a.getKey(), b.getKey());
             }
         };
     }
@@ -176,7 +176,7 @@ public final class Comparators {
         return new Comparator<Map.Entry<K, V>>() {
             @Override
             public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b) {
-                return Fn.compare(b.getKey(), a.getKey());
+                return Objects.compare(b.getKey(), a.getKey());
             }
         };
     }
@@ -186,7 +186,7 @@ public final class Comparators {
         return new Comparator<Map.Entry<K, V>>() {
             @Override
             public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b) {
-                return Fn.compare(a.getValue(), b.getValue());
+                return Objects.compare(a.getValue(), b.getValue());
             }
         };
     }
@@ -196,7 +196,7 @@ public final class Comparators {
         return new Comparator<Map.Entry<K, V>>() {
             @Override
             public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b) {
-                return Fn.compare(b.getValue(), a.getValue());
+                return Objects.compare(b.getValue(), a.getValue());
             }
         };
     }
