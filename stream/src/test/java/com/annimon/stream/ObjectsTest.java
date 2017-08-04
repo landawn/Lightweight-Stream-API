@@ -1,14 +1,16 @@
 package com.annimon.stream;
 
-import java.util.Random;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import static com.annimon.stream.test.hamcrest.CommonMatcher.hasOnlyPrivateConstructors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Random;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Tests {@code Objects}.
@@ -36,13 +38,13 @@ public class ObjectsTest {
         assertEquals(value.hashCode(), Objects.hashCode(value));
     }
 
-    @Test
-    public void testHashRepeated() {
-        Object value = new Random();
-        int initial = Objects.hash(value, "test", 10, true, value, null, 50);
-        assertEquals(initial, Objects.hash(value, "test", 10, true, value, null, 50));
-        assertEquals(initial, Objects.hash(value, "test", 10, true, value, null, 50));
-    }
+    //    @Test
+    //    public void testHashRepeated() {
+    //        Object value = new Random();
+    //        int initial = Objects.hash(value, "test", 10, true, value, null, 50);
+    //        assertEquals(initial, Objects.hash(value, "test", 10, true, value, null, 50));
+    //        assertEquals(initial, Objects.hash(value, "test", 10, true, value, null, 50));
+    //    }
 
     @Test
     public void testToString() {
@@ -72,23 +74,23 @@ public class ObjectsTest {
         assertEquals(1, result);
     }
 
-    @Test
-    public void testCompareInt() {
-        assertEquals(-1, Objects.compareInt(10, 20));
-
-        assertEquals(0, Objects.compareInt(20, 20));
-
-        assertEquals(1, Objects.compareInt(20, 10));
-    }
-
-    @Test
-    public void testCompareLong() {
-        assertEquals(-1, Objects.compareLong(100L, 10000L));
-
-        assertEquals(0, Objects.compareLong(2000L, 2000L));
-
-        assertEquals(1, Objects.compareLong(200000L, 10L));
-    }
+    //    @Test
+    //    public void testCompareInt() {
+    //        assertEquals(-1, Objects.compareInt(10, 20));
+    //
+    //        assertEquals(0, Objects.compareInt(20, 20));
+    //
+    //        assertEquals(1, Objects.compareInt(20, 10));
+    //    }
+    //
+    //    @Test
+    //    public void testCompareLong() {
+    //        assertEquals(-1, Objects.compareLong(100L, 10000L));
+    //
+    //        assertEquals(0, Objects.compareLong(2000L, 2000L));
+    //
+    //        assertEquals(1, Objects.compareLong(200000L, 10L));
+    //    }
 
     @Test
     public void testRequireNonNull() {

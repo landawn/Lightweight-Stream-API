@@ -32,22 +32,6 @@ public final class Objects {
     }
 
     /**
-     * Returns the hash code for objects.
-     *
-     * @param values  the values
-     * @return the hash code
-     */
-    public static int hash(Object... values) {
-        if (values == null)
-            return 0;
-
-        int result = 1;
-        for (Object element : values)
-            result = 31 * result + hashCode(element);
-        return result;
-    }
-
-    /**
      * Returns result of calling {@code toString} on object or {@code nullDefault} if object is null.
      *
      * @param o  an object
@@ -73,30 +57,6 @@ public final class Objects {
      */
     public static <T> int compare(T a, T b, Comparator<? super T> c) {
         return (a == b) ? 0 : c.compare(a, b);
-    }
-
-    /**
-     * Compares two {@code int} values.
-     *
-     * @param x  the first {@code int} value
-     * @param y  the second {@code int} value
-     * @return comparing result
-     * @since 1.1.6
-     */
-    public static int compareInt(int x, int y) {
-        return (x < y) ? -1 : ((x == y) ? 0 : 1);
-    }
-
-    /**
-     * Compares two {@code long} values.
-     *
-     * @param x  the first {@code long} value
-     * @param y  the second {@code long} value
-     * @return comparing result
-     * @since 1.1.6
-     */
-    public static int compareLong(long x, long y) {
-        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 
     /**

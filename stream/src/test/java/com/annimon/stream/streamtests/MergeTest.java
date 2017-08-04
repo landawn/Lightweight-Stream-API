@@ -88,7 +88,7 @@ public final class MergeTest {
         return new BiFunction<Integer, Integer, ObjMerge.MergeResult>() {
             @Override
             public ObjMerge.MergeResult apply(Integer value1, Integer value2) {
-                return Objects.compareInt(value1, value2) == -1 ? ObjMerge.MergeResult.TAKE_FIRST : ObjMerge.MergeResult.TAKE_SECOND;
+                return Objects.compare(value1, value2) == -1 ? ObjMerge.MergeResult.TAKE_FIRST : ObjMerge.MergeResult.TAKE_SECOND;
             }
         };
     }
