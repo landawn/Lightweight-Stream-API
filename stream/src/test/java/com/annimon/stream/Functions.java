@@ -1,20 +1,20 @@
 package com.annimon.stream;
 
+import java.lang.reflect.Array;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+
 import com.annimon.stream.function.BiConsumer;
 import com.annimon.stream.function.BiFunction;
 import com.annimon.stream.function.DoublePredicate;
 import com.annimon.stream.function.Function;
-import com.annimon.stream.function.IndexedBiFunction;
 import com.annimon.stream.function.IntFunction;
 import com.annimon.stream.function.IntPredicate;
 import com.annimon.stream.function.LongPredicate;
 import com.annimon.stream.function.Predicate;
 import com.annimon.stream.function.Supplier;
 import com.annimon.stream.function.ToIntFunction;
-import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Functions that used in tests.
@@ -81,6 +81,7 @@ public final class Functions {
             }
         };
     }
+
     public static <T> ToIntFunction<Indexed<T>> intPairIndex() {
         return new ToIntFunction<Indexed<T>>() {
 
@@ -127,7 +128,8 @@ public final class Functions {
             }
 
             @Override
-            public void remove() { }
+            public void remove() {
+            }
         };
     }
 
@@ -140,7 +142,8 @@ public final class Functions {
             @Override
             public Long get() {
                 final long result = beforePrevious + previous;
-                if (result == 0) previous = 1;
+                if (result == 0)
+                    previous = 1;
                 beforePrevious = previous;
                 previous = result;
                 return result;
@@ -198,14 +201,14 @@ public final class Functions {
         };
     }
 
-    public static IndexedBiFunction<Integer, Integer, Integer> indexedAddition() {
-        return new IndexedBiFunction<Integer, Integer, Integer>() {
-            @Override
-            public Integer apply(int index, Integer value1, Integer value2) {
-                return index + value1 + value2;
-            }
-        };
-    }
+    //    public static IndexedBiFunction<Integer, Integer, Integer> indexedAddition() {
+    //        return new IndexedBiFunction<Integer, Integer, Integer>() {
+    //            @Override
+    //            public Integer apply(int index, Integer value1, Integer value2) {
+    //                return index + value1 + value2;
+    //            }
+    //        };
+    //    }
 
     public static Comparator<Integer> naturalOrder() {
         return new Comparator<Integer>() {
