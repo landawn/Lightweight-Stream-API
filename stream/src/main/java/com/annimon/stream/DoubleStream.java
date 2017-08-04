@@ -174,6 +174,10 @@ public final class DoubleStream implements Closeable {
         return result.onClose(Compose.closeables(a, b));
     }
 
+    public static DoubleStream concat(final double[] a, final double[] b) {
+        return concat(DoubleStream.of(a), DoubleStream.of(b));
+    }
+
     private final PrimitiveIterator.OfDouble iterator;
     private final Params params;
 

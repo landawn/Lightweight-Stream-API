@@ -298,6 +298,10 @@ public final class IntStream implements Closeable {
         return result.onClose(Compose.closeables(a, b));
     }
 
+    public static IntStream concat(final int[] a, final int[] b) {
+        return concat(IntStream.of(a), IntStream.of(b));
+    }
+
     private final PrimitiveIterator.OfInt iterator;
     private final Params params;
 

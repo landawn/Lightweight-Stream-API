@@ -301,6 +301,10 @@ public final class LongStream implements Closeable {
         return result.onClose(Compose.closeables(a, b));
     }
 
+    public static LongStream concat(final long[] a, final long[] b) {
+        return concat(LongStream.of(a), LongStream.of(b));
+    }
+
     private final PrimitiveIterator.OfLong iterator;
     private final Params params;
 
