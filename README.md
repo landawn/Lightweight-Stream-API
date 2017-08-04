@@ -132,7 +132,7 @@ Maven:
 <dependency>
   <groupId>com.landawn</groupId>
   <artifactId>stream</artifactId>
-  <version>2.0</version>
+  <version>2.1</version>
 </dependency>
 ```
 or Gradle:
@@ -140,7 +140,7 @@ or Gradle:
 ```groovy
 dependencies {
   ...
-  compile 'com.landawn:stream:2.0'
+  compile 'com.landawn:stream:2.1'
   ...
 }
 ```
