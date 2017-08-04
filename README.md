@@ -11,7 +11,6 @@ Stream API from Java 8 rewritten on iterators for Java 7 and Android.
  + Functional interfaces (`Supplier`, `Function`, `Consumer` etc);
  + `Stream`/`IntStream`/`LongStream`/`DoubleStream` (without parallel processing, but with a variety of additional methods and with custom operators);
  + `Optional`/`OptionalBoolean`/`OptionalInt`/`OptionalLong`/`OptionalDouble` classes;
- + `Exceptional` class - functional way to deal with exceptions;
  + `Objects` from Java 7.
 
 
@@ -38,7 +37,7 @@ Unlike Java 8 streams, Lightweight-Stream-API provides the ability to apply cust
 
 ```java
 Stream.of(...)
-    .custom(new Reverse<>())
+    .chain(new Reverse<>())
     .forEach(...);
 
 public final class Reverse<T> implements UnaryOperator<Stream<T>> {
@@ -61,19 +60,6 @@ You can find more examples [here](https://github.com/aNNiMON/Lightweight-Stream-
 
 In addition to backported Java 8 Stream operators, the library provides:
 
-- `filterNot` - negated `filter` operator
-
-  ```java
-  // Java 8
-  stream.filter(((Predicate<String>) String::isEmpty).negate())
-  // LSA
-  stream.filterNot(String::isEmpty)
-  ```
-
-- `select` - filters instances of the given class
-
-  ```java
-
 - `skipNull` - filters only not null elements
 
   ```java
@@ -81,7 +67,7 @@ In addition to backported Java 8 Stream operators, the library provides:
       .skipNull() // [a, c, d]
   ```
 
-- `sortBy` - sorts by extractor function
+- `sortedBy` - sorts by extractor function
 
   ```java
   // Java 8
@@ -104,13 +90,6 @@ In addition to backported Java 8 Stream operators, the library provides:
   ```java
   Stream.of("a", "b", "cd", "ef", "gh", "ij", "klmnn")
       .chunkBy(String::length) // [[a, b], [cd, ef, gh, ij], [klmnn]]
-  ```
-
-- `sample` - emits every n-th elements
-
-  ```java
-  Stream.rangeClosed(0, 10)
-      .sample(2) // [0, 2, 4, 6, 8, 10]
   ```
 
 - `sliding` - partitions stream into fixed-sized list and sliding over the elements
@@ -142,32 +121,6 @@ In addition to backported Java 8 Stream operators, the library provides:
   Stream.of("a", "b", "c")
       .indexed() // [(0 : "a"), (1 : "b"), (2 : "c")]
   ```
-
-- `filterIndexed` / `mapIndexed` / `takeWhileIndexed` / `takeUntilIndexed` / `dropWhileIndexed` / `reduceIndexed` / `forEachIndexed` - indexed specialization of operators
-
-  ```java
-  Stream.of("a", "b", "c")
-      .mapIndexed((i, s) -> s + Integer.toString(i)) // [a0, b1, c2]
-  ```
-
-
-### Throwable functions
-
-No more ugly try/catch in lambda expressions.
-
-```java
-// Java 8
-stream.map(file -> {
-    try {
-        return new FileInputStream(file);
-    } catch (IOException ioe) {
-        return null;
-    }
-})
-// LSA
-stream.map(Function.Util.safe(FileInputStream::new))
-```
-
 
 ## Download
 
