@@ -52,11 +52,11 @@ public final class Objects {
      * @param <T> the type of the arguments
      * @param a  an object
      * @param b  an object
-     * @param c  the comparator
+     * @param cmp  the comparator
      * @return comparing result
      */
-    public static <T> int compare(T a, T b, Comparator<? super T> c) {
-        return (a == b) ? 0 : c.compare(a, b);
+    public static <T> int compare(T a, T b, Comparator<? super T> cmp) {
+        return a == null ? (b == null ? 0 : -1) : (b == null ? 1 : cmp.compare(a, b));
     }
 
     /**
