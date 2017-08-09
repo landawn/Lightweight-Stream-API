@@ -41,7 +41,7 @@ import com.annimon.stream.function.Supplier;
 public final class EntryStream<K, V> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static final EntryStream EMPTY = of(new Map.Entry[0]);
+    private static final EntryStream EMPTY = new EntryStream(Stream.<Map.Entry> empty());
 
     private final Stream<Map.Entry<K, V>> s;
 
@@ -503,6 +503,10 @@ public final class EntryStream<K, V> {
 
     public <K2, V2> EntryStream<K2, V2> chain(Function<? super Stream<Map.Entry<K, V>>, ? extends Stream<Map.Entry<K2, V2>>> transfer) {
         return of(transfer.apply(s));
+    }
+
+    public void println() {
+        s.println();
     }
 
     public EntryStream<K, V> onClose(Runnable closeHandler) {
