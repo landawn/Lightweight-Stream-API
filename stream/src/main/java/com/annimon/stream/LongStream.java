@@ -53,7 +53,18 @@ public final class LongStream implements Closeable {
     /**
      * Single instance for empty stream. It is safe for multi-thread environment because it has no content.
      */
-    private static final LongStream EMPTY = of(new long[0]);
+    private static final LongStream EMPTY = new LongStream(new PrimitiveIterator.OfLong() {
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public long nextLong() {
+            return 0L;
+        }
+    });
 
     /**
      * Returns an empty stream.
@@ -72,10 +83,10 @@ public final class LongStream implements Closeable {
      * @throws NullPointerException if {@code values} is null
      */
     public static LongStream of(final long... values) {
-        Objects.requireNonNull(values);
-        if (values.length == 0) {
+        if (values == null || values.length == 0) {
             return LongStream.empty();
         }
+
         return new LongStream(new LongArray(values));
     }
 
