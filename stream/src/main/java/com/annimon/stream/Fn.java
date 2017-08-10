@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 
 import com.annimon.stream.function.BiConsumer;
 import com.annimon.stream.function.BiFunction;
+import com.annimon.stream.function.BinaryOperator;
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.IntFunction;
@@ -172,6 +173,30 @@ public final class Fn {
         @Override
         public boolean test(Object value) {
             return value != null;
+        }
+    };
+
+    @SuppressWarnings("rawtypes")
+    private static final BinaryOperator THROWING_MERGER = new BinaryOperator() {
+        @Override
+        public Object apply(Object t, Object u) {
+            throw new IllegalStateException(String.format("Duplicate key %s", u));
+        }
+    };
+
+    @SuppressWarnings("rawtypes")
+    private static final BinaryOperator IGNORING_MERGER = new BinaryOperator() {
+        @Override
+        public Object apply(Object t, Object u) {
+            return t;
+        }
+    };
+
+    @SuppressWarnings("rawtypes")
+    private static final BinaryOperator REPLACING_MERGER = new BinaryOperator() {
+        @Override
+        public Object apply(Object t, Object u) {
+            return u;
         }
     };
 
@@ -474,6 +499,18 @@ public final class Fn {
                 return new AbstractMap.SimpleImmutableEntry<>(entry.getKey(), func.apply(entry.getValue()));
             }
         };
+    }
+
+    public static <T> BinaryOperator<T> throwingMerger() {
+        return THROWING_MERGER;
+    }
+
+    public static <T> BinaryOperator<T> ignoringMerger() {
+        return IGNORING_MERGER;
+    }
+
+    public static <T> BinaryOperator<T> replacingMerger() {
+        return REPLACING_MERGER;
     }
 
     public static <T> Collector<T, ?, List<T>> toList() {

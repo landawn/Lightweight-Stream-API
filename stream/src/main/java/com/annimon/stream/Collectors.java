@@ -17,7 +17,6 @@ package com.annimon.stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -134,10 +133,11 @@ public final class Collectors {
      * @param <K> the result type of key mapping function
      * @param keyMapper  a mapping function to produce keys
      * @return a {@code Collector}
+     * @see #toMap(Function, Function, BinaryOperator, Supplier)
      * @since 1.1.3
      */
     public static <K, T> Collector<T, ?, Map<K, T>> toMap(final Function<? super T, ? extends K> keyMapper) {
-        return Collectors.<T, K, T> toMap(keyMapper, Fn.<T> identity());
+        return toMap(keyMapper, Fn.<T> identity());
     }
 
     /**
@@ -149,10 +149,37 @@ public final class Collectors {
      * @param keyMapper  a mapping function to produce keys
      * @param valueMapper  a mapping function to produce values
      * @return a {@code Collector}
+     * @see #toMap(Function, Function, BinaryOperator, Supplier)
      */
     public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(final Function<? super T, ? extends K> keyMapper,
             final Function<? super T, ? extends V> valueMapper) {
-        return Collectors.<T, K, V, Map<K, V>> toMap(keyMapper, valueMapper, Collectors.<K, V> hashMapSupplier());
+        return toMap(keyMapper, valueMapper, Fn.<V> throwingMerger());
+    }
+
+    /**
+     * 
+     * @param keyMapper
+     * @param valueMapper
+     * @param mergeFunction
+     * @return
+     * @see #toMap(Function, Function, BinaryOperator, Supplier)
+     */
+    public static <T, K, V> Collector<T, ?, Map<K, V>> toMap(final Function<? super T, ? extends K> keyMapper,
+            final Function<? super T, ? extends V> valueMapper, BinaryOperator<V> mergeFunction) {
+        return toMap(keyMapper, valueMapper, mergeFunction, Fn.Suppliers.<K, V> ofMap());
+    }
+
+    /**
+     * 
+     * @param keyMapper
+     * @param valueMapper
+     * @param mapFactory
+     * @return
+     * @see #toMap(Function, Function, BinaryOperator, Supplier)
+     */
+    public static <T, K, V, M extends Map<K, V>> Collector<T, ?, M> toMap(final Function<? super T, ? extends K> keyMapper,
+            final Function<? super T, ? extends V> valueMapper, final Supplier<M> mapFactory) {
+        return toMap(keyMapper, valueMapper, Fn.<V> throwingMerger(), mapFactory);
     }
 
     /**
@@ -163,30 +190,26 @@ public final class Collectors {
      * @param <V> the result type of value mapping function
      * @param <M> the type of the resulting {@code Map}
      * @param keyMapper  a mapping function to produce keys
-     * @param valueMapper  a mapping function to produce values
+     * @param valueMapper a mapping function to produce values
+     * @param mergeFunction
      * @param mapFactory  a supplier function that provides new {@code Map}
      * @return a {@code Collector}
      */
     public static <T, K, V, M extends Map<K, V>> Collector<T, ?, M> toMap(final Function<? super T, ? extends K> keyMapper,
-            final Function<? super T, ? extends V> valueMapper, final Supplier<M> mapFactory) {
-        return new CollectorsImpl<>(
+            final Function<? super T, ? extends V> valueMapper, final BinaryOperator<V> mergeFunction, final Supplier<M> mapFactory) {
+        return new CollectorsImpl<>(mapFactory, new BiConsumer<M, T>() {
+            @Override
+            public void accept(M map, T t) {
+                final K key = keyMapper.apply(t);
+                final V value = valueMapper.apply(t);
 
-                mapFactory,
-
-                new BiConsumer<M, T>() {
-                    @Override
-                    public void accept(M map, T t) {
-                        final K key = keyMapper.apply(t);
-                        final V value = valueMapper.apply(t);
-                        final V oldValue = map.get(key);
-                        final V newValue = (oldValue == null) ? value : oldValue;
-                        if (newValue == null) {
-                            map.remove(key);
-                        } else {
-                            map.put(key, newValue);
-                        }
-                    }
-                });
+                if (map.containsKey(key)) {
+                    map.put(key, mergeFunction.apply(map.get(key), value));
+                } else {
+                    map.put(key, value);
+                }
+            }
+        });
     }
 
     /**
@@ -671,7 +694,7 @@ public final class Collectors {
      * @see #groupingBy(com.annimon.stream.function.Function, com.annimon.stream.Collector, com.annimon.stream.function.Supplier) 
      */
     public static <T, K, A, D> Collector<T, ?, Map<K, D>> groupingBy(Function<? super T, ? extends K> classifier, Collector<? super T, A, D> downstream) {
-        return Collectors.<T, K, D, A, Map<K, D>> groupingBy(classifier, downstream, Collectors.<K, D> hashMapSupplier());
+        return Collectors.<T, K, D, A, Map<K, D>> groupingBy(classifier, downstream, Fn.Suppliers.<K, D> ofMap());
     }
 
     /**
@@ -733,16 +756,6 @@ public final class Collectors {
                 },
 
                 finisher);
-    }
-
-    private static <K, V> Supplier<Map<K, V>> hashMapSupplier() {
-        return new Supplier<Map<K, V>>() {
-
-            @Override
-            public Map<K, V> get() {
-                return new HashMap<>();
-            }
-        };
     }
 
     @SuppressWarnings("unchecked")
