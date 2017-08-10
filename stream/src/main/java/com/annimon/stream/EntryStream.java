@@ -440,23 +440,12 @@ public final class EntryStream<K, V> {
     /**
      * 
      * @return
+     * @see Collectors#toMap(Function, Function, BinaryOperator, Supplier)
      */
     public Map<K, V> toMap() {
         final Function<? super Map.Entry<K, V>, K> keyMapper = Fn.key();
         final Function<? super Map.Entry<K, V>, V> valueMapper = Fn.value();
 
-        return toMap(keyMapper, valueMapper);
-    }
-
-    /**
-     * 
-     * @param keyMapper
-     * @param valueMapper
-     * @return
-     * @see Collectors#toMap(Function, Function)
-     */
-    public <KK, VV> Map<KK, VV> toMap(final Function<? super Map.Entry<K, V>, ? extends KK> keyMapper,
-            final Function<? super Map.Entry<K, V>, ? extends VV> valueMapper) {
         return s.toMap(keyMapper, valueMapper);
     }
 
@@ -464,6 +453,7 @@ public final class EntryStream<K, V> {
      * 
      * @param mapFactory
      * @return
+     * @see Collectors#toMap(Function, Function, BinaryOperator, Supplier)
      */
     public Map<K, V> toMap(final BinaryOperator<V> mergeFunction) {
         final Function<? super Map.Entry<K, V>, K> keyMapper = Fn.key();
@@ -476,6 +466,7 @@ public final class EntryStream<K, V> {
      * 
      * @param mapFactory
      * @return
+     * @see Collectors#toMap(Function, Function, BinaryOperator, Supplier)
      */
     public <M extends Map<K, V>> M toMap(final Supplier<M> mapFactory) {
         final Function<? super Map.Entry<K, V>, K> keyMapper = Fn.key();
@@ -485,16 +476,15 @@ public final class EntryStream<K, V> {
     }
 
     /**
-     * 
-     * @param keyMapper
-     * @param valueMapper
      * @param mergeFunction
      * @param mapFactory
      * @return
-     * @see Collectors#toMap(Function, Function, Supplier)
+     * @see Collectors#toMap(Function, Function, BinaryOperator, Supplier)
      */
-    public <KK, VV, M extends Map<KK, VV>> M toMap(final Function<? super Map.Entry<K, V>, ? extends KK> keyMapper,
-            final Function<? super Map.Entry<K, V>, ? extends VV> valueMapper, final BinaryOperator<VV> mergeFunction, final Supplier<M> mapFactory) {
+    public <M extends Map<K, V>> M toMap(final BinaryOperator<V> mergeFunction, final Supplier<M> mapFactory) {
+        final Function<? super Map.Entry<K, V>, K> keyMapper = Fn.key();
+        final Function<? super Map.Entry<K, V>, V> valueMapper = Fn.value();
+
         return s.toMap(keyMapper, valueMapper, mergeFunction, mapFactory);
     }
 
