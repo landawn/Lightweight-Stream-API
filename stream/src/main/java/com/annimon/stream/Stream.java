@@ -586,7 +586,7 @@ public class Stream<T> implements Closeable {
         return new Stream<>(params, new ObjFlatMap<>(iterator, mapper));
     }
 
-    public <R> Stream<R> flatMap2(final Function<? super T, ? extends Collection<? extends R>> mapper) {
+    public <R> Stream<R> flatCollection(final Function<? super T, ? extends Collection<? extends R>> mapper) {
         return flatMap(new Function<T, Stream<R>>() {
             @Override
             public Stream<R> apply(T t) {
@@ -596,7 +596,7 @@ public class Stream<T> implements Closeable {
         });
     }
 
-    public <R> Stream<R> flatMap3(final Function<? super T, ? extends R[]> mapper) {
+    public <R> Stream<R> flatArray(final Function<? super T, ? extends R[]> mapper) {
         return flatMap(new Function<T, Stream<R>>() {
             @Override
             public Stream<R> apply(T t) {
@@ -655,16 +655,16 @@ public class Stream<T> implements Closeable {
         return EntryStream.of(flatMap(mapper));
     }
 
-    public <K, V> EntryStream<K, V> flatMapToEntry2(final Function<? super T, ? extends Map<K, V>> mapper) {
-        final Function<T, Stream<Map.Entry<K, V>>> mapper2 = new Function<T, Stream<Map.Entry<K, V>>>() {
-            @Override
-            public Stream<Entry<K, V>> apply(T t) {
-                return Stream.of(mapper.apply(t));
-            }
-        };
-
-        return EntryStream.of(flatMap(mapper2));
-    }
+    //    public <K, V> EntryStream<K, V> flatMapToEntry2(final Function<? super T, ? extends Map<K, V>> mapper) {
+    //        final Function<T, Stream<Map.Entry<K, V>>> mapper2 = new Function<T, Stream<Map.Entry<K, V>>>() {
+    //            @Override
+    //            public Stream<Entry<K, V>> apply(T t) {
+    //                return Stream.of(mapper.apply(t));
+    //            }
+    //        };
+    //
+    //        return EntryStream.of(flatMap(mapper2));
+    //    }
 
     /**
      * Returns {@code Stream} with indexed elements.

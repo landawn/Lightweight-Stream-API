@@ -40,6 +40,13 @@ import com.annimon.stream.function.Supplier;
  */
 public final class EntryStream<K, V> {
 
+    static final Function<Map<Object, Object>, Stream<Map.Entry<Object, Object>>> mapper_func = new Function<Map<Object, Object>, Stream<Map.Entry<Object, Object>>>() {
+        @Override
+        public Stream<Map.Entry<Object, Object>> apply(Map<Object, Object> t) {
+            return Stream.of(t);
+        }
+    };
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private static final EntryStream EMPTY = new EntryStream(Stream.<Map.Entry> empty());
 
@@ -48,6 +55,11 @@ public final class EntryStream<K, V> {
     @SuppressWarnings("unchecked")
     EntryStream(final Stream<? extends Map.Entry<K, V>> s) {
         this.s = (Stream<Map.Entry<K, V>>) s;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    static <K, V> Function<Map<K, V>, Stream<Map.Entry<K, V>>> mapFunc() {
+        return (Function) mapper_func;
     }
 
     @SuppressWarnings("unchecked")
@@ -90,15 +102,15 @@ public final class EntryStream<K, V> {
 
     @SafeVarargs
     public static <K, V> EntryStream<K, V> concat(final Map<K, V>... maps) {
-        final Function<Map<K, V>, Map<K, V>> mapper = Fn.identity();
+        final Function<Map<K, V>, Stream<Map.Entry<K, V>>> mapper = mapFunc();
 
-        return Stream.of(maps).flatMapToEntry2(mapper);
+        return Stream.of(maps).flatMapToEntry(mapper);
     }
 
     public static <K, V> EntryStream<K, V> concat(final Collection<? extends Map<K, V>> maps) {
-        final Function<Map<K, V>, Map<K, V>> mapper = Fn.identity();
+        final Function<Map<K, V>, Stream<Map.Entry<K, V>>> mapper = mapFunc();
 
-        return Stream.of(maps).flatMapToEntry2(mapper);
+        return Stream.of(maps).flatMapToEntry(mapper);
     }
 
     public static <K, V> EntryStream<K, V> zip(final K[] keys, final V[] values) {
@@ -219,31 +231,31 @@ public final class EntryStream<K, V> {
         return of(s.map(mapper));
     }
 
-    public <KK, VV> EntryStream<KK, VV> flatMap(final Function<? super Map.Entry<K, V>, EntryStream<KK, VV>> mapper) {
-        final Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>> mapper2 = new Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>>() {
-            @Override
-            public Stream<Entry<KK, VV>> apply(Entry<K, V> t) {
-                return mapper.apply(t).s;
-            }
-        };
+    //    public <KK, VV> EntryStream<KK, VV> flatMap(final Function<? super Map.Entry<K, V>, EntryStream<KK, VV>> mapper) {
+    //        final Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>> mapper2 = new Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>>() {
+    //            @Override
+    //            public Stream<Entry<KK, VV>> apply(Entry<K, V> t) {
+    //                return mapper.apply(t).s;
+    //            }
+    //        };
+    //
+    //        return flatMap2(mapper2);
+    //    }
 
-        return flatMap2(mapper2);
-    }
-
-    public <KK, VV> EntryStream<KK, VV> flatMap2(final Function<? super Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>> mapper) {
+    public <KK, VV> EntryStream<KK, VV> flatMap(final Function<? super Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>> mapper) {
         return of(s.flatMap(mapper));
     }
 
-    public <KK, VV> EntryStream<KK, VV> flatMap3(final Function<? super Map.Entry<K, V>, Map<KK, VV>> mapper) {
-        final Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>> mapper2 = new Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>>() {
-            @Override
-            public Stream<Entry<KK, VV>> apply(Entry<K, V> t) {
-                return Stream.of(mapper.apply(t));
-            }
-        };
-
-        return flatMap2(mapper2);
-    }
+    //    public <KK, VV> EntryStream<KK, VV> flatMap3(final Function<? super Map.Entry<K, V>, Map<KK, VV>> mapper) {
+    //        final Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>> mapper2 = new Function<Map.Entry<K, V>, Stream<Map.Entry<KK, VV>>>() {
+    //            @Override
+    //            public Stream<Entry<KK, VV>> apply(Entry<K, V> t) {
+    //                return Stream.of(mapper.apply(t));
+    //            }
+    //        };
+    //
+    //        return flatMap2(mapper2);
+    //    }
 
     public <KK> EntryStream<KK, V> flatMapKey(final Function<? super K, Stream<KK>> keyMapper) {
         final Function<Map.Entry<K, V>, Stream<Map.Entry<KK, V>>> mapper2 = new Function<Map.Entry<K, V>, Stream<Map.Entry<KK, V>>>() {
@@ -258,7 +270,7 @@ public final class EntryStream<K, V> {
             }
         };
 
-        return flatMap2(mapper2);
+        return flatMap(mapper2);
     }
 
     public <VV> EntryStream<K, VV> flatMapValue(final Function<? super V, Stream<VV>> valueMapper) {
@@ -274,7 +286,7 @@ public final class EntryStream<K, V> {
             }
         };
 
-        return flatMap2(mapper2);
+        return flatMap(mapper2);
     }
 
     /**
