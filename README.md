@@ -131,7 +131,7 @@ Maven:
 <dependency>
   <groupId>com.landawn</groupId>
   <artifactId>stream-lite</artifactId>
-  <version>0.8.4</version>
+  <version>0.8.5</version>
 </dependency>
 ```
 or Gradle:
@@ -139,7 +139,7 @@ or Gradle:
 ```groovy
 dependencies {
   ...
-  compile 'com.landawn:stream-lite:0.8.4'
+  compile 'com.landawn:stream-lite:0.8.5'
   ...
 }
 ```
