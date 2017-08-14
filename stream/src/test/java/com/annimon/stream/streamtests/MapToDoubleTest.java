@@ -20,7 +20,7 @@ public final class MapToDoubleTest {
         };
         Stream.of("1.23", "4.56789", "10.1112")
                 .mapToDouble(stringToDouble)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         closeTo(1.23, 0.000001),
                         closeTo(4.56789, 0.000001),
                         closeTo(10.1112, 0.000001)

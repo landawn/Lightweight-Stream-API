@@ -9,6 +9,6 @@ public final class OfArrayTest {
     @Test
     public void testStreamOfEmptyArray() {
         Stream.of(new String[0])
-                .chain(StreamMatcher.<String>assertIsEmpty());
+                .__(StreamMatcher.<String>assertIsEmpty());
     }
 }

@@ -13,26 +13,26 @@ public final class ConcatTest {
         IntStream a1 = IntStream.empty();
         IntStream b1 = IntStream.empty();
         IntStream.concat(a1,b1)
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
 
         IntStream a2 = IntStream.of(1, 2, 3);
         IntStream b2 = IntStream.empty();
         IntStream.concat(a2, b2)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         1, 2, 3
                 )));
 
         IntStream a3 = IntStream.empty();
         IntStream b3 = IntStream.of(42);
         IntStream.concat(a3, b3)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         42
                 )));
 
         IntStream a4 = IntStream.of(2, 4, 6, 8);
         IntStream b4 = IntStream.of(1, 3, 5, 7, 9);
         IntStream.concat(a4, b4)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         2, 4, 6, 8, 1, 3, 5, 7, 9
                 )));
     }

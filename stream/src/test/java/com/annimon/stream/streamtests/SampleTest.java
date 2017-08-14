@@ -6,7 +6,7 @@ public final class SampleTest {
     //    public void testSample() {
     //        Stream.of(      1, 2, 3, 1, 2, 3, 1, 2, 3)
     //                .sample(3)
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        1,       1,       1
     //                )));
     //    }
@@ -15,7 +15,7 @@ public final class SampleTest {
     //    public void testSampleWithStep1() {
     //        Stream.of(      1, 2, 3, 1, 2, 3, 1, 2, 3)
     //                .sample(1)
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        1, 2, 3, 1, 2, 3, 1, 2, 3
     //                )));
     //    }

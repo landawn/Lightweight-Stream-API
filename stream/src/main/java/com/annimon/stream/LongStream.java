@@ -1083,9 +1083,8 @@ public final class LongStream implements Closeable {
      * @see Stream#chain(com.annimon.stream.function.Function)
      * @throws NullPointerException if {@code function} is null
      */
-    public <R> R chain(final Function<LongStream, R> function) {
-        Objects.requireNonNull(function);
-        return function.apply(this);
+    public <R> R __(Function<? super LongStream, R> transfer) {
+        return transfer.apply(this);
     }
 
     public void println() {

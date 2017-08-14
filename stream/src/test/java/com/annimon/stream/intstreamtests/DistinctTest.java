@@ -18,7 +18,7 @@ public final class DistinctTest {
     public void testDistinct() {
         IntStream.of(1, 2, -1, 10, 1, 1, -1, 5)
                 .distinct()
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         1, 2, -1, 10, 5
                 )));
     }

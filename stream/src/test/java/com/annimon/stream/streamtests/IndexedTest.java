@@ -44,7 +44,7 @@ public final class IndexedTest {
     //                        return t.value();
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        "fifth", "fourth", "third", "second", "first"
     //                )));
     //    }

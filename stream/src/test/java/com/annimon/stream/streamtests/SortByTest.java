@@ -23,7 +23,7 @@ public final class SortByTest {
             public Integer apply(String value) {
                 return value.length();
             }
-        }).chain(assertElements(contains("a", "is", "This", "test")));
+        }).__(assertElements(contains("a", "is", "This", "test")));
     }
 
     @Test
@@ -34,7 +34,7 @@ public final class SortByTest {
             public String apply(Student student) {
                 return student.getName();
             }
-        }).chain(assertElements(contains(Students.JOHN_CS_2, Students.MARIA_ECONOMICS_1, Students.STEVE_CS_4, Students.VICTORIA_CS_3)));
+        }).__(assertElements(contains(Students.JOHN_CS_2, Students.MARIA_ECONOMICS_1, Students.STEVE_CS_4, Students.VICTORIA_CS_3)));
     }
 
     @Test
@@ -45,6 +45,6 @@ public final class SortByTest {
             public Integer apply(Student student) {
                 return -student.getCourse();
             }
-        }).chain(assertElements(contains(Students.STEVE_CS_4, Students.VICTORIA_CS_3, Students.JOHN_CS_2, Students.MARIA_ECONOMICS_1)));
+        }).__(assertElements(contains(Students.STEVE_CS_4, Students.VICTORIA_CS_3, Students.JOHN_CS_2, Students.MARIA_ECONOMICS_1)));
     }
 }

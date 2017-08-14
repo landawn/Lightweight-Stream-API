@@ -11,7 +11,7 @@ public final class BoxedTest {
     public void testBoxed() {
         IntStream.of(1, 10, 20)
                 .boxed()
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         1, 10, 20
                 )));
     }

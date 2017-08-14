@@ -21,17 +21,17 @@ public final class CustomTest {
 
     @Test(expected = NullPointerException.class)
     public void testCustomNull() {
-        Stream.empty().chain(null);
+        Stream.empty().__(null);
     }
 
     @Test
     public void testCustomIntermediateOperator_Reverse() {
-        IntStream.range(0, 10).boxed().chain(new CustomOperators.Reverse<Integer>()).chain(assertElements(contains(9, 8, 7, 6, 5, 4, 3, 2, 1, 0)));
+        IntStream.range(0, 10).boxed().__(new CustomOperators.Reverse<Integer>()).__(assertElements(contains(9, 8, 7, 6, 5, 4, 3, 2, 1, 0)));
     }
 
     @Test
     public void testCustomIntermediateOperator_SkipAndLimit() {
-        IntStream.range(0, 10).boxed().chain(new CustomOperators.SkipAndLimit<Integer>(5, 2)).chain(assertElements(contains(5, 6)));
+        IntStream.range(0, 10).boxed().__(new CustomOperators.SkipAndLimit<Integer>(5, 2)).__(assertElements(contains(5, 6)));
     }
 
     @Test
@@ -40,25 +40,25 @@ public final class CustomTest {
         for (char ch = 'a'; ch <= 'f'; ch++) {
             lists.add(new ArrayList<>(Arrays.asList(ch)));
         }
-        Stream.of(lists).chain(new CustomOperators.FlatMap<>(new Function<List, Stream<Object>>() {
+        Stream.of(lists).__(new CustomOperators.FlatMap<>(new Function<List, Stream<Object>>() {
             @SuppressWarnings("unchecked")
             @Override
             public Stream<Object> apply(List value) {
                 return Stream.of(value);
             }
-        })).chain(new CustomOperators.Cast<>(Character.class)).chain(assertElements(contains('a', 'b', 'c', 'd', 'e', 'f')));
+        })).__(new CustomOperators.Cast<>(Character.class)).__(assertElements(contains('a', 'b', 'c', 'd', 'e', 'f')));
     }
 
     @Test
     public void testCustomTerminalOperator_Sum() {
-        int sum = Stream.of(1, 2, 3, 4, 5).chain(new CustomOperators.Sum());
+        int sum = Stream.of(1, 2, 3, 4, 5).__(new CustomOperators.Sum());
         assertEquals(15, sum);
     }
 
     @Test
     public void testCustomTerminalOperator_ForEach() {
         final List<Integer> list = new ArrayList<>();
-        IntStream.range(0, 10).boxed().chain(new CustomOperators.ForEach<>(new Consumer<Integer>() {
+        IntStream.range(0, 10).boxed().__(new CustomOperators.ForEach<>(new Consumer<Integer>() {
             @Override
             public void accept(Integer t) {
                 list.add(t);

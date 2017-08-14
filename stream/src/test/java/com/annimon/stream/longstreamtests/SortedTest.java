@@ -15,9 +15,9 @@ public final class SortedTest {
 
     @Test
     public void testSorted() {
-        LongStream.of(12, 32, 9, 22).sorted().chain(assertElements(arrayContaining(9L, 12L, 22L, 32L)));
+        LongStream.of(12, 32, 9, 22).sorted().__(assertElements(arrayContaining(9L, 12L, 22L, 32L)));
 
-        LongStream.empty().sorted().chain(assertIsEmpty());
+        LongStream.empty().sorted().__(assertIsEmpty());
     }
 
     @Test
@@ -28,6 +28,6 @@ public final class SortedTest {
                 // reverse order
                 return Objects.compare(o2, o1);
             }
-        }).chain(assertElements(arrayContaining(32L, 22L, 12L, 9L)));
+        }).__(assertElements(arrayContaining(32L, 22L, 12L, 9L)));
     }
 }

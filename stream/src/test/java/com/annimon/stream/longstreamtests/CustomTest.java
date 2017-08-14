@@ -12,7 +12,7 @@ public final class CustomTest {
 
     @Test(expected = NullPointerException.class)
     public void testCustom() {
-        LongStream.empty().chain(null);
+        LongStream.empty().__(null);
     }
 
     @Test
@@ -26,14 +26,14 @@ public final class CustomTest {
         LongStream s1 = LongStream.of(1, 3,  5,  7, 9);
         LongStream s2 = LongStream.of(2, 4,  6,  8);
         long[] expected =           {3, 7, 11, 15};
-        LongStream result = s1.chain(new CustomOperators.ZipLong(s2, op));
+        LongStream result = s1.__(new CustomOperators.ZipLong(s2, op));
         assertThat(result.toArray(), is(expected));
     }
 
     @Test
     public void testCustomTerminalOperator_Average() {
         long[] input = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        double average = LongStream.of(input).chain(new CustomOperators.AverageLong());
+        double average = LongStream.of(input).__(new CustomOperators.AverageLong());
         assertThat(average, closeTo(4.5, 0.001));
     }
 }

@@ -11,7 +11,7 @@ public final class DropWhileIndexedTest {
     //                        return (index + value) < 5;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        3, 4, 0, 1, 2
     //                )));
     //    }
@@ -25,7 +25,7 @@ public final class DropWhileIndexedTest {
     //                        return (index + value) < 10;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        4, -5, -6, -7
     //                )));
     //    }

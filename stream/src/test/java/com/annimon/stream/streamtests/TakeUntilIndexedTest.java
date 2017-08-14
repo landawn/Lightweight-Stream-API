@@ -11,7 +11,7 @@ public final class TakeUntilIndexedTest {
     //                        return (index + value) > 4;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        1, 2, 3
     //                )));
     //    }
@@ -25,7 +25,7 @@ public final class TakeUntilIndexedTest {
     //                        return (index + value) > 8;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        1, 2, 3
     //                )));
     //    }

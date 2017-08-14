@@ -12,7 +12,7 @@ public final class LimitTest {
     public void testLimit() {
         LongStream.of(12L, 32L, 22L, 9L)
                 .limit(2)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         12L, 32L
                 )));
     }
@@ -26,14 +26,14 @@ public final class LimitTest {
     public void testLimitZero() {
         LongStream.of(12L, 32L)
                 .limit(0)
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 
     @Test
     public void testLimitMoreThanCount() {
         LongStream.of(12L, 32L, 22L)
                 .limit(5)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         12L, 32L, 22L
                 )));
     }

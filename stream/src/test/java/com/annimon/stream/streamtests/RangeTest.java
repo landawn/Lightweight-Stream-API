@@ -13,7 +13,7 @@ public final class RangeTest {
 
     @Test
     public void testStreamRange() {
-        IntStream.range(0, 5).boxed().chain(assertElements(contains(0, 1, 2, 3, 4)));
+        IntStream.range(0, 5).boxed().__(assertElements(contains(0, 1, 2, 3, 4)));
     }
 
     @Test
@@ -30,7 +30,7 @@ public final class RangeTest {
 
     @Test
     public void testStreamRangeClosed() {
-        IntStream.rangeClosed(0, 5).boxed().chain(assertElements(contains(0, 1, 2, 3, 4, 5)));
+        IntStream.rangeClosed(0, 5).boxed().__(assertElements(contains(0, 1, 2, 3, 4, 5)));
     }
 
     @Test

@@ -9,6 +9,6 @@ public final class FlatMapToLongTest {
     //            public LongStream apply(Long t) {
     //                return LongStream.iterate(t, LongUnaryOperator.Util.identity()).limit(t);
     //            }
-    //        }).chain(assertElements(arrayContaining(2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L)));
+    //        }).__(assertElements(arrayContaining(2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L, 4L)));
     //    }
 }

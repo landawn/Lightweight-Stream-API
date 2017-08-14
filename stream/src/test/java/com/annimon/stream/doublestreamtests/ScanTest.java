@@ -21,7 +21,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         closeTo(1.1, 0.00001),
                         closeTo(3.3, 0.00001),
                         closeTo(6.6, 0.00001)
@@ -38,7 +38,7 @@ public final class ScanTest {
                         return value1 / value2;
                     }
                 })
-                .chain(assertElements(is(arrayContaining(
+                .__(assertElements(is(arrayContaining(
                         closeTo(1.0, 0.00001),
                         closeTo(1.0 / 0.2, 0.00001),
                         closeTo(1.0 / 0.2 / 0.3, 0.00001),
@@ -55,7 +55,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 
     @Test
@@ -68,7 +68,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         closeTo(1.1, 0.00001),
                         closeTo(3.3, 0.00001),
                         closeTo(6.6, 0.00001),
@@ -86,7 +86,7 @@ public final class ScanTest {
                         return value1 / value2;
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         closeTo(1.0, 0.00001),
                         closeTo(1.0 / 0.2, 0.00001),
                         closeTo(1.0 / 0.2 / 0.3, 0.00001),
@@ -103,7 +103,7 @@ public final class ScanTest {
                         return left + right;
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.09
                 )));
     }

@@ -13,7 +13,7 @@ public final class TakeWhileTest {
     public void testTakeWhile() {
         DoubleStream.of(10.2, 30.234, 10.09, 2.2, 80d)
                 .takeWhile(Functions.greaterThan(Math.PI))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.2, 30.234, 10.09
                 )));
     }
@@ -22,14 +22,14 @@ public final class TakeWhileTest {
     public void testTakeWhileNonFirstMatch() {
         DoubleStream.of(1.2, 3.234, 0.09, 2.2, 80d)
                 .takeWhile(Functions.greaterThan(Math.PI))
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 
     @Test
     public void testTakeWhileAllMatch() {
         DoubleStream.of(10.2, 30.234, 10.09)
                 .takeWhile(Functions.greaterThan(Math.PI))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.2, 30.234, 10.09
                 )));
     }

@@ -15,7 +15,7 @@ public final class ScanTest {
     public void testScan() {
         Stream.of(1, 2, 3)
                 .scan(Functions.addition())
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         1, 3, 6
                 )));
     }
@@ -29,7 +29,7 @@ public final class ScanTest {
                         return value1 / value2;
                     }
                 })
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         1800,
                         1800 / 2,
                         1800 / 2 / 3,
@@ -41,7 +41,7 @@ public final class ScanTest {
     public void testScanOnEmptyStream() {
         Stream.<Integer>empty()
                 .scan(Functions.addition())
-                .chain(StreamMatcher.<Integer>assertIsEmpty());
+                .__(StreamMatcher.<Integer>assertIsEmpty());
     }
 
     @Test
@@ -53,7 +53,7 @@ public final class ScanTest {
                         return length + s.length();
                     }
                 })
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         0, 1, 3, 6, 10
                 )));
     }
@@ -62,7 +62,7 @@ public final class ScanTest {
     public void testScanWithIdentityOnEmptyStream() {
         Stream.<Integer>empty()
                 .scan(9, Functions.addition())
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         9
                 )));
     }

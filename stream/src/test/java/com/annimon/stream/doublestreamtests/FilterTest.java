@@ -16,13 +16,13 @@ public final class FilterTest {
         final DoublePredicate predicate = Functions.greaterThan(Math.PI);
         DoubleStream.of(0.012, 10.347, 3.039, 19.84, 100d)
                 .filter(predicate)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.347, 19.84, 100d
                 )));
 
         DoubleStream.of(0.012, -10)
                 .filter(predicate)
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 
     @Test(expected = NoSuchElementException.class)

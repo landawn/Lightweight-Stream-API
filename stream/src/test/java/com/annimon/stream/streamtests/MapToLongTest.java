@@ -20,7 +20,7 @@ public final class MapToLongTest {
         };
         Stream.of("[2]", "[3]", "[4]", "[8]", "[25]")
                 .mapToLong(stringToSquareLong)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         4L, 9L, 16L, 64L, 625L
                 )));
     }

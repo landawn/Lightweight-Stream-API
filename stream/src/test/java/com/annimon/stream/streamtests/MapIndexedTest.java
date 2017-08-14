@@ -11,7 +11,7 @@ public final class MapIndexedTest {
     //                        return index * t;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                       0,  // (0 * 4)
     //                       5,  // (1 * 5)
     //                       12, // (2 * 6)
@@ -29,7 +29,7 @@ public final class MapIndexedTest {
     //                        return index * t;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                       80, // (20 * 4)
     //                       75, // (15 * 5)
     //                       60, // (10 * 6)

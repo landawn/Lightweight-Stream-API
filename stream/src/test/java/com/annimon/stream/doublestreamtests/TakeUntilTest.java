@@ -12,7 +12,7 @@ public final class TakeUntilTest {
     public void testTakeUntil() {
         DoubleStream.of(0.3, 2.2, 10.2, 30.234, 10.09, 80d)
                 .takeUntil(Functions.greaterThan(Math.PI))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0.3, 2.2, 10.2
                 )));
     }
@@ -21,7 +21,7 @@ public final class TakeUntilTest {
     public void testTakeUntilFirstMatch() {
         DoubleStream.of(11.2, 3.234, 0.09, 2.2, 80d)
                 .takeUntil(Functions.greaterThan(Math.PI))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         11.2
                 )));
     }
@@ -30,7 +30,7 @@ public final class TakeUntilTest {
     public void testTakeUntilNoneMatch() {
         DoubleStream.of(1.2, 1.19, 0.09, 2.2)
                 .takeUntil(Functions.greaterThan(128))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         1.2, 1.19, 0.09, 2.2
                 )));
     }

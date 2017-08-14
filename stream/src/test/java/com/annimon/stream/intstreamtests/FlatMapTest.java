@@ -24,7 +24,7 @@ public final class FlatMapTest {
                         return IntStream.range(0, value);
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         // -1
                         //  0
                         0, //  1               

@@ -17,7 +17,7 @@ public final class SlidingWindowTest {
 
         Stream.of(                    1, 1, 1, 2, 2, 2, 3, 3, 3)
                 .sliding(3, 3)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         Arrays.asList(1, 1, 1),
                         Arrays.asList(         2, 2, 2),
                         Arrays.asList(                  3, 3, 3)
@@ -25,7 +25,7 @@ public final class SlidingWindowTest {
 
         Stream.of(                    1, 2, 3, 1, 2, 3, 1, 2, 3)
                 .sliding(2, 3)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         Arrays.asList(1, 2),
                         Arrays.asList(         1, 2),
                         Arrays.asList(                  1, 2)
@@ -33,7 +33,7 @@ public final class SlidingWindowTest {
 
         Stream.of(                    1, 2, 3, 4, 5, 6)
                 .sliding(3, 1)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         Arrays.asList(1, 2, 3),
                         Arrays.asList(   2, 3, 4),
                         Arrays.asList(      3, 4, 5),
@@ -42,7 +42,7 @@ public final class SlidingWindowTest {
 
         Stream.of(                    1, 2, 3, 4, 5, 6)
                 .sliding(3)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         Arrays.asList(1, 2, 3),
                         Arrays.asList(   2, 3, 4),
                         Arrays.asList(      3, 4, 5),
@@ -51,7 +51,7 @@ public final class SlidingWindowTest {
 
         Stream.of(                    1, 2)
                 .sliding(3, 1)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         Arrays.asList(1, 2)
                 )));
     }

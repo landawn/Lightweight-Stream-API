@@ -19,7 +19,7 @@ public final class GroupByTest {
 
         Stream.of(1, 2, 3, 1, 2, 3, 1, 2, 3)
                 .groupBy(Functions.equalityPartitionItem(partitionItem))
-                .chain(assertElements(containsInAnyOrder(
+                .__(assertElements(containsInAnyOrder(
                         entry(false, Arrays.asList(2, 3, 2, 3, 2, 3)),
                         entry(true, Arrays.asList(1, 1, 1))
                 )));

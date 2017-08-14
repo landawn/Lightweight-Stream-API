@@ -13,7 +13,7 @@ public final class TakeWhileTest {
     public void testTakeWhile() {
         LongStream.of(12, 32, 22, 9, 30, 41, 42)
                 .takeWhile(Functions.remainderLong(2))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         12L, 32L, 22L
                 )));
     }
@@ -22,14 +22,14 @@ public final class TakeWhileTest {
     public void testTakeWhileNonFirstMatch() {
         LongStream.of(5, 32, 22, 9, 30, 41, 42)
                 .takeWhile(Functions.remainderLong(2))
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 
     @Test
     public void testTakeWhileAllMatch() {
         LongStream.of(10, 20, 30)
                 .takeWhile(Functions.remainderLong(2))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10L, 20L, 30L
                 )));
     }

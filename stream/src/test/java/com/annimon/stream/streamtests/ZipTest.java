@@ -24,7 +24,7 @@ public final class ZipTest {
             public Integer apply(Integer value1, Integer value2) {
                 return value1 + value2;
             }
-        }).chain(assertElements(contains(2, 4, 6, 8, 10)));
+        }).__(assertElements(contains(2, 4, 6, 8, 10)));
     }
 
     @Test(expected = NullPointerException.class)
@@ -46,6 +46,6 @@ public final class ZipTest {
             public Integer apply(Integer value1, Integer value2) {
                 return value1 + value2;
             }
-        }).chain(assertElements(contains(2, 4, 6, 8, 10)));
+        }).__(assertElements(contains(2, 4, 6, 8, 10)));
     }
 }

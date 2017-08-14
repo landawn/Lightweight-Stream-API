@@ -76,7 +76,7 @@ public final class IterateTest {
             }
         };
         Stream.iterate(0, condition, increment)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         0, 5, 10, 15
                 )));
     }

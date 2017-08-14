@@ -18,21 +18,21 @@ public final class ConcatTest {
         DoubleStream a2 = DoubleStream.of(10.123, Math.PI);
         DoubleStream b2 = DoubleStream.empty();
         DoubleStream.concat(a2, b2)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.123, Math.PI
                 )));
 
         DoubleStream a3 = DoubleStream.of(10.123, Math.PI);
         DoubleStream b3 = DoubleStream.empty();
         DoubleStream.concat(a3, b3)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.123, Math.PI
                 )));
 
         DoubleStream a4 = DoubleStream.of(10.123, Math.PI, -1e11, -1e8);
         DoubleStream b4 = DoubleStream.of(1.617, 9.81);
         DoubleStream.concat(a4, b4)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         10.123, Math.PI, -1e11, -1e8, 1.617, 9.81
                 )));
     }

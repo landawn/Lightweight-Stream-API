@@ -11,13 +11,13 @@ public final class DistinctTest {
     public void testDistinct() {
         LongStream.of(9, 12, 0, 22, 9, 12, 32, 9)
                 .distinct()
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         9L, 12L, 0L, 22L, 32L
                 )));
 
         LongStream.of(8, 800, 5, 5, 5, 3, 5, 3, 5)
                 .distinct()
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         8L, 800L, 5L, 3L
                 )));
     }

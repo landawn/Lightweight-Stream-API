@@ -14,7 +14,7 @@ import java.util.Iterator;
 /**
  * Custom operator examples for {@code Stream.custom) method.
  *
- * @see com.annimon.stream.Stream#chain(com.annimon.stream.function.Function)
+ * @see com.annimon.stream.Stream#__(com.annimon.stream.function.Function)
  */
 public final class CustomOperators {
 

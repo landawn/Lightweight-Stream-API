@@ -11,7 +11,7 @@ public final class FilterIndexedTest {
     //                        return (index * value) % 2 == 0;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                       4, // (0 * 4)
     //                          // (1 * 5)
     //                       6, // (2 * 6)
@@ -29,7 +29,7 @@ public final class FilterIndexedTest {
     //                        return (index * value) % 2 == 0;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                       4, // (20 * 4)
     //                          // (15 * 5)
     //                       6, // (10 * 6)

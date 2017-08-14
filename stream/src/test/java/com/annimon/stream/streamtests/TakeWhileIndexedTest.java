@@ -11,7 +11,7 @@ public final class TakeWhileIndexedTest {
     //                        return index + value < 5;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        1, 2
     //                )));
     //    }
@@ -25,7 +25,7 @@ public final class TakeWhileIndexedTest {
     //                        return index + value < 8;
     //                    }
     //                })
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        1, 2
     //                )));
     //    }

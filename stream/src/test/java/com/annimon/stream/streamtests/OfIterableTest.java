@@ -13,7 +13,7 @@ public final class OfIterableTest {
     //
     //        Stream.of(iterable)
     //                .limit(5)
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                      0, 1, 2, 3, 4
     //                )));
     //    }

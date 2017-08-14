@@ -20,12 +20,12 @@ public final class MapToObjTest {
         
         LongStream.of(10L, 20L, 30L)
                 .mapToObj(longToString)
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         "10", "20", "30"
                 )));
 
         LongStream.empty()
                 .mapToObj(longToString)
-                .chain(StreamMatcher.<String>assertIsEmpty());
+                .__(StreamMatcher.<String>assertIsEmpty());
     }
 }

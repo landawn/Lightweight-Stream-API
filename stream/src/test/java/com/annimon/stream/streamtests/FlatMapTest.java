@@ -26,6 +26,6 @@ public final class FlatMapTest {
                     }
                 });
             }
-        }).chain(assertElements(contains("2 * 2 = 4", "2 * 4 = 8", "3 * 2 = 6", "3 * 4 = 12", "4 * 2 = 8", "4 * 4 = 16")));
+        }).__(assertElements(contains("2 * 2 = 4", "2 * 4 = 8", "3 * 2 = 6", "3 * 4 = 12", "4 * 2 = 8", "4 * 4 = 16")));
     }
 }

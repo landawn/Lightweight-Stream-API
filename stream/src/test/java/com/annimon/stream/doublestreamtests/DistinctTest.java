@@ -11,7 +11,7 @@ public final class DistinctTest {
     public void testDistinct() {
         DoubleStream.of(0.09, 1.2, 0, 2.2, 0.09, 1.2, 3.2, 0.09)
                 .distinct()
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0.09, 1.2, 0d, 2.2, 3.2
                 )));
     }

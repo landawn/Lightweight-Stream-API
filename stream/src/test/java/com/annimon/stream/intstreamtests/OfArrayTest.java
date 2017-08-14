@@ -27,6 +27,6 @@ public final class OfArrayTest {
     @Test
     public void testStreamOfEmptyArray() {
         IntStream.of(new int[0])
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 }

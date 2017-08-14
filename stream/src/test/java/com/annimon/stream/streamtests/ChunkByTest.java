@@ -7,7 +7,7 @@ public final class ChunkByTest {
     //    public void testChunkBy() {
     //        Stream.of(1, 1, 2, 2, 2, 3, 1)
     //                .chunkBy(UnaryOperator.Util.<Integer>identity())
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        Arrays.asList(1, 1),
     //                        Arrays.asList(2, 2, 2),
     //                        Arrays.asList(3),

@@ -21,7 +21,7 @@ public final class FlatMapTest {
         };
         DoubleStream.of(0.012, -3.039, 100d)
                 .flatMap(twicer)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0.012, 0.012, -3.039, -3.039, 100d, 100d
                 )));
 
@@ -33,7 +33,7 @@ public final class FlatMapTest {
                         return null;
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         -3.039
                 )));
 
@@ -45,7 +45,7 @@ public final class FlatMapTest {
                         return DoubleStream.of(value);
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0.012, 100d
                 )));
     }

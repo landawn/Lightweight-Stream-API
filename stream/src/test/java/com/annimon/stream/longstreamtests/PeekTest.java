@@ -19,7 +19,7 @@ public final class PeekTest {
             public void accept(long value) {
                 fail();
             }
-        }).chain(assertIsEmpty());
+        }).__(assertIsEmpty());
 
         final long[] expected = { 12, 34 };
         assertThat(LongStream.of(12, 34).peek(new LongConsumer() {

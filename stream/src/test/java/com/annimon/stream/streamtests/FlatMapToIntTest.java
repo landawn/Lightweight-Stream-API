@@ -10,6 +10,6 @@ public final class FlatMapToIntTest {
     //            public IntStream apply(Integer t) {
     //                return IntStream.iterate(t, IntUnaryOperator.Util.identity()).limit(t);
     //            }
-    //        }).chain(assertElements(arrayContaining(2, 2, 3, 3, 3, 4, 4, 4, 4)));
+    //        }).__(assertElements(arrayContaining(2, 2, 3, 3, 3, 4, 4, 4, 4)));
     //    }
 }

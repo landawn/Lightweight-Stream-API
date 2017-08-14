@@ -83,31 +83,31 @@ public class LongStreamMatcherTest {
     @Test
     public void testAssertIsEmptyOperator() {
         LongStream.empty()
-                .chain(LongStreamMatcher.assertIsEmpty());
+                .__(LongStreamMatcher.assertIsEmpty());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertIsEmptyOperatorOnEmptyStream() {
         LongStream.of(1, 2)
-                .chain(LongStreamMatcher.assertIsEmpty());
+                .__(LongStreamMatcher.assertIsEmpty());
     }
 
     @Test
     public void testAssertHasElementsOperator() {
         LongStream.of(1, 2)
-                .chain(LongStreamMatcher.assertHasElements());
+                .__(LongStreamMatcher.assertHasElements());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertHasElementsOperatorOnEmptyStream() {
         LongStream.empty()
-                .chain(LongStreamMatcher.assertHasElements());
+                .__(LongStreamMatcher.assertHasElements());
     }
 
     @Test
     public void testAssertElementsOperator() {
         LongStream.of(-813, 123456, Integer.MAX_VALUE)
-                .chain(LongStreamMatcher.assertElements(
+                .__(LongStreamMatcher.assertElements(
                         arrayContaining(new Long[] {
                             -813L, 123456L, (long) Integer.MAX_VALUE
                         })));

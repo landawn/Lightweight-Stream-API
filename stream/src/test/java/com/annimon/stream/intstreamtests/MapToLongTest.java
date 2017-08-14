@@ -17,7 +17,7 @@ public final class MapToLongTest {
                         return value * 10000000000L;
                     }
                 })
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         20000000000L,
                         30000000000L,
                         40000000000L

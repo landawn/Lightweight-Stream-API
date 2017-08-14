@@ -10,6 +10,6 @@ public final class SelectTest {
     //            public boolean test(String value) {
     //                return value.length() == 1;
     //            }
-    //        }).chain(assertElements(contains("a", "b")));
+    //        }).__(assertElements(contains("a", "b")));
     //    }
 }

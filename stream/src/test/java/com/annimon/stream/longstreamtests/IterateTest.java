@@ -20,7 +20,7 @@ public final class IterateTest {
 
         LongStream.iterate(0L, operator)
                 .limit(4)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0L, 1000000L, 2000000L, 3000000L
                 )));
     }
@@ -45,7 +45,7 @@ public final class IterateTest {
             }
         };
         LongStream.iterate(0, condition, increment)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0L, 5L, 10L, 15L
                 )));
     }

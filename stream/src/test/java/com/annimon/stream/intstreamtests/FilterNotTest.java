@@ -6,7 +6,7 @@ public final class FilterNotTest {
     //    public void testFilterNot() {
     //        IntStream.rangeClosed(1, 10)
     //                .removeIf(Functions.remainderInt(2))
-    //                .chain(assertElements(arrayContaining(
+    //                .__(assertElements(arrayContaining(
     //                        1, 3, 5, 7, 9
     //                )));
     //    }

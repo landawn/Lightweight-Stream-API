@@ -13,7 +13,7 @@ public final class DropWhileTest {
     public void testDropWhile() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .dropWhile(Functions.remainder(2))
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         7, 8, 10, 11
                 )));
     }
@@ -22,7 +22,7 @@ public final class DropWhileTest {
     public void testDropWhileNonFirstMatch() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .dropWhile(Functions.remainder(3))
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         2, 4, 6, 7, 8, 10, 11
                 )));
     }
@@ -31,6 +31,6 @@ public final class DropWhileTest {
     public void testDropWhileAllMatch() {
         Stream.of(2, 4, 6, 7, 8, 10, 11)
                 .dropWhile(Functions.remainder(1))
-                .chain(StreamMatcher.<Integer>assertIsEmpty());
+                .__(StreamMatcher.<Integer>assertIsEmpty());
     }
 }

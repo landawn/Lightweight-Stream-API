@@ -26,7 +26,7 @@ public final class SkipTest {
     public void testSkipZero() {
         IntStream.of(1,2)
                 .skip(0)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         1, 2
                 )));
     }
@@ -36,7 +36,7 @@ public final class SkipTest {
         IntStream.range(0, 10)
                 .skip(2)
                 .limit(5)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         2, 3, 4, 5, 6
                 )));
     }

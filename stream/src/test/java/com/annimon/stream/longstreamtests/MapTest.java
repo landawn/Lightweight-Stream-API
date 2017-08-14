@@ -19,12 +19,12 @@ public final class MapTest {
         };
         LongStream.of(10L, 20L, 30L)
                 .map(negator)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         -10L, -20L, -30L
                 )));
 
         LongStream.empty()
                 .map(negator)
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 }

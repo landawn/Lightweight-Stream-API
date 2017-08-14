@@ -12,13 +12,13 @@ public final class TakeUntilTest {
     //    public void testTakeUntil() {
     //        Stream.of(2, 4, 6, 7, 8, 10, 11)
     //                .takeUntil(Predicate.Util.negate(Functions.remainder(2)))
-    //                .chain(assertElements(contains(
+    //                .__(assertElements(contains(
     //                        2, 4, 6, 7
     //                )));
     //    }
 
     @Test
     public void testTakeUntilOnEmptyStream() {
-        Stream.<Integer> empty().takeUntil(Functions.remainder(2)).chain(StreamMatcher.<Integer> assertIsEmpty());
+        Stream.<Integer> empty().takeUntil(Functions.remainder(2)).__(StreamMatcher.<Integer> assertIsEmpty());
     }
 }

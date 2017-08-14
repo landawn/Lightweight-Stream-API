@@ -13,7 +13,7 @@ public final class DropWhileTest {
     public void testDropWhile() {
         DoubleStream.of(10.2, 30.234, 10.09, 2.2, 80d)
                 .dropWhile(Functions.greaterThan(Math.PI))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         2.2, 80d
                 )));
     }
@@ -21,7 +21,7 @@ public final class DropWhileTest {
     public void testDropWhileNonFirstMatch() {
         DoubleStream.of(1.2, 3.234, 0.09, 2.2, 80d)
                 .dropWhile(Functions.greaterThan(Math.PI))
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         1.2, 3.234, 0.09, 2.2, 80d
                 )));
     }
@@ -30,6 +30,6 @@ public final class DropWhileTest {
     public void testDropWhileAllMatch() {
         DoubleStream.of(10.2, 30.234, 80d)
                 .dropWhile(Functions.greaterThan(Math.PI))
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 }

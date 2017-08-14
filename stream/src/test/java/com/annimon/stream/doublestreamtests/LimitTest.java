@@ -12,7 +12,7 @@ public final class LimitTest {
     public void testLimit() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .limit(2)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0.1, 0.2
                 )));
     }
@@ -26,14 +26,14 @@ public final class LimitTest {
     public void testLimitZero() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .limit(0)
-                .chain(assertIsEmpty());
+                .__(assertIsEmpty());
     }
 
     @Test
     public void testLimitMoreThanCount() {
         DoubleStream.of(0.1, 0.2, 0.3)
                 .limit(5)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0.1, 0.2, 0.3
                 )));
     }

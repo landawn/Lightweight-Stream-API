@@ -14,7 +14,7 @@ public final class LimitTest {
 
     @Test
     public void testLimit() {
-        IntStream.range(0, 10).boxed().limit(2).chain(assertElements(contains(0, 1)));
+        IntStream.range(0, 10).boxed().limit(2).__(assertElements(contains(0, 1)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -30,6 +30,6 @@ public final class LimitTest {
 
     @Test
     public void testLimitMoreThanCount() {
-        IntStream.range(0, 5).boxed().limit(15).chain(assertElements(contains(0, 1, 2, 3, 4)));
+        IntStream.range(0, 5).boxed().limit(15).__(assertElements(contains(0, 1, 2, 3, 4)));
     }
 }

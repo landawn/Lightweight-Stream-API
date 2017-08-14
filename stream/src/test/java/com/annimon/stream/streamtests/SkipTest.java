@@ -17,7 +17,7 @@ public final class SkipTest {
 
     @Test
     public void testSkip() {
-        IntStream.range(0, 10).boxed().skip(7).chain(assertElements(contains(7, 8, 9)));
+        IntStream.range(0, 10).boxed().skip(7).__(assertElements(contains(7, 8, 9)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -27,12 +27,12 @@ public final class SkipTest {
 
     @Test
     public void testSkipZero() {
-        IntStream.range(0, 2).boxed().skip(0).chain(assertElements(contains(0, 1)));
+        IntStream.range(0, 2).boxed().skip(0).__(assertElements(contains(0, 1)));
     }
 
     @Test
     public void testSkipMoreThanCount() {
-        IntStream.range(0, 10).boxed().skip(15).chain(StreamMatcher.<Integer> assertIsEmpty());
+        IntStream.range(0, 10).boxed().skip(15).__(StreamMatcher.<Integer> assertIsEmpty());
     }
 
     @Test
@@ -42,33 +42,33 @@ public final class SkipTest {
 
         Stream<Integer> stream = Stream.of(data).skip(3);
         data.addAll(Arrays.asList(1, 2, 3, 4, 5));
-        stream.chain(assertElements(contains(3, 4, 5)));
+        stream.__(assertElements(contains(3, 4, 5)));
     }
 
     @Test
     public void testSkipAndLimit() {
         IntStream.range(0, 10).boxed().skip(2) // 23456789
                 .limit(5) // 23456
-                .chain(assertElements(contains(2, 3, 4, 5, 6)));
+                .__(assertElements(contains(2, 3, 4, 5, 6)));
     }
 
     @Test
     public void testLimitAndSkip() {
         IntStream.range(0, 10).boxed().limit(5) // 01234
                 .skip(2) // 234
-                .chain(assertElements(contains(2, 3, 4)));
+                .__(assertElements(contains(2, 3, 4)));
     }
 
     @Test
     public void testSkipAndLimitMoreThanCount() {
         IntStream.range(0, 10).boxed().skip(8) // 89
                 .limit(15) // 89
-                .chain(assertElements(contains(8, 9)));
+                .__(assertElements(contains(8, 9)));
     }
 
     @Test
     public void testSkipMoreThanCountAndLimit() {
-        IntStream.range(0, 10).boxed().skip(15).limit(8).chain(StreamMatcher.<Integer> assertIsEmpty());
+        IntStream.range(0, 10).boxed().skip(15).limit(8).__(StreamMatcher.<Integer> assertIsEmpty());
     }
 
     @Test
@@ -77,6 +77,6 @@ public final class SkipTest {
                 .limit(5) // 23456
                 .skip(2) // 456
                 .limit(2) // 45
-                .chain(assertElements(contains(4, 5)));
+                .__(assertElements(contains(4, 5)));
     }
 }

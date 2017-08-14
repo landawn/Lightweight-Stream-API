@@ -43,7 +43,7 @@ public final class IterateTest {
             }
         };
         IntStream.iterate(0, condition, increment)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         0, 5, 10, 15
                 )));
     }

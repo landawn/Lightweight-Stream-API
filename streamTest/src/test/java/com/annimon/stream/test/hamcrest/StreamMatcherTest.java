@@ -72,26 +72,26 @@ public class StreamMatcherTest {
 
     @Test
     public void testAssertIsEmptyOperator() {
-        Stream.<Integer> empty().chain(StreamMatcher.<Integer> assertIsEmpty());
+        Stream.<Integer> empty().__(StreamMatcher.<Integer> assertIsEmpty());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertIsEmptyOperatorOnEmptyStream() {
-        Stream.of(1, 2).chain(StreamMatcher.<Integer> assertIsEmpty());
+        Stream.of(1, 2).__(StreamMatcher.<Integer> assertIsEmpty());
     }
 
     @Test
     public void testAssertHasElementsOperator() {
-        Stream.of(1, 2).chain(StreamMatcher.<Integer> assertHasElements());
+        Stream.of(1, 2).__(StreamMatcher.<Integer> assertHasElements());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertHasElementsOperatorOnEmptyStream() {
-        Stream.<Integer> empty().chain(StreamMatcher.<Integer> assertHasElements());
+        Stream.<Integer> empty().__(StreamMatcher.<Integer> assertHasElements());
     }
 
     @Test
     public void testAssertElementsOperator() {
-        IntStream.range(0, 5).boxed().chain(StreamMatcher.assertElements(contains(0, 1, 2, 3, 4)));
+        IntStream.range(0, 5).boxed().__(StreamMatcher.assertElements(contains(0, 1, 2, 3, 4)));
     }
 }

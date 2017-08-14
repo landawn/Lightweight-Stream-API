@@ -12,26 +12,26 @@ public final class ConcatTest {
     public void testStreamConcat() {
         LongStream a1 = LongStream.empty();
         LongStream b1 = LongStream.empty();
-        LongStream.concat(a1, b1).chain(assertIsEmpty());
+        LongStream.concat(a1, b1).__(assertIsEmpty());
 
         LongStream a2 = LongStream.of(100200300L, 1234567L);
         LongStream b2 = LongStream.empty();
         LongStream.concat(a2, b2)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         100200300L, 1234567L
                 )));
 
         LongStream a3 = LongStream.of(100200300L, 1234567L);
         LongStream b3 = LongStream.empty();
         LongStream.concat(a3, b3)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         100200300L, 1234567L
                 )));
 
         LongStream a4 = LongStream.of(-5L, 1234567L, -Integer.MAX_VALUE, Long.MAX_VALUE);
         LongStream b4 = LongStream.of(Integer.MAX_VALUE, 100200300L);
         LongStream.concat(a4, b4)
-                .chain(assertElements(arrayContaining(
+                .__(assertElements(arrayContaining(
                         -5L, 1234567L, (long) -Integer.MAX_VALUE, Long.MAX_VALUE,
                         (long) Integer.MAX_VALUE, 100200300L
                 )));

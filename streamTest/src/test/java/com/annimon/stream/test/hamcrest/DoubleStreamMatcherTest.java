@@ -83,31 +83,31 @@ public class DoubleStreamMatcherTest {
     @Test
     public void testAssertIsEmptyOperator() {
         DoubleStream.empty()
-                .chain(DoubleStreamMatcher.assertIsEmpty());
+                .__(DoubleStreamMatcher.assertIsEmpty());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertIsEmptyOperatorOnEmptyStream() {
         DoubleStream.of(1, 2)
-                .chain(DoubleStreamMatcher.assertIsEmpty());
+                .__(DoubleStreamMatcher.assertIsEmpty());
     }
 
     @Test
     public void testAssertHasElementsOperator() {
         DoubleStream.of(1, 2)
-                .chain(DoubleStreamMatcher.assertHasElements());
+                .__(DoubleStreamMatcher.assertHasElements());
     }
 
     @Test(expected = AssertionError.class)
     public void testAssertHasElementsOperatorOnEmptyStream() {
         DoubleStream.empty()
-                .chain(DoubleStreamMatcher.assertHasElements());
+                .__(DoubleStreamMatcher.assertHasElements());
     }
 
     @Test
     public void testAssertElementsOperator() {
         DoubleStream.of(-0.987, 1.234, Math.PI, 1.618)
-                .chain(DoubleStreamMatcher.assertElements(
+                .__(DoubleStreamMatcher.assertElements(
                         arrayContaining(new Double[] {
                             -0.987, 1.234, Math.PI, 1.618
                         })));

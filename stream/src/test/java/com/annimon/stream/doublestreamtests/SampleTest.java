@@ -6,7 +6,7 @@ public final class SampleTest {
     //    public void testSample() {
     //        DoubleStream.of(1.2, 3.234, 0.09, 2.2, 80d)
     //                .sample(2)
-    //                .chain(assertElements(arrayContaining(
+    //                .__(assertElements(arrayContaining(
     //                        1.2, 0.09, 80d
     //                )));
     //    }
@@ -15,7 +15,7 @@ public final class SampleTest {
     //    public void testSampleWithStep1() {
     //        DoubleStream.of(1.2, 3.234, 0.09, 2.2, 80d)
     //                .sample(1)
-    //                .chain(assertElements(arrayContaining(
+    //                .__(assertElements(arrayContaining(
     //                        1.2, 3.234, 0.09, 2.2, 80d
     //                )));
     //    }

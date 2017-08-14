@@ -17,7 +17,7 @@ public final class SortedTest {
     public void testSorted() {
         Stream.of(6, 3, 9, 0, -7, 19)
                 .sorted()
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         -7, 0, 3, 6, 9, 19
                 )));
     }
@@ -36,7 +36,7 @@ public final class SortedTest {
     public void testSortedWithComparator() {
         Stream.of(6, 3, 9, 0, -7, 19)
                 .sorted(Functions.descendingAbsoluteOrder())
-                .chain(assertElements(contains(
+                .__(assertElements(contains(
                         19, 9, -7, 6, 3, 0
                 )));
     }

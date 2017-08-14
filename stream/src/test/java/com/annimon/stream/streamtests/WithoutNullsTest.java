@@ -17,6 +17,6 @@ public final class WithoutNullsTest {
             public String apply(Integer integer) {
                 return integer % 3 == 0 ? null : integer.toString();
             }
-        }).skipNull().chain(assertElements(contains("1", "2", "4", "5", "7", "8")));
+        }).skipNull().__(assertElements(contains("1", "2", "4", "5", "7", "8")));
     }
 }
