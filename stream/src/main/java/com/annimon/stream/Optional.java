@@ -171,7 +171,7 @@ public class Optional<T> {
      * @param other  the value to be returned if inner value is not present
      * @return inner value if present, otherwise {@code other}
      */
-    public T or(T other) {
+    public T orElse(T other) {
         return value != null ? value : other;
     }
 
@@ -181,7 +181,7 @@ public class Optional<T> {
      * @param other  supplier function that produces value if inner value is not present
      * @return inner value if present, otherwise value produced by supplier function
      */
-    public T orGet(Supplier<? extends T> other) {
+    public T orElseGet(Supplier<? extends T> other) {
         return value != null ? value : other.get();
     }
 
@@ -193,7 +193,7 @@ public class Optional<T> {
      * @return inner value if present
      * @throws X if inner value is not present
      */
-    public <X extends Throwable> T orThrow(Supplier<? extends X> exc) throws X {
+    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exc) throws X {
         if (value != null)
             return value;
         else

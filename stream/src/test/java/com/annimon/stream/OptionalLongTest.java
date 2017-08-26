@@ -315,7 +315,7 @@ public class OptionalLongTest {
 
     //    @Test
     //    public void testOr() {
-    //        long value = OptionalLong.of(42).or(new Supplier<OptionalLong>() {
+    //        long value = OptionalLong.of(42).orElse(new Supplier<OptionalLong>() {
     //            @Override
     //            public OptionalLong get() {
     //                return OptionalLong.of(19);
@@ -326,7 +326,7 @@ public class OptionalLongTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptional() {
-    //        long value = OptionalLong.empty().or(new Supplier<OptionalLong>() {
+    //        long value = OptionalLong.empty().orElse(new Supplier<OptionalLong>() {
     //            @Override
     //            public OptionalLong get() {
     //                return OptionalLong.of(19);
@@ -337,7 +337,7 @@ public class OptionalLongTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptionalAndEmptySupplierOptional() {
-    //        final OptionalLong optional = OptionalLong.empty().or(new Supplier<OptionalLong>() {
+    //        final OptionalLong optional = OptionalLong.empty().orElse(new Supplier<OptionalLong>() {
     //            @Override
     //            public OptionalLong get() {
     //                return OptionalLong.empty();
@@ -348,20 +348,20 @@ public class OptionalLongTest {
 
     @Test
     public void testOrElse() {
-        assertEquals(17, OptionalLong.empty().or(17));
-        assertEquals(17, OptionalLong.of(17).or(0));
+        assertEquals(17, OptionalLong.empty().orElse(17));
+        assertEquals(17, OptionalLong.of(17).orElse(0));
     }
 
     @Test
     public void testOrElseGet() {
-        assertEquals(21, OptionalLong.empty().orGet(new LongSupplier() {
+        assertEquals(21, OptionalLong.empty().orElseGet(new LongSupplier() {
             @Override
             public long getAsLong() {
                 return 21;
             }
         }));
 
-        assertEquals(21, OptionalLong.of(21).orGet(new LongSupplier() {
+        assertEquals(21, OptionalLong.of(21).orElseGet(new LongSupplier() {
             @Override
             public long getAsLong() {
                 throw new IllegalStateException();
@@ -372,7 +372,7 @@ public class OptionalLongTest {
     @Test
     public void testOrElseThrow() {
         try {
-            assertEquals(25, OptionalLong.of(25).orThrow(new Supplier<NoSuchElementException>() {
+            assertEquals(25, OptionalLong.of(25).orElseThrow(new Supplier<NoSuchElementException>() {
                 @Override
                 public NoSuchElementException get() {
                     throw new IllegalStateException();
@@ -385,7 +385,7 @@ public class OptionalLongTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testOrElseThrow2() {
-        assertEquals(25, OptionalLong.empty().orThrow(new Supplier<NoSuchElementException>() {
+        assertEquals(25, OptionalLong.empty().orElseThrow(new Supplier<NoSuchElementException>() {
             @Override
             public NoSuchElementException get() {
                 return new NoSuchElementException();

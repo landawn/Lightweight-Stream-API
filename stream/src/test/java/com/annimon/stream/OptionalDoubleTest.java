@@ -332,7 +332,7 @@ public class OptionalDoubleTest {
     //
     //    @Test
     //    public void testOr() {
-    //        double value = OptionalDouble.of(10.123).or(new Supplier<OptionalDouble>() {
+    //        double value = OptionalDouble.of(10.123).orElse(new Supplier<OptionalDouble>() {
     //            @Override
     //            public OptionalDouble get() {
     //                return OptionalDouble.of(19);
@@ -343,7 +343,7 @@ public class OptionalDoubleTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptional() {
-    //        double value = OptionalDouble.empty().or(new Supplier<OptionalDouble>() {
+    //        double value = OptionalDouble.empty().orElse(new Supplier<OptionalDouble>() {
     //            @Override
     //            public OptionalDouble get() {
     //                return OptionalDouble.of(Math.PI);
@@ -354,7 +354,7 @@ public class OptionalDoubleTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptionalAndEmptySupplierOptional() {
-    //        final OptionalDouble optional = OptionalDouble.empty().or(new Supplier<OptionalDouble>() {
+    //        final OptionalDouble optional = OptionalDouble.empty().orElse(new Supplier<OptionalDouble>() {
     //            @Override
     //            public OptionalDouble get() {
     //                return OptionalDouble.empty();
@@ -365,20 +365,20 @@ public class OptionalDoubleTest {
     //
     //    @Test
     //    public void testOrElse() {
-    //        assertThat(OptionalDouble.empty().or(10.123), closeTo(10.123, 0.0001));
-    //        assertThat(OptionalDouble.of(10.123).or(0d), closeTo(10.123, 0.0001));
+    //        assertThat(OptionalDouble.empty().orElse(10.123), closeTo(10.123, 0.0001));
+    //        assertThat(OptionalDouble.of(10.123).orElse(0d), closeTo(10.123, 0.0001));
     //    }
 
     @Test
     public void testOrElseGet() {
-        assertThat(OptionalDouble.empty().orGet(new DoubleSupplier() {
+        assertThat(OptionalDouble.empty().orElseGet(new DoubleSupplier() {
             @Override
             public double getAsDouble() {
                 return 21.098;
             }
         }), closeTo(21.098, 0.0001));
 
-        assertThat(OptionalDouble.of(21.098).orGet(new DoubleSupplier() {
+        assertThat(OptionalDouble.of(21.098).orElseGet(new DoubleSupplier() {
             @Override
             public double getAsDouble() {
                 throw new IllegalStateException();
@@ -389,7 +389,7 @@ public class OptionalDoubleTest {
     @Test
     public void testOrElseThrow() {
         try {
-            assertThat(OptionalDouble.of(10.123).orThrow(new Supplier<NoSuchElementException>() {
+            assertThat(OptionalDouble.of(10.123).orElseThrow(new Supplier<NoSuchElementException>() {
                 @Override
                 public NoSuchElementException get() {
                     throw new IllegalStateException();
@@ -402,7 +402,7 @@ public class OptionalDoubleTest {
 
     @Test(expected = NoSuchElementException.class)
     public void testOrElseThrow2() {
-        OptionalDouble.empty().orThrow(new Supplier<NoSuchElementException>() {
+        OptionalDouble.empty().orElseThrow(new Supplier<NoSuchElementException>() {
             @Override
             public NoSuchElementException get() {
                 return new NoSuchElementException();

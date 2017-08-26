@@ -295,7 +295,7 @@ public class OptionalBooleanTest {
     //
     //    @Test
     //    public void testOr() {
-    //        boolean value = OptionalBoolean.of(true).or(new Supplier<OptionalBoolean>() {
+    //        boolean value = OptionalBoolean.of(true).orElse(new Supplier<OptionalBoolean>() {
     //            @Override
     //            public OptionalBoolean get() {
     //                return OptionalBoolean.of(false);
@@ -306,7 +306,7 @@ public class OptionalBooleanTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptional() {
-    //        boolean value = OptionalBoolean.empty().or(new Supplier<OptionalBoolean>() {
+    //        boolean value = OptionalBoolean.empty().orElse(new Supplier<OptionalBoolean>() {
     //            @Override
     //            public OptionalBoolean get() {
     //                return OptionalBoolean.of(false);
@@ -317,7 +317,7 @@ public class OptionalBooleanTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptionalAndEmptySupplierOptional() {
-    //        final OptionalBoolean optional = OptionalBoolean.empty().or(new Supplier<OptionalBoolean>() {
+    //        final OptionalBoolean optional = OptionalBoolean.empty().orElse(new Supplier<OptionalBoolean>() {
     //            @Override
     //            public OptionalBoolean get() {
     //                return OptionalBoolean.empty();
@@ -328,20 +328,20 @@ public class OptionalBooleanTest {
     //
     //    @Test
     //    public void testOrElse() {
-    //        assertTrue(OptionalBoolean.empty().or(true));
-    //        assertFalse(OptionalBoolean.empty().or(false));
+    //        assertTrue(OptionalBoolean.empty().orElse(true));
+    //        assertFalse(OptionalBoolean.empty().orElse(false));
     //    }
     //
     //    @Test
     //    public void testOrElseGet() {
-    //        assertTrue(OptionalBoolean.empty().orGet(new BooleanSupplier() {
+    //        assertTrue(OptionalBoolean.empty().orElseGet(new BooleanSupplier() {
     //            @Override
     //            public boolean getAsBoolean() {
     //                return true;
     //            }
     //        }));
     //
-    //        assertTrue(OptionalBoolean.of(true).orGet(new BooleanSupplier() {
+    //        assertTrue(OptionalBoolean.of(true).orElseGet(new BooleanSupplier() {
     //            @Override
     //            public boolean getAsBoolean() {
     //                throw new IllegalStateException();
@@ -352,7 +352,7 @@ public class OptionalBooleanTest {
     //    @Test
     //    public void testOrElseThrow() {
     //        try {
-    //            assertFalse(OptionalBoolean.of(false).orThrow(new Supplier<NoSuchElementException>() {
+    //            assertFalse(OptionalBoolean.of(false).orElseThrow(new Supplier<NoSuchElementException>() {
     //                @Override
     //                public NoSuchElementException get() {
     //                    throw new IllegalStateException();
@@ -365,7 +365,7 @@ public class OptionalBooleanTest {
     //
     //    @Test(expected = NoSuchElementException.class)
     //    public void testOrElseThrow2() {
-    //        OptionalBoolean.empty().orThrow(new Supplier<NoSuchElementException>() {
+    //        OptionalBoolean.empty().orElseThrow(new Supplier<NoSuchElementException>() {
     //            @Override
     //            public NoSuchElementException get() {
     //                return new NoSuchElementException();

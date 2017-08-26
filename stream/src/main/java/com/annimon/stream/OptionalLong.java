@@ -119,7 +119,7 @@ public final class OptionalLong {
      * @param other  the value to be returned if there is no value present
      * @return the value, if present, otherwise {@code other}
      */
-    public long or(long other) {
+    public long orElse(long other) {
         return isPresent ? value : other;
     }
 
@@ -130,7 +130,7 @@ public final class OptionalLong {
      * @return the value if present otherwise the result of {@code other.getAsLong()}
      * @throws NullPointerException if value is not present and {@code other} is null
      */
-    public long orGet(LongSupplier other) {
+    public long orElseGet(LongSupplier other) {
         return isPresent ? value : other.getAsLong();
     }
 
@@ -142,7 +142,7 @@ public final class OptionalLong {
      * @return inner value if present
      * @throws X if inner value is not present
      */
-    public <X extends Throwable> long orThrow(Supplier<X> exceptionSupplier) throws X {
+    public <X extends Throwable> long orElseThrow(Supplier<X> exceptionSupplier) throws X {
         if (isPresent) {
             return value;
         } else {

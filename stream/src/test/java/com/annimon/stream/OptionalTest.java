@@ -395,7 +395,7 @@ public final class OptionalTest {
     //
     //    @Test
     //    public void testOr() {
-    //        int value = Optional.of(42).or(new Supplier<Optional<Integer>>() {
+    //        int value = Optional.of(42).orElse(new Supplier<Optional<Integer>>() {
     //            @Override
     //            public Optional<Integer> get() {
     //                return Optional.of(19);
@@ -406,7 +406,7 @@ public final class OptionalTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptional() {
-    //        int value = Optional.<Integer>empty().or(new Supplier<Optional<Integer>>() {
+    //        int value = Optional.<Integer>empty().orElse(new Supplier<Optional<Integer>>() {
     //            @Override
     //            public Optional<Integer> get() {
     //                return Optional.of(19);
@@ -417,7 +417,7 @@ public final class OptionalTest {
     //
     //    @Test
     //    public void testOrOnEmptyOptionalAndEmptySupplierOptional() {
-    //        final Optional<Integer> optional = Optional.<Integer>empty().or(new Supplier<Optional<Integer>>() {
+    //        final Optional<Integer> optional = Optional.<Integer>empty().orElse(new Supplier<Optional<Integer>>() {
     //            @Override
     //            public Optional<Integer> get() {
     //                return Optional.empty();
@@ -428,18 +428,18 @@ public final class OptionalTest {
     //
     //    @Test
     //    public void testOrElseWithPresentValue() {
-    //        int value = Optional.<Integer>empty().or(42);
+    //        int value = Optional.<Integer>empty().orElse(42);
     //        assertEquals(42, value);
     //    }
 
     @Test
     public void testOrElseOnEmptyOptional() {
-        assertEquals("Lena", Optional.<Student> empty().or(student).getName());
+        assertEquals("Lena", Optional.<Student> empty().orElse(student).getName());
     }
 
     @Test
     public void testOrElseGet() {
-        int value = Optional.<Integer> empty().orGet(new Supplier<Integer>() {
+        int value = Optional.<Integer> empty().orElseGet(new Supplier<Integer>() {
             @Override
             public Integer get() {
                 return 42;
@@ -450,7 +450,7 @@ public final class OptionalTest {
 
     @Test(expected = ArithmeticException.class)
     public void testOrElseThrow() {
-        Optional.empty().orThrow(new Supplier<RuntimeException>() {
+        Optional.empty().orElseThrow(new Supplier<RuntimeException>() {
 
             @Override
             public RuntimeException get() {
