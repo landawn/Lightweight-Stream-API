@@ -35,10 +35,12 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import com.annimon.stream.function.BiConsumer;
 import com.annimon.stream.function.BiFunction;
+import com.annimon.stream.function.BiPredicate;
 import com.annimon.stream.function.BinaryOperator;
 import com.annimon.stream.function.Consumer;
 import com.annimon.stream.function.Function;
@@ -511,6 +513,44 @@ public final class Fn {
 
     public static <T> BinaryOperator<T> replacingMerger() {
         return REPLACING_MERGER;
+    }
+
+    /**
+     * 
+     * @param predicate
+     * @param limit
+     * @return
+     */
+    public static <T> Predicate<T> limited(final Predicate<T> predicate, final int limit) {
+        Objects.requireNonNull(predicate);
+
+        return new Predicate<T>() {
+            private final AtomicInteger counter = new AtomicInteger(limit);
+
+            @Override
+            public boolean test(T t) {
+                return predicate.test(t) && counter.decrementAndGet() >= 0;
+            }
+        };
+    }
+
+    /** 
+     * 
+     * @param predicate
+     * @param limit
+     * @return
+     */
+    public static <T, U> BiPredicate<T, U> limited(final BiPredicate<T, U> predicate, final int limit) {
+        Objects.requireNonNull(predicate);
+
+        return new BiPredicate<T, U>() {
+            private final AtomicInteger counter = new AtomicInteger(limit);
+
+            @Override
+            public boolean test(T t, U u) {
+                return predicate.test(t, u) && counter.decrementAndGet() >= 0;
+            }
+        };
     }
 
     public static <T> Collector<T, ?, List<T>> toList() {
