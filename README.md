@@ -4,7 +4,7 @@ Lightweight-Stream-API
 [![Maven Central](https://img.shields.io/maven-central/v/com.landawn/stream-lite.svg)](https://maven-badges.herokuapp.com/maven-central/com.landawn/stream-lite/)
 [![Javadocs](https://www.javadoc.io/badge/com.landawn/stream-lite.svg)](https://www.javadoc.io/doc/com.landawn/stream-lite)
 
-Stream API from Java 8 rewritten on iterators for Android and Java 7.Full API documentation is available [here](https://www.javadoc.io/doc/com.landawn/stream-lite).
+Stream API from Java 8 rewritten on iterators for Android and Java 7. Full API documentation is available [here](https://www.javadoc.io/doc/com.landawn/stream-lite).
 
 ### Includes
 
